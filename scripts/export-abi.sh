@@ -12,7 +12,7 @@ forge build >/dev/null
 
 mkdir -p "$ABI_DIR"
 
-CONTRACTS=(CorporateActionRegistry DividendDistributor AdminActionSource MockERC20)
+CONTRACTS=(CorporateActionRegistry DividendDistributor AdminActionSource FunctionsActionSource MockERC20)
 
 TS_INDEX="$ABI_DIR/index.ts"
 {
@@ -24,6 +24,7 @@ declare -A VARMAP=(
   [CorporateActionRegistry]=registryAbi
   [DividendDistributor]=distributorAbi
   [AdminActionSource]=actionSourceAbi
+  [FunctionsActionSource]=functionsActionSourceAbi
   [MockERC20]=erc20Abi
 )
 
