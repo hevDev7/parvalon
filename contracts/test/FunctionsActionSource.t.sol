@@ -46,6 +46,20 @@ contract FunctionsActionSourceTest is Test {
         );
     }
 
+    /// @dev Request attestation for the canonical action (same fields as _dataHash/_announce).
+    function _request() internal returns (bytes32 requestId) {
+        return source.requestAttestation(
+            address(tsla),
+            ActionType.CASH_DIVIDEND,
+            1e18,
+            uint64(block.number),
+            uint64(block.timestamp),
+            0,
+            address(usdg),
+            "ipfs://x"
+        );
+    }
+
     function _announce() internal returns (uint256) {
         vm.prank(issuer);
         return registry.announceAction(
@@ -66,7 +80,7 @@ contract FunctionsActionSourceTest is Test {
 
     function test_RequestThenFulfillAuthentic_AllowsAnnounce() public {
         bytes32 h = _dataHash();
-        bytes32 reqId = source.requestAttestation(address(tsla), h);
+        bytes32 reqId = _request();
         // Not attested yet.
         assertFalse(source.isAttested(address(tsla), h));
 
@@ -80,7 +94,7 @@ contract FunctionsActionSourceTest is Test {
 
     function test_FulfillNotAuthentic_BlocksAnnounce() public {
         bytes32 h = _dataHash();
-        bytes32 reqId = source.requestAttestation(address(tsla), h);
+        bytes32 reqId = _request();
         router.fulfill(address(source), reqId, abi.encode(false), "");
         assertFalse(source.isAttested(address(tsla), h));
 
@@ -90,14 +104,14 @@ contract FunctionsActionSourceTest is Test {
 
     function test_FulfillWithError_IsNotAuthentic() public {
         bytes32 h = _dataHash();
-        bytes32 reqId = source.requestAttestation(address(tsla), h);
+        bytes32 reqId = _request();
         router.fulfill(address(source), reqId, "", "vendor timeout");
         assertFalse(source.isAttested(address(tsla), h));
     }
 
     function test_OnlyRouterCanFulfill() public {
         bytes32 h = _dataHash();
-        bytes32 reqId = source.requestAttestation(address(tsla), h);
+        bytes32 reqId = _request();
         vm.expectRevert(abi.encodeWithSelector(FunctionsActionSource.OnlyRouter.selector, address(this)));
         source.handleOracleFulfillment(reqId, abi.encode(true), "");
     }
@@ -111,14 +125,22 @@ contract FunctionsActionSourceTest is Test {
     function test_RequestWithoutPayloadReverts() public {
         FunctionsActionSource bare = new FunctionsActionSource(admin, address(router), 1, keccak256("don"), 300_000);
         vm.expectRevert(FunctionsActionSource.RequestNotConfigured.selector);
-        bare.requestAttestation(address(tsla), _dataHash());
+        bare.requestAttestation(
+            address(tsla),
+            ActionType.CASH_DIVIDEND,
+            1e18,
+            uint64(block.number),
+            uint64(block.timestamp),
+            0,
+            address(usdg),
+            "ipfs://x"
+        );
     }
 
     function test_OnlyRequesterRoleCanRequest() public {
-        bytes32 h = _dataHash();
         address stranger = makeAddr("stranger");
         vm.prank(stranger);
         vm.expectRevert();
-        source.requestAttestation(address(tsla), h);
+        _request();
     }
 }

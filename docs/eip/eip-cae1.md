@@ -1,15 +1,19 @@
 ---
-eip: cae-1
-title: "CAE-1: Corporate Action Events for Tokenized Equities"
-description: A permissionless, ERC-20-compatible event vocabulary for announcing, enumerating, and settling on-chain corporate actions (cash dividends, splits, stock dividends) over tokens the publisher does not control.
+eip: 7XXXX
+title: Corporate Action Events
+description: A permissionless event vocabulary and Merkle leaf binding for on-chain corporate actions over tokens the publisher does not control.
 author: CorporaX (@corporax)
-discussions-to: https://ethereum-magicians.org/
+discussions-to: https://ethereum-magicians.org/t/erc-corporate-action-events/00000
 status: Draft
 type: Standards Track
 category: ERC
 created: 2026-06-11
 requires: 20
 ---
+
+> **Working name:** "CAE-1" (Corporate Action Events). The `eip:` number above is a
+> placeholder assigned by an EIP editor on submission, and `discussions-to` must point
+> at the real Ethereum Magicians thread. See [SUBMISSION.md](./SUBMISSION.md).
 
 ## Abstract
 

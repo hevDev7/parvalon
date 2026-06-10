@@ -233,4 +233,29 @@ npm test
 - **Amounts are `bigint` wei** throughout the SDK; the human-decimal strings in
   the public `/api/actions` feed (INTEGRATION.md §10) are a frontend concern.
 - The default chain RPC URLs are placeholders — point them at your endpoint.
+
+---
+
+## Releasing (`@corporax/sdk` → npm)
+
+Publishing is automated by [`.github/workflows/release-sdk.yml`](../../.github/workflows/release-sdk.yml).
+
+**One-time setup**
+
+1. Create an npm **automation token** with publish rights to the `@corporax` scope and add it
+   as the repo secret `NPM_TOKEN`.
+2. Update `repository`/`homepage`/`bugs` in `package.json` to the real GitHub URL — npm
+   **provenance** requires `repository` to match the repo the Action runs in.
+
+**Cut a release**
+
+```bash
+npm version patch -w @corporax/sdk    # bump (or minor / major)
+V=$(node -p "require('./packages/sdk/package.json').version")
+git commit -am "sdk: v$V" && git tag "sdk-v$V" && git push origin "sdk-v$V"
 ```
+
+The workflow then installs the workspace, **verifies the tag matches `package.json`**, runs
+`build` + `test`, and `npm publish --provenance --access public` (`prepublishOnly` re-runs
+build+test as a final guard). Trigger a **dry run** anytime via *Actions → release-sdk → Run
+workflow* (defaults to `--dry-run`, no publish).

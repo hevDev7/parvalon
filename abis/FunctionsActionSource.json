@@ -231,9 +231,39 @@
         "internalType": "address"
       },
       {
-        "name": "dataHash",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "name": "actionType",
+        "type": "uint8",
+        "internalType": "enum ActionType"
+      },
+      {
+        "name": "ratePerShare",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "recordBlock",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "payableAt",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "claimDeadline",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "payoutToken",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "metadataURI",
+        "type": "string",
+        "internalType": "string"
       }
     ],
     "outputs": [

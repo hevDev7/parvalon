@@ -9,7 +9,8 @@
     "packages/sdk",
     "tooling/snapshot",
     "tooling/monitor",
-    "examples/agent"
+    "examples/agent",
+    "functions"
   ],
   "scripts": {
     "abi": "bash scripts/export-abi.sh",

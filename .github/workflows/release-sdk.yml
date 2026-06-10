@@ -1,0 +1,84 @@
+# Publish @corporax/sdk to npm.
+#
+# Trigger: push a tag `sdk-vX.Y.Z` (must match packages/sdk/package.json version),
+# or run manually (workflow_dispatch) — manual runs default to --dry-run.
+#
+# Requires repo secret NPM_TOKEN (an npm automation token with publish rights to
+# the @corporax scope). Publishes with npm provenance (id-token: write); the
+# package.json `repository` field MUST match this GitHub repo for provenance to
+# attach — update it before the first real release.
+name: release-sdk
+
+on:
+  push:
+    tags:
+      - "sdk-v*"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (pack + validate, do not publish)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write # npm provenance
+
+concurrency:
+  group: release-sdk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: build · test · publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22 (+ npm registry auth)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      - name: Install (workspaces)
+        run: npm ci
+
+      - name: Verify tag matches SDK version
+        if: startsWith(github.ref, 'refs/tags/sdk-v')
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#sdk-v}"
+          PKG_VERSION="$(node -p "require('./packages/sdk/package.json').version")"
+          echo "tag=$TAG_VERSION  package.json=$PKG_VERSION"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::Tag version ($TAG_VERSION) != packages/sdk/package.json ($PKG_VERSION). Bump the version and re-tag."
+            exit 1
+          fi
+
+      - name: Build + test the SDK
+        run: |
+          npm -w @corporax/sdk run build
+          npm -w @corporax/sdk run test
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "Dry run — packing and validating, not publishing."
+            npm publish -w @corporax/sdk --provenance --access public --dry-run
+          else
+            npm publish -w @corporax/sdk --provenance --access public
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### @corporax/sdk release"
+            echo "- ref: \`${GITHUB_REF_NAME}\`"
+            echo "- version: \`$(node -p "require('./packages/sdk/package.json').version")\`"
+            echo "- event: \`${{ github.event_name }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

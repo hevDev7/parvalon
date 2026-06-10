@@ -3,6 +3,7 @@ pragma solidity 0.8.26;
 
 import { IActionSource } from "../interfaces/IActionSource.sol";
 import { IFunctionsRouter } from "../interfaces/IFunctionsRouter.sol";
+import { ActionType } from "../libraries/CorporateActionTypes.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title FunctionsActionSource
@@ -97,14 +98,29 @@ contract FunctionsActionSource is IActionSource, AccessControl {
                             REQUEST / FULFILL
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Ask the DON to verify `(asset, dataHash)` against the data vendor.
+    /// @notice Ask the DON to verify a corporate action against the data vendor.
+    /// @dev The `dataHash` is computed HERE from the exact fields, identically to
+    ///      {CorporateActionRegistry.announceAction}, and bound to the request. The
+    ///      requester cannot substitute a hash for fields the DON did not verify, so
+    ///      the off-chain source only needs to return a boolean verdict (no keccak in
+    ///      the restricted Functions runtime). In production these fields are conveyed
+    ///      to the DON as Functions request args via the FunctionsRequest CBOR builder;
+    ///      {IFunctionsRouter} here is a minimal, testable abstraction of that.
     /// @return requestId The Functions request id.
-    function requestAttestation(address asset, bytes32 dataHash)
-        external
-        onlyRole(REQUESTER_ROLE)
-        returns (bytes32 requestId)
-    {
+    function requestAttestation(
+        address asset,
+        ActionType actionType,
+        uint256 ratePerShare,
+        uint64 recordBlock,
+        uint64 payableAt,
+        uint64 claimDeadline,
+        address payoutToken,
+        string calldata metadataURI
+    ) external onlyRole(REQUESTER_ROLE) returns (bytes32 requestId) {
         if (requestData.length == 0) revert RequestNotConfigured();
+        bytes32 dataHash = keccak256(
+            abi.encode(asset, actionType, ratePerShare, recordBlock, payableAt, claimDeadline, payoutToken, metadataURI)
+        );
         requestId = ROUTER.sendRequest(subscriptionId, requestData, 1, callbackGasLimit, donId);
         _pending[requestId] = PendingRequest({ asset: asset, dataHash: dataHash, exists: true });
         emit AttestationRequested(asset, dataHash, requestId);

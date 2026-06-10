@@ -1,9 +1,27 @@
 {
   "name": "@corporax/sdk",
   "version": "1.0.0",
-  "private": true,
   "description": "Typed TypeScript/viem client for the CorporaX corporate-actions & dividend protocol — read/write helpers, CAE-1 event watchers, Merkle claim builders, and a CorporaXClient that wires it together. Integrators never hand-roll calldata or event decoding.",
   "license": "MIT",
+  "author": "CorporaX",
+  "keywords": [
+    "corporax",
+    "cae-1",
+    "corporate-actions",
+    "dividends",
+    "tokenized-stocks",
+    "rwa",
+    "arbitrum",
+    "viem",
+    "merkle"
+  ],
+  "homepage": "https://github.com/corporax/corporax/tree/main/packages/sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/corporax/corporax.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": "https://github.com/corporax/corporax/issues",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -19,6 +37,9 @@
     "src",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=20"
   },
@@ -28,7 +49,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "npm run sync-abis && tsc -p tsconfig.json --noEmit",
     "test": "npm run sync-abis && vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm run test"
   },
   "dependencies": {
     "viem": "^2.21.0"
