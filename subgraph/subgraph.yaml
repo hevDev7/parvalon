@@ -1,0 +1,72 @@
+# CorporaX subgraph manifest — indexes CAE-1 events (INTEGRATION.md §3).
+#
+# Address / startBlock / network are driven by networks.json, NOT hard-coded:
+#   graph build  --network <robinhood|arbitrum-sepolia|local>
+#   graph deploy --network <...>
+# graph-cli's built-in `--network` flag reads networks.json and rewrites this
+# manifest in place (source.address, source.startBlock, dataSources[].network)
+# before codegen/deploy. NOTE: that rewrite also strips comments — keep this
+# header in version control as the canonical documented default; the committed
+# values below are the `local` (anvil 31337) deployment so the manifest is valid
+# and buildable out of the box.
+#
+# Robinhood Chain (46630) needs a self-hosted Graph Node configured for that
+# chain (Studio does not list it). See README.md "Networks" + "Deploy".
+specVersion: 1.0.0
+description: CorporaX — corporate-actions & dividend index for tokenized stocks on Robinhood Chain (Arbitrum Orbit L2).
+repository: https://github.com/corporax/arbitrum
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: CorporateActionRegistry
+    # Overridden per target via `graph build --network <name>` + networks.json.
+    network: local
+    source:
+      address: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
+      abi: CorporateActionRegistry
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - CorporateAction
+      abis:
+        - name: CorporateActionRegistry
+          file: ./abis/CorporateActionRegistry.json
+      eventHandlers:
+        - event: ActionAnnounced(indexed uint256,indexed address,uint8,uint256,uint64,uint64,uint64,address,string)
+          handler: handleActionAnnounced
+        - event: MerkleRootPublished(indexed uint256,bytes32,uint256,uint256)
+          handler: handleMerkleRootPublished
+        - event: ActionStatusChanged(indexed uint256,uint8,uint8)
+          handler: handleActionStatusChanged
+  - kind: ethereum
+    name: DividendDistributor
+    network: local
+    source:
+      address: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"
+      abi: DividendDistributor
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - CorporateAction
+        - Claim
+        - Funding
+        - Sweep
+      abis:
+        - name: DividendDistributor
+          file: ./abis/DividendDistributor.json
+      eventHandlers:
+        - event: Funded(indexed uint256,indexed address,uint256,uint256)
+          handler: handleFunded
+        - event: Claimed(indexed uint256,uint256,indexed address,uint256)
+          handler: handleClaimed
+        - event: UnclaimedSwept(indexed uint256,indexed address,uint256)
+          handler: handleUnclaimedSwept

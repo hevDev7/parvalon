@@ -19,10 +19,34 @@ see [LIMITATIONS.md](./LIMITATIONS.md).
 
 - Two immutable, no-proxy, no-`delegatecall` contracts (`CorporateActionRegistry`, `DividendDistributor`) + the swappable `IActionSource` seam.
 - OZ v5.1.0 patterns throughout: `AccessControl`, `Pausable`, `ReentrancyGuard`, `SafeERC20`, `MerkleProof`, `BitMaps`. Custom errors, full NatSpec, an event for every state change.
-- **42 tests** (unit + fuzz to 60 holders + invariants) green; `claim() ≈ 82,172 gas`; deterministic, verifiable Merkle root.
+- **67 contract tests + 148 TS tests** (unit + fuzz to 60 holders + invariants) green; `claim() ≈ 82,172 gas`; deterministic, verifiable Merkle root (CLI reproduces the on-chain root from live logs).
 - The state-vs-value split caps blast radius; admin has no path to holder funds.
 
-**Explicitly not production yet:** single EOA admin/issuer; issuer-fed oracle (`AdminActionSource`); seed-script snapshot shortcut; no external audit; no monitoring/alerting; no IPFS proof hosting; no withholding/compliance metadata; no SDK; no DR runbook beyond [RUNBOOK.md](./RUNBOOK.md). Each is addressed below.
+### 0.1 Code-complete in this repo (the P0/P1/P2 build-out)
+
+The following roadmap items are **implemented and tested in-repo**. What remains for each is an
+**operational / vendor / deployment** action (a multisig to create, an audit firm to engage, a
+Functions subscription to fund, a cloud KMS to provision) — not code.
+
+| Item | What landed | Still needs (ops) |
+|---|---|---|
+| P0-1/P0-2 | `DeployGovernance.s.sol` + `Governance.t.sol`: `TimelockController` holds admin, Safe holds pauser | create the Safe; run the handover |
+| P0-3 | Expanded invariants (`InvariantLifecycle`), slither run, [AUDIT-PREP.md](./AUDIT-PREP.md) | engage an external audit firm |
+| P0-4 | `FunctionsActionSource` + `MockFunctionsRouter` + `DeployFunctionsSource.s.sol` | fund a Functions subscription; deploy the off-chain source |
+| P0-5 | Snapshot CLI over real `Transfer` logs (chunked/retry/resume) — parity-proven | — (already the production path) |
+| P0-6 | `@corporax/monitor` service (solvency + lifecycle alerts, webhook sink) | point at a prod RPC; wire the alert channel |
+| P0-7/P0-8 | `scripts/drills.sh`, `scripts/deploy-and-verify.sh`, [DEPLOY.md](./DEPLOY.md) | run on the target chain |
+| P1-1/P1-2 | `subgraph/` (codegen+build pass) + Allium SQL; CLI `--pin-ipfs` | host a Graph node / pin to a real IPFS provider |
+| P1-3/P1-5 | CLI `--exclude`/`--exclude-file`, `--withholding-bps` + metadata schema | issuer supplies exclusion list + withholding policy |
+| P1-6 | `@corporax/sdk` (typed reads/writes + CAE-1 watchers, 30 tests) | publish to npm |
+| P1-9 | `scripts/onboard-issuer.sh` + [ONBOARDING.md](./ONBOARDING.md) | run per issuer |
+| P2-1 | `SplitAdjuster` library + `SplitAwareCollateral` example | integrators adopt |
+| P2-2/P2-3 | [eip-cae1.md](./eip/eip-cae1.md) draft; `examples/agent` (x402 narrative) | submit to Ethereum Magicians |
+| P2-4/5/6 | `deployments/chains.json`, [MULTICHAIN.md](./MULTICHAIN.md), [KEY-MANAGEMENT.md](./KEY-MANAGEMENT.md), [DR.md](./DR.md) + `scripts/dr-restore.sh` | provision KMS; rehearse DR |
+
+**Still genuinely external (cannot be "done" in a repo):** the external audit itself, the live
+multisig/timelock deployment, a funded Chainlink subscription, a production IPFS/Graph/Allium account,
+and a cloud HSM/KMS. Everything that *can* be code, is.
 
 ---
 

@@ -20,11 +20,30 @@ export {
 export {
   deriveHolders,
   sumPayout,
+  sumGross,
   generateSnapshot,
   serializeProofs,
 } from "./snapshot.js";
+export {
+  applyExclusions,
+  normalizeExclusions,
+  netFromGross,
+  assertBps,
+} from "./eligibility.js";
 export {
   verifyProofs,
   type VerifyResult,
   type VerifyIssue,
 } from "./verify.js";
+export {
+  resolvePinner,
+  extractCid,
+  HttpPinner,
+  NoopPinner,
+  NoPinnerConfiguredError,
+  type Pinner,
+  type PinResult,
+  type FetchLike,
+  type HttpPinnerOptions,
+  type Log,
+} from "./pin.js";

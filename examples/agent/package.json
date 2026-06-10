@@ -1,0 +1,35 @@
+{
+  "name": "@corporax/example-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Runnable example: a dividend-aware autonomous agent that subscribes to CorporaX ActionAnnounced (CAE-1) events and prints strategy decisions. Includes an illustrative x402 (HTTP 402) pay-per-call narrative for premium feeds.",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "start": "tsx src/cli.ts",
+    "watch": "tsx src/cli.ts watch"
+  },
+  "dependencies": {
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

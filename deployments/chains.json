@@ -1,0 +1,52 @@
+{
+  "$schema": "corporax-chains-v1",
+  "description": "CorporaX multichain registry. chainId -> deploy/runtime metadata. The address registries live in deployments/<chainId>.json; this file maps each chain to its name, the env var holding its RPC URL, its explorer, and its type. Tooling resolves a chain by id, reads rpcEnv from the environment (no secrets in git), and writes/reads deployments/<chainId>.json accordingly.",
+  "chains": {
+    "46630": {
+      "name": "Robinhood Chain testnet",
+      "alias": "robinhood_testnet",
+      "rpcEnv": "ROBINHOOD_TESTNET_RPC_URL",
+      "explorer": "https://explorer.testnet.chain.robinhood.com",
+      "explorerApi": "https://explorer.testnet.chain.robinhood.com/api",
+      "verifier": "blockscout",
+      "verifierApiKeyEnv": "BLOCKSCOUT_API_KEY",
+      "verifierApiUrlEnv": "ROBINHOOD_BLOCKSCOUT_API_URL",
+      "type": "primary",
+      "nativeCurrency": "ETH",
+      "stack": "arbitrum-orbit-l2",
+      "deploymentFile": "deployments/46630.json",
+      "tokenMode": "real"
+    },
+    "421614": {
+      "name": "Arbitrum Sepolia",
+      "alias": "arbitrum_sepolia",
+      "rpcEnv": "ARBITRUM_SEPOLIA_RPC_URL",
+      "explorer": "https://sepolia.arbiscan.io",
+      "explorerApi": "https://api-sepolia.arbiscan.io/api",
+      "verifier": "etherscan",
+      "verifierApiKeyEnv": "ARBISCAN_API_KEY",
+      "verifierApiUrlEnv": null,
+      "type": "fallback",
+      "nativeCurrency": "ETH",
+      "stack": "arbitrum-l2",
+      "deploymentFile": "deployments/421614.json",
+      "tokenMode": "mock"
+    },
+    "31337": {
+      "name": "Local anvil",
+      "alias": "localhost",
+      "rpcEnv": "LOCAL_RPC_URL",
+      "rpcDefault": "http://127.0.0.1:8545",
+      "explorer": null,
+      "explorerApi": null,
+      "verifier": null,
+      "verifierApiKeyEnv": null,
+      "verifierApiUrlEnv": null,
+      "type": "local",
+      "nativeCurrency": "ETH",
+      "stack": "anvil",
+      "deploymentFile": "deployments/31337.json",
+      "tokenMode": "mock"
+    }
+  }
+}

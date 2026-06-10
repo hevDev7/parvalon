@@ -1,0 +1,33 @@
+{
+  "_comment": "graph-cli reads this with `graph build/deploy --network <key>` and rewrites subgraph.yaml's source.address + source.startBlock + dataSource.network per target. The top-level keys are Graph-Node network NAMES (not chainIds). 'robinhood' (chainId 46630) and 'local' (anvil 31337) are custom networks that require a self-hosted Graph Node configured for those RPCs — Studio's hosted indexers do not serve them. Replace the 0x0 placeholders + startBlock with the real deployment values from deployments/<chainId>.json once deployed (registry/distributor addresses) and the block the contracts were deployed at.",
+  "robinhood": {
+    "CorporateActionRegistry": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 0
+    },
+    "DividendDistributor": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 0
+    }
+  },
+  "arbitrum-sepolia": {
+    "CorporateActionRegistry": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 0
+    },
+    "DividendDistributor": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 0
+    }
+  },
+  "local": {
+    "CorporateActionRegistry": {
+      "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      "startBlock": 0
+    },
+    "DividendDistributor": {
+      "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      "startBlock": 0
+    }
+  }
+}

@@ -1,0 +1,9 @@
+# Build context is the repo root; keep the image lean.
+**/node_modules
+**/dist
+**/.git
+**/*.log
+**/.env
+**/.env.*
+!**/.env.example
+tooling/monitor/src/generated

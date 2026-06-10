@@ -13,11 +13,13 @@
  */
 import {
   PROOFS_FORMAT,
+  MAX_BPS,
   type Address,
   type Hex,
   type ProofsFile,
 } from "./types.js";
 import { buildProofs, verifyLeaf } from "./merkle.js";
+import { netFromGross } from "./eligibility.js";
 
 /** A single verification problem, with enough context to act on. */
 export interface VerifyIssue {
@@ -27,6 +29,7 @@ export interface VerifyIssue {
     | "root"
     | "total"
     | "holder-count"
+    | "withholding"
     | "schema";
   readonly message: string;
 }
@@ -60,6 +63,28 @@ export function verifyProofs(file: ProofsFile): VerifyResult {
   const declaredTotal = parseBigInt(file.totalPayout, "totalPayout", issues);
   const root = file.merkleRoot as Hex;
 
+  // Action-level withholding (additive v1 extension). Validate range up-front so
+  // a bogus rate is reported once rather than per-claim.
+  const withholdingBps = file.withholdingBps;
+  let withholdingUsable = true;
+  if (withholdingBps !== undefined) {
+    if (
+      !Number.isInteger(withholdingBps) ||
+      withholdingBps < 0 ||
+      withholdingBps > MAX_BPS
+    ) {
+      issues.push({
+        kind: "withholding",
+        message: `withholdingBps=${withholdingBps} is out of range [0, ${MAX_BPS}]`,
+      });
+      withholdingUsable = false;
+    }
+  }
+  const declaredGross =
+    file.totalGross !== undefined
+      ? parseBigInt(file.totalGross, "totalGross", issues)
+      : null;
+
   const entries = Object.entries(file.claims);
   if (entries.length !== file.holderCount) {
     issues.push({
@@ -70,7 +95,8 @@ export function verifyProofs(file: ProofsFile): VerifyResult {
 
   // 1) Verify each proof against the stated root (contract-equivalent rule).
   let checked = 0;
-  let sum = 0n;
+  let sum = 0n; // Σ NET (leaf amount)
+  let grossSum = 0n; // Σ GROSS (when present)
   const holdersForRoot: Array<{ account: Address; amount: bigint; index: number }> = [];
 
   for (const [addr, claim] of entries) {
@@ -87,6 +113,34 @@ export function verifyProofs(file: ProofsFile): VerifyResult {
     }
     sum += amount;
     holdersForRoot.push({ account, amount, index: claim.index });
+
+    // Withholding cross-check: when a claim carries grossAmount, the leaf
+    // (net) amount must equal gross * (10000 - bps) / 10000. Also confirms the
+    // issuer didn't quietly pay more/less than the declared rate implies.
+    if (claim.grossAmount !== undefined) {
+      let gross: bigint;
+      try {
+        gross = BigInt(claim.grossAmount);
+      } catch {
+        issues.push({
+          kind: "schema",
+          message: `claim ${addr}: grossAmount "${claim.grossAmount}" is not an integer`,
+        });
+        continue;
+      }
+      grossSum += gross;
+      if (withholdingBps !== undefined && withholdingUsable) {
+        const expectedNet = netFromGross(gross, withholdingBps);
+        if (expectedNet !== amount) {
+          issues.push({
+            kind: "withholding",
+            message:
+              `claim ${addr}: net amount ${amount} != gross ${gross} * ` +
+              `(10000-${withholdingBps})/10000 = ${expectedNet}`,
+          });
+        }
+      }
+    }
 
     if (actionId !== null) {
       const valid = verifyLeaf(
@@ -116,8 +170,11 @@ export function verifyProofs(file: ProofsFile): VerifyResult {
         holdersForRoot.map((h) => ({
           account: h.account,
           amount: h.amount,
+          // grossAmount/balance are not part of the leaf — only index/account/
+          // amount feed the tree — so any placeholder is fine for re-derivation.
+          grossAmount: h.amount,
           index: h.index,
-          balance: 0n, // not needed for root derivation
+          balance: 0n,
         })),
       );
       recomputedRoot = derived;
@@ -135,11 +192,19 @@ export function verifyProofs(file: ProofsFile): VerifyResult {
     }
   }
 
-  // 3) Σ amount == totalPayout.
+  // 3) Σ (NET) amount == totalPayout.
   if (declaredTotal !== null && sum !== declaredTotal) {
     issues.push({
       kind: "total",
       message: `Σ amount=${sum} != totalPayout=${declaredTotal}`,
+    });
+  }
+
+  // 4) Σ gross == totalGross (when both are present).
+  if (declaredGross !== null && grossSum !== declaredGross) {
+    issues.push({
+      kind: "total",
+      message: `Σ grossAmount=${grossSum} != totalGross=${declaredGross}`,
     });
   }
 

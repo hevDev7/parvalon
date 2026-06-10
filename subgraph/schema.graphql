@@ -1,0 +1,203 @@
+# CorporaX subgraph schema — CAE-1 event index
+#
+# Mirrors the FROZEN integration contract (docs/INTEGRATION.md §3 CAE-1 events,
+# §2 enums, §10 /api/actions feed shape). The Graph Node materialises these
+# entities from the Registry + Distributor event streams so integrators query
+# GraphQL instead of paginating raw `eth_getLogs`.
+#
+# Conventions:
+#  - All token/share amounts are kept as on-chain `BigInt` (wei). Decimal
+#    formatting is a presentation concern handled downstream (e.g. /api/actions).
+#  - uint8 `actionType` / `status` are mapped to their canonical enum *names*
+#    in the mappings (see src/mappings.ts) so consumers never juggle magic ints.
+#  - `id` of a CorporateAction is the on-chain action id as a decimal string
+#    (ids run 1..actionCount). Child entities (Claim/Funding/Sweep) use
+#    `txHash-logIndex` to be globally unique and idempotent on re-org replay.
+
+"""
+Canonical corporate-action lifecycle status (INTEGRATION.md §2 Status enum).
+String values mirror the Solidity `ActionStatus` enum names 1:1.
+"""
+enum ActionStatus {
+  ANNOUNCED
+  ROOT_PUBLISHED
+  CLAIMABLE
+  FINALIZED
+  CANCELLED
+}
+
+"""
+Corporate-action category (INTEGRATION.md §2 ActionType enum).
+Only `CASH_DIVIDEND` flows value through the DividendDistributor; the others
+are informational and carry their ratio in `metadataURI`.
+"""
+enum ActionType {
+  CASH_DIVIDEND
+  STOCK_SPLIT
+  STOCK_DIVIDEND
+}
+
+"""
+One on-chain corporate action, projected from the Registry event stream and
+enriched with funding/claim aggregates from the Distributor stream.
+
+Sourced from:
+  ActionAnnounced     -> creates the entity (asset, type, schedule, payoutToken, metadataURI)
+  MerkleRootPublished -> sets merkleRoot, totalPayout, holderCount
+  ActionStatusChanged -> advances `status`
+  Funded              -> bumps `totalFunded`
+  Claimed             -> bumps `totalClaimed`
+"""
+type CorporateAction @entity(immutable: false) {
+  "On-chain action id as a decimal string (1..actionCount)."
+  id: ID!
+
+  "Tokenized-stock asset the action applies to (the dividend-bearing token)."
+  asset: Bytes!
+
+  "Action category — see ActionType."
+  actionType: ActionType!
+
+  "Current lifecycle status — see ActionStatus."
+  status: ActionStatus!
+
+  "Payout per 1e18 units of `asset` for CASH_DIVIDEND; 0 for informational actions (wei)."
+  ratePerShare: BigInt!
+
+  "Block whose balances define eligibility (the record block)."
+  recordBlock: BigInt!
+
+  "Unix timestamp from which claims are first payable."
+  payableAt: BigInt!
+
+  "Unix timestamp after which unclaimed funds may be swept."
+  claimDeadline: BigInt!
+
+  "ERC-20 token claims are paid in (USDG for cash dividends)."
+  payoutToken: Bytes!
+
+  "Merkle root over (actionId,index,account,amount) leaves; null until published."
+  merkleRoot: Bytes
+
+  "Σ of all eligible claim amounts — the exact funding target (wei); null until published."
+  totalPayout: BigInt
+
+  "Number of eligible holders in the snapshot; null until published."
+  holderCount: BigInt
+
+  "Cumulative amount funded into the Distributor for this action (wei)."
+  totalFunded: BigInt!
+
+  "Cumulative amount claimed by holders for this action (wei)."
+  totalClaimed: BigInt!
+
+  "Off-chain metadata pointer (e.g. ipfs://…)."
+  metadataURI: String!
+
+  # --- timestamps / provenance ---
+  "Unix timestamp of the ActionAnnounced block."
+  createdAt: BigInt!
+  "Block number of the ActionAnnounced log."
+  createdAtBlock: BigInt!
+  "Unix timestamp of the most recent mutation to this entity."
+  updatedAt: BigInt!
+  "Tx hash of the ActionAnnounced log."
+  txHash: Bytes!
+
+  # --- derived relations (reverse lookups, no extra storage) ---
+  "All claims recorded against this action."
+  claims: [Claim!]! @derivedFrom(field: "action")
+  "All funding deposits recorded against this action."
+  fundings: [Funding!]! @derivedFrom(field: "action")
+  "All sweeps recorded against this action."
+  sweeps: [Sweep!]! @derivedFrom(field: "action")
+}
+
+"""
+A single holder claim (Distributor.Claimed). `claim()` is claim-on-behalf, so
+`account` is always the *recipient*, regardless of who sent the tx.
+Immutable: a claim event is never revised once emitted.
+"""
+type Claim @entity(immutable: true) {
+  "`txHash-logIndex` — globally unique, idempotent on replay."
+  id: ID!
+
+  "The action this claim belongs to."
+  action: CorporateAction!
+
+  "Holder's 0-based merkle index / bitmap slot consumed."
+  index: BigInt!
+
+  "Recipient address funds were paid to."
+  account: Bytes!
+
+  "Amount paid out (wei)."
+  amount: BigInt!
+
+  "Transaction hash of the claim."
+  tx: Bytes!
+
+  "Unix timestamp of the claim block."
+  timestamp: BigInt!
+
+  "Block number of the claim log."
+  blockNumber: BigInt!
+}
+
+"""
+A funding deposit into the Distributor for an action (Distributor.Funded).
+`totalFunded` is the cumulative running total reported by the contract at the
+moment of this deposit. Immutable per-event record.
+"""
+type Funding @entity(immutable: true) {
+  "`txHash-logIndex` — globally unique, idempotent on replay."
+  id: ID!
+
+  "The action being funded."
+  action: CorporateAction!
+
+  "Funder address (typically the asset issuer)."
+  from: Bytes!
+
+  "Amount deposited in this funding tx (wei)."
+  amount: BigInt!
+
+  "Cumulative total funded for this action after this deposit (wei)."
+  totalFunded: BigInt!
+
+  "Transaction hash of the funding."
+  tx: Bytes!
+
+  "Unix timestamp of the funding block."
+  timestamp: BigInt!
+
+  "Block number of the funding log."
+  blockNumber: BigInt!
+}
+
+"""
+A sweep of unclaimed funds after the claim deadline (Distributor.UnclaimedSwept).
+Immutable per-event record.
+"""
+type Sweep @entity(immutable: true) {
+  "`txHash-logIndex` — globally unique, idempotent on replay."
+  id: ID!
+
+  "The action whose remainder was swept."
+  action: CorporateAction!
+
+  "Recipient of the swept remainder."
+  to: Bytes!
+
+  "Amount swept (wei)."
+  amount: BigInt!
+
+  "Transaction hash of the sweep."
+  tx: Bytes!
+
+  "Unix timestamp of the sweep block."
+  timestamp: BigInt!
+
+  "Block number of the sweep log."
+  blockNumber: BigInt!
+}

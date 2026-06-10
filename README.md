@@ -118,13 +118,17 @@ For the **production snapshot path** (against real `Transfer` logs instead of th
 ## Reproduce the tests & gas evidence
 
 ```bash
-npm run test:contracts                       # 42 tests
+npm run test:contracts                       # 67 forge tests
+npm run test:ts                              # 148 TS tests (sdk/snapshot/monitor/agent)
 cd contracts && forge test --gas-report      # per-function gas table
+cd contracts && slither . --config-file slither.config.json   # static analysis
 ```
 
 | Evidence | Result |
 |---|---|
-| Test suite | **42 tests pass** (unit + fuzz + invariants), 0 failed |
+| Contract suite | **67 tests pass** (unit + fuzz + invariants), 0 failed |
+| TypeScript suites | **148 tests pass** — SDK 30, snapshot 49, monitor 51, agent 18 |
+| Static analysis | slither 0.11.5 — **0 high / 0 medium** (see [AUDIT-PREP.md](docs/AUDIT-PREP.md)) |
 | Fuzz coverage | Full announce→claim cycle fuzzed up to **60 holders**; root determinism fuzzed |
 | Invariants | Solvency (`balance == funded − claimed`), claimed ≤ funded, funded capped — held over randomized claim orderings |
 | **`claim()` gas** | **~82,172** (measured by `test_Claim_GasUnderTarget`; under the 90k PRD target) |
@@ -136,14 +140,18 @@ The Merkle root is **deterministic and independently verifiable**: two runs of t
 
 | Path | What |
 |---|---|
-| `contracts/` | Foundry protocol — `CorporateActionRegistry`, `DividendDistributor`, `AdminActionSource` (D3 seam), mocks, 42 tests, deploy/seed scripts |
-| `tooling/snapshot/` | TypeScript (viem) deterministic Merkle snapshot CLI |
+| `contracts/` | Foundry protocol — `CorporateActionRegistry`, `DividendDistributor`, `AdminActionSource` + `FunctionsActionSource` (D3 seam), `SplitAdjuster` lib, `TimelockController` governance, mocks, **67 tests**, deploy/seed/governance scripts |
+| `tooling/snapshot/` | TypeScript (viem) deterministic Merkle snapshot CLI — exclusion lists, withholding, IPFS pinning |
+| `tooling/monitor/` | `@corporax/monitor` — solvency-invariant + lifecycle alerting service |
+| `packages/sdk/` | `@corporax/sdk` — typed client (reads/writes + CAE-1 watchers) for integrators |
 | `app/` | Next.js 14 dApp — `/claim`, `/issuer`, `/feed`, `/api/actions` |
+| `subgraph/` | The Graph subgraph indexing CAE-1 events (+ Allium SQL) |
+| `examples/agent/` | Example dividend-aware AI agent consuming CAE-1 (x402 narrative) |
 | `abis/` | **Auto-generated** typed ABIs (`index.ts` `as const` + JSON). Import these; never hand-write ABIs. |
-| `deployments/` | `<chainId>.json` address registries + `proofs-<chainId>-<id>.json` artifacts |
-| `docs/` | This documentation suite (see [below](#documentation)) |
-| `scripts/` | `export-abi.sh` and dev helpers |
-| `infra/` | Deploy ops, monitoring (roadmap — see [PRODUCTION-READINESS](docs/PRODUCTION-READINESS.md)) |
+| `deployments/` | `<chainId>.json` address registries + `proofs-<chainId>-<id>.json` artifacts + `chains.json` |
+| `docs/` | This documentation suite (see [below](#documentation)), incl. the [CAE-1 EIP draft](docs/eip/eip-cae1.md) |
+| `scripts/` | `export-abi.sh`, `deploy-and-verify.sh`, `drills.sh`, `onboard-issuer.sh`, `dr-restore.sh` |
+| `infra/` + `.github/` | Docker, CI (forge + TS + slither + codeql), Makefile |
 
 ## Contract addresses
 
@@ -181,7 +189,11 @@ The Merkle root is **deterministic and independently verifiable**: two runs of t
 | [CAE-1.md](docs/CAE-1.md) | **Corporate Action Events v1** — the draft event standard: schemas, enumerations, the action feed, and how integrators consume it. |
 | [RUNBOOK.md](docs/RUNBOOK.md) | Operator runbook — deploy/verify, the full announce→snapshot→publish→fund→claim cycle, key rotation, pause/sweep/emergency procedures, on-call checklist. |
 | [THREAT-MODEL.md](docs/THREAT-MODEL.md) | Assets, actors, trust boundaries, STRIDE enumeration, each mitigation mapped to a contract control or test. |
-| [PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md) | Prioritized (P0/P1/P2) roadmap from hackathon MVP to production. |
+| [PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md) | Prioritized (P0/P1/P2) roadmap — and a status table of what is now code-complete. |
+| [AUDIT-PREP.md](docs/AUDIT-PREP.md) | Slither run + disposition, invariant coverage map, and the scope to hand an audit firm. |
+| [DEPLOY.md](docs/DEPLOY.md) · [ONBOARDING.md](docs/ONBOARDING.md) · [MULTICHAIN.md](docs/MULTICHAIN.md) | Production deploy + verify, issuer onboarding, per-chain registry. |
+| [KEY-MANAGEMENT.md](docs/KEY-MANAGEMENT.md) · [DR.md](docs/DR.md) | HSM/KMS custody; disaster recovery from on-chain state + artifacts. |
+| [eip/eip-cae1.md](docs/eip/eip-cae1.md) | Draft EIP for the **CAE-1** Corporate Action Events standard. |
 | [LIMITATIONS.md](docs/LIMITATIONS.md) | Honest current limitations and why each is acceptable for v1. |
 | [DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) | The <3-minute demo video script, mapped to the working flow. |
 | [PRD-CorporaX.md](PRD-CorporaX.md) | Product requirements — scope, priorities, decision log. |

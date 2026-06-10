@@ -6,17 +6,24 @@
   "license": "MIT",
   "workspaces": [
     "app",
-    "tooling/snapshot"
+    "packages/sdk",
+    "tooling/snapshot",
+    "tooling/monitor",
+    "examples/agent"
   ],
   "scripts": {
     "abi": "bash scripts/export-abi.sh",
     "test:contracts": "cd contracts && forge test",
+    "test:ts": "npm run test --workspaces --if-present",
+    "test": "npm run test:contracts && npm run test:ts",
     "build:contracts": "cd contracts && forge build",
-    "snapshot": "npm -w @corporax/snapshot run start --",
-    "dev": "npm -w @corporax/app run dev",
     "build": "npm -w @corporax/app run build",
+    "build:packages": "npm run build --workspace @corporax/sdk --workspace @corporax/snapshot --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm -w @corporax/app run lint",
-    "typecheck": "npm -w @corporax/app run typecheck && npm -w @corporax/snapshot run typecheck",
+    "snapshot": "npm -w @corporax/snapshot run start --",
+    "monitor": "npm -w @corporax/monitor run start --",
+    "dev": "npm -w @corporax/app run dev",
     "anvil": "anvil",
     "deploy:local": "cd contracts && forge script script/Deploy.s.sol:Deploy --rpc-url http://127.0.0.1:8545 --broadcast",
     "seed:local": "cd contracts && forge script script/Seed.s.sol:Seed --rpc-url http://127.0.0.1:8545 --broadcast"

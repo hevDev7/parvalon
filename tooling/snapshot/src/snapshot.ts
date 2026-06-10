@@ -10,15 +10,19 @@
 import { getAddress } from "viem";
 import {
   PROOFS_FORMAT,
+  SCHEMA_MINOR,
   LEAF_ENCODING,
   type Address,
+  type ActionMetadata,
   type BalanceProvider,
   type ClaimEntry,
+  type ExclusionsRecord,
   type Holder,
   type ProofsFile,
   type SnapshotInput,
 } from "./types.js";
 import { buildProofs } from "./merkle.js";
+import { applyExclusions, assertBps, netFromGross } from "./eligibility.js";
 
 const ONE_E18 = 10n ** 18n;
 
@@ -30,15 +34,23 @@ const ONE_E18 = 10n ** 18n;
  *   1. drop the zero address and any non-positive balance,
  *   2. sort by address ascending (byte order on the 20-byte value),
  *   3. assign 0-based `index` in that sorted order,
- *   4. `amount = balance * ratePerShare / 1e18` (floor division, BigInt).
+ *   4. `grossAmount = balance * ratePerShare / 1e18` (floor division, BigInt),
+ *   5. `amount = grossAmount * (10000 - withholdingBps) / 10000` (the NET leaf).
  *
  * Two runs over the same chain state therefore yield identical indices, amounts,
  * and — because the leaf set is identical — an identical Merkle root.
+ *
+ * `withholdingBps` defaults to 0 (net == gross), preserving prior behaviour.
+ * Exclusions are NOT applied here — callers strip excluded addresses from the
+ * balance map first (see {@link generateSnapshot}) so `index` numbering already
+ * reflects the eligible set.
  */
 export function deriveHolders(
   balances: Map<Address, bigint>,
   ratePerShare: bigint,
+  withholdingBps = 0,
 ): Holder[] {
+  assertBps(withholdingBps);
   const eligible: Array<{ account: Address; balance: bigint }> = [];
   for (const [account, balance] of balances) {
     if (balance > 0n) {
@@ -54,17 +66,26 @@ export function deriveHolders(
     return av < bv ? -1 : av > bv ? 1 : 0;
   });
 
-  return eligible.map(({ account, balance }, index) => ({
-    account,
-    balance,
-    index,
-    amount: (balance * ratePerShare) / ONE_E18,
-  }));
+  return eligible.map(({ account, balance }, index) => {
+    const grossAmount = (balance * ratePerShare) / ONE_E18;
+    return {
+      account,
+      balance,
+      index,
+      grossAmount,
+      amount: netFromGross(grossAmount, withholdingBps),
+    };
+  });
 }
 
-/** Sum of all holder payout amounts — the exact funding target. */
+/** Sum of all holder NET payout amounts — the exact funding target (Σ net). */
 export function sumPayout(holders: readonly Holder[]): bigint {
   return holders.reduce((acc, h) => acc + h.amount, 0n);
+}
+
+/** Sum of all holder GROSS amounts (before withholding). */
+export function sumGross(holders: readonly Holder[]): bigint {
+  return holders.reduce((acc, h) => acc + h.grossAmount, 0n);
 }
 
 /**
@@ -80,18 +101,44 @@ export async function generateSnapshot(
   input: SnapshotInput,
   provider: BalanceProvider,
 ): Promise<ProofsFile> {
-  const balances = await provider.balancesAt(input);
-  const holders = deriveHolders(balances, input.ratePerShare);
+  const rawBalances = await provider.balancesAt(input);
+
+  // PRD P1-3 — exclusions: drop AMM pools / bridges / escrows from the eligible
+  // set BEFORE indexing/amount/tree so they never accrue a dividend leaf.
+  let balances = rawBalances;
+  let exclusionsRecord: ExclusionsRecord | undefined;
+  if (input.exclude && input.exclude.length > 0) {
+    const { balances: filtered, record } = applyExclusions(
+      rawBalances,
+      input.exclude,
+    );
+    balances = filtered;
+    exclusionsRecord = record;
+  }
+
+  // PRD P1-5 — withholding: net leaf amount = gross * (10000 - bps) / 10000.
+  const withholdingBps = input.withholdingBps ?? 0;
+  assertBps(withholdingBps);
+
+  const holders = deriveHolders(balances, input.ratePerShare, withholdingBps);
 
   if (holders.length === 0) {
     throw new Error(
-      "no eligible holders found (every balance was zero at the record block) — " +
-        "check --token / --deploy-block / --record-block",
+      "no eligible holders found (every balance was zero at the record block, " +
+        "or all eligible holders were excluded) — " +
+        "check --token / --deploy-block / --record-block / --exclude",
     );
   }
 
   const { root, proofs } = buildProofs(input.actionId, holders);
-  const totalPayout = sumPayout(holders);
+  const totalPayout = sumPayout(holders); // Σ NET
+  const totalGross = sumGross(holders); // Σ GROSS
+
+  // Whether to surface gross/withholding fields. We track them whenever a
+  // withholding rate is explicitly supplied (incl. 0) so the artifact is
+  // self-describing for auditors; a plain run with no flag stays byte-for-byte
+  // identical to the legacy v1 shape.
+  const tracksWithholding = input.withholdingBps !== undefined;
 
   const claims: Record<string, ClaimEntry> = {};
   holders.forEach((holder, i) => {
@@ -102,12 +149,16 @@ export async function generateSnapshot(
     claims[holder.account] = {
       index: holder.index,
       amount: holder.amount.toString(),
+      ...(tracksWithholding ? { grossAmount: holder.grossAmount.toString() } : {}),
       proof,
     };
   });
 
+  const metadata = normalizeMetadata(input.metadata, withholdingBps, tracksWithholding);
+
   const artifact: ProofsFile = {
     format: PROOFS_FORMAT,
+    schemaMinor: SCHEMA_MINOR,
     actionId: input.actionId.toString(),
     chainId: input.chainId ?? 0,
     asset: getAddress(input.asset).toLowerCase() as Address,
@@ -120,10 +171,34 @@ export async function generateSnapshot(
     totalPayout: totalPayout.toString(),
     holderCount: holders.length,
     leafEncoding: [...LEAF_ENCODING],
+    ...(tracksWithholding
+      ? { withholdingBps, totalGross: totalGross.toString() }
+      : {}),
+    ...(exclusionsRecord ? { exclusions: exclusionsRecord } : {}),
+    ...(metadata ? { metadata } : {}),
     claims,
   };
 
   return artifact;
+}
+
+/**
+ * Fold the action-level withholding into the metadata block so the resolved
+ * `metadataURI` payload is self-consistent. Returns `undefined` when there is
+ * nothing to record (keeps legacy artifacts clean).
+ */
+function normalizeMetadata(
+  metadata: ActionMetadata | undefined,
+  withholdingBps: number,
+  tracksWithholding: boolean,
+): ActionMetadata | undefined {
+  const base: { -readonly [K in keyof ActionMetadata]: ActionMetadata[K] } = {
+    ...(metadata ?? {}),
+  };
+  if (tracksWithholding && base.withholdingBps === undefined) {
+    base.withholdingBps = withholdingBps;
+  }
+  return Object.keys(base).length > 0 ? base : undefined;
 }
 
 /**

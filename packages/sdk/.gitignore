@@ -1,0 +1,5 @@
+node_modules/
+dist/
+*.tsbuildinfo
+# src/generated/abis.ts is reproducible via `npm run sync-abis` but is committed
+# so the package builds even without running the prepare step.

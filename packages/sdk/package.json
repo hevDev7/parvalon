@@ -1,0 +1,43 @@
+{
+  "name": "@corporax/sdk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Typed TypeScript/viem client for the CorporaX corporate-actions & dividend protocol — read/write helpers, CAE-1 event watchers, Merkle claim builders, and a CorporaXClient that wires it together. Integrators never hand-roll calldata or event decoding.",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "sync-abis": "tsx scripts/sync-abis.ts",
+    "prebuild": "npm run sync-abis",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "npm run sync-abis && tsc -p tsconfig.json --noEmit",
+    "test": "npm run sync-abis && vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@openzeppelin/merkle-tree": "^1.0.7",
+    "@types/node": "^20.14.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

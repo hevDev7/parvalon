@@ -1,0 +1,44 @@
+{
+  "name": "@corporax/monitor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CorporaX monitoring & alerting service — watches the on-chain solvency invariant, lifecycle events, funding/claim/sweep anomalies and pause state, and pages on violation (PRODUCTION-READINESS.md §4, P0-6).",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "corporax-monitor": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "sync-abi": "node scripts/sync-abi.mjs",
+    "prebuild": "node scripts/sync-abi.mjs",
+    "build": "tsc -p tsconfig.json",
+    "pretypecheck": "node scripts/sync-abi.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pretest": "node scripts/sync-abi.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prestart": "node scripts/sync-abi.mjs",
+    "start": "tsx src/cli.ts start",
+    "dev": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

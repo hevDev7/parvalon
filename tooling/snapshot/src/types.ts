@@ -18,6 +18,19 @@ export type Hex = `0x${string}`;
 export const PROOFS_FORMAT = "corporax-merkle-v1" as const;
 
 /**
+ * Internal, ADDITIVE schema-minor counter for `corporax-merkle-v1`.
+ *
+ * The wire `format` string is FROZEN by INTEGRATION.md §5 and never changes —
+ * every reader that understood v1 still understands these artifacts because all
+ * new fields are *optional additions* (exclusions, withholdingBps, per-claim
+ * grossAmount, metadata, proofsCid). This counter is a non-breaking marker that
+ * lets tooling/audit logs distinguish "plain v1" (minor 0) from artifacts that
+ * carry the exclusion/withholding/IPFS extensions (minor 1). It is purely
+ * informational; consumers MUST NOT gate parsing on it.
+ */
+export const SCHEMA_MINOR = 1 as const;
+
+/**
  * The leaf encoding, spelled out exactly as it appears in the artifact and in
  * INTEGRATION.md §4/§5. The OZ `StandardMerkleTree` is built with the bare
  * Solidity types `["uint256","uint256","address","uint256"]`; this annotated
@@ -42,7 +55,17 @@ export interface Holder {
   readonly account: Address;
   /** Token balance at the record block, in token base units (wei). */
   readonly balance: bigint;
-  /** Payout owed: `balance * ratePerShare / 1e18` (wei of the payout token). */
+  /**
+   * GROSS payout owed before withholding: `balance * ratePerShare / 1e18`
+   * (wei of the payout token).
+   */
+  readonly grossAmount: bigint;
+  /**
+   * NET claimable payout after withholding: `gross * (10000 - withholdingBps)
+   * / 10000` (wei). This is the value committed into the Merkle leaf and the
+   * exact amount the contract will transfer on `claim`. With `withholdingBps=0`
+   * it equals `grossAmount`.
+   */
   readonly amount: bigint;
   /** 0-based deterministic position — also the on-chain bitmap slot. */
   readonly index: number;
@@ -51,18 +74,82 @@ export interface Holder {
 /** One holder's claim entry in proofs.json (`claims[address]`). */
 export interface ClaimEntry {
   readonly index: number;
-  /** Decimal string (wei). */
+  /**
+   * NET claimable amount — decimal string (wei). This is the leaf `amount`; it
+   * is what `claim()` pays and what every proof commits to.
+   */
   readonly amount: string;
+  /**
+   * GROSS amount before withholding — decimal string (wei). Present whenever a
+   * withholding rate is applied (and emitted unconditionally for auditability,
+   * equal to `amount` when `withholdingBps=0`). NOT part of the leaf.
+   */
+  readonly grossAmount?: string;
   /** Merkle proof: sorted-pair siblings, `0x`-prefixed. */
   readonly proof: Hex[];
 }
 
 /**
+ * Standardised `metadataURI` payload schema (the JSON a `metadataURI` resolves
+ * to — e.g. `ipfs://<cid>`). This is the MECHANISM-level contract only: it
+ * documents the fields tooling reads/writes so issuer feeds, the snapshot tool,
+ * and the frontend agree on shape. Anything legal/KYC/jurisdictional in here is
+ * asserted BY THE ISSUER — CorporaX neither validates nor enforces it.
+ *
+ * All fields are optional so partial issuer metadata is still well-formed.
+ */
+export interface ActionMetadata {
+  /**
+   * Withholding tax applied to the gross dividend, in basis points (0..10000).
+   * The snapshot tool derives the net leaf `amount` from this; recording it here
+   * lets a verifier recompute gross↔net without the CLI flags.
+   */
+  readonly withholdingBps?: number;
+  /** Issuer tax jurisdiction (e.g. ISO-3166 alpha-2 `"US"`). Issuer-asserted. */
+  readonly jurisdiction?: string;
+  /** Ex-dividend date (ISO-8601 `YYYY-MM-DD`). */
+  readonly exDate?: string;
+  /** Record date (ISO-8601 `YYYY-MM-DD`) — informational mirror of recordBlock. */
+  readonly recordDate?: string;
+  /** Pay date (ISO-8601 `YYYY-MM-DD`). */
+  readonly payDate?: string;
+  /**
+   * Tax classification of the distribution (issuer-asserted), e.g.
+   * `"ordinary"`, `"qualified"`, `"return-of-capital"`. Free-form by design.
+   */
+  readonly taxClass?: string;
+}
+
+/**
+ * The applied exclusions block, recorded for auditability. Excluded addresses
+ * are dropped from the eligible set BEFORE indexing/amount/tree, so non-
+ * beneficial-owner contracts (AMM pools, bridges, escrows) never accrue a leaf.
+ */
+export interface ExclusionsRecord {
+  /** Lowercase addresses that were excluded from the eligible holder set. */
+  readonly addresses: Address[];
+  /**
+   * Of `addresses`, the subset that actually held a positive balance at the
+   * record block and was therefore *removed* (vs. listed but never a holder).
+   * Lets an auditor see the exclusions that had a material effect.
+   */
+  readonly applied: Address[];
+}
+
+/**
  * The canonical `corporax-merkle-v1` artifact. Mirrors INTEGRATION.md §5
- * field-for-field. `claims` is keyed by **lowercase** holder address.
+ * field-for-field, plus ADDITIVE optional extensions (exclusions, withholding,
+ * metadata, IPFS CID). The wire `format` stays `corporax-merkle-v1`; v1 readers
+ * that ignore unknown keys are unaffected. `claims` is keyed by **lowercase**
+ * holder address.
  */
 export interface ProofsFile {
   readonly format: typeof PROOFS_FORMAT;
+  /**
+   * Additive schema-minor marker (see {@link SCHEMA_MINOR}). Informational only;
+   * never gate parsing on it.
+   */
+  readonly schemaMinor?: number;
   /** Decimal string. */
   readonly actionId: string;
   readonly chainId: number;
@@ -72,10 +159,34 @@ export interface ProofsFile {
   readonly ratePerShare: string;
   readonly recordBlock: number;
   readonly merkleRoot: Hex;
-  /** Decimal string (wei) — the exact funding target, Σ amount. */
+  /** Decimal string (wei) — the exact funding target, Σ (NET) amount. */
   readonly totalPayout: string;
   readonly holderCount: number;
   readonly leafEncoding: readonly string[];
+  /**
+   * Withholding rate applied action-wide, in basis points (0..10000). Present
+   * (and emitted as `0` for clarity) whenever the field is tracked; the net leaf
+   * `amount = gross * (10000 - withholdingBps) / 10000`.
+   */
+  readonly withholdingBps?: number;
+  /**
+   * Sum of GROSS amounts before withholding — decimal string (wei). Equals
+   * `totalPayout` when `withholdingBps=0`. Present when withholding is tracked.
+   */
+  readonly totalGross?: string;
+  /** Applied exclusions, for auditability. Present when any exclusion was given. */
+  readonly exclusions?: ExclusionsRecord;
+  /**
+   * Standardised action metadata (the resolved `metadataURI` payload). Echoed
+   * into the artifact for convenience; the on-chain source of truth is the
+   * action's `metadataURI`. Present when any metadata field is supplied.
+   */
+  readonly metadata?: ActionMetadata;
+  /**
+   * Content identifier (CID) of THIS artifact after IPFS pinning, so consumers
+   * can content-address it. Present only when `--pin-ipfs` pinned successfully.
+   */
+  readonly proofsCid?: string;
   readonly claims: Record<string, ClaimEntry>;
 }
 
@@ -101,7 +212,28 @@ export interface SnapshotInput {
    */
   readonly chainId?: number;
   readonly payoutToken?: Address;
+  /**
+   * Addresses to drop from the eligible holder set BEFORE indexing/amount/tree
+   * (AMM pools, bridges, escrows, the issuer's own treasury). Compared
+   * case-insensitively; recorded in the artifact's `exclusions` block. Optional.
+   */
+  readonly exclude?: readonly Address[];
+  /**
+   * Withholding rate in basis points (0..10000). The net leaf `amount = gross *
+   * (10000 - withholdingBps) / 10000`. Defaults to 0 (no withholding) when
+   * omitted. When present (incl. 0) the artifact records `withholdingBps`,
+   * `totalGross`, and per-claim `grossAmount`.
+   */
+  readonly withholdingBps?: number;
+  /**
+   * Standardised action metadata echoed into the artifact (see
+   * {@link ActionMetadata}). Optional; mechanism-only.
+   */
+  readonly metadata?: ActionMetadata;
 }
+
+/** Hard cap on withholding basis points (100% = 10000 bps). */
+export const MAX_BPS = 10000 as const;
 
 /**
  * A balance source — the seam that lets tests inject a deterministic holder set

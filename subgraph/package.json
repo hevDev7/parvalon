@@ -1,0 +1,28 @@
+{
+  "name": "@corporax/subgraph",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Graph subgraph indexing CorporaX CAE-1 events (CorporateActionRegistry + DividendDistributor) for fast, scalable corporate-action & dividend queries.",
+  "license": "MIT",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "build:robinhood": "graph build --network robinhood",
+    "build:sepolia": "graph build --network arbitrum-sepolia",
+    "build:local": "graph build --network local",
+    "auth": "graph auth",
+    "create:local": "graph create --node http://localhost:8020/ corporax/corporax",
+    "remove:local": "graph remove --node http://localhost:8020/ corporax/corporax",
+    "deploy:studio": "graph deploy --node https://api.studio.thegraph.com/deploy/ corporax",
+    "deploy:local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 --network local corporax/corporax",
+    "deploy:robinhood": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 --network robinhood corporax/corporax",
+    "test": "graph test"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.98.1",
+    "@graphprotocol/graph-ts": "0.38.2"
+  },
+  "devDependencies": {
+    "matchstick-as": "0.6.0"
+  }
+}
