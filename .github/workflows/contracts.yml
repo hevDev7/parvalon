@@ -1,0 +1,79 @@
+# Foundry CI for the CorporaX protocol (contracts/).
+#
+# Gates every push/PR on: formatting, a clean build (with deployed-size report),
+# the full test suite, and a coverage summary. Uses the `ci` Foundry profile
+# (foundry.toml) which bumps fuzz runs to 1000 and invariant runs to 256.
+#
+# The OpenZeppelin + forge-std dependencies are vendored under contracts/lib
+# (no git submodules — see .github/dependabot.yml), so a plain checkout is all
+# the build needs; there is no `forge install` step.
+name: contracts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "contracts/**"
+      - ".github/workflows/contracts.yml"
+  pull_request:
+    paths:
+      - "contracts/**"
+      - ".github/workflows/contracts.yml"
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: contracts-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  foundry:
+    name: forge fmt / build / test / coverage
+    runs-on: ubuntu-latest
+    # Run every forge command from contracts/ where foundry.toml lives.
+    defaults:
+      run:
+        working-directory: contracts
+    env:
+      # foundry.toml defines a `ci` profile (1000 fuzz / 256 invariant runs).
+      FOUNDRY_PROFILE: ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      # Cache the Solidity compiler downloads and the build artifact cache.
+      # forge keys its own cache off solc inputs; persisting out/ + cache/
+      # across runs makes incremental builds and coverage materially faster.
+      - name: Cache Foundry artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.svm
+            contracts/cache
+            contracts/out
+          key: foundry-${{ runner.os }}-${{ hashFiles('contracts/foundry.toml', 'contracts/src/**/*.sol', 'contracts/test/**/*.sol') }}
+          restore-keys: |
+            foundry-${{ runner.os }}-
+
+      - name: Check formatting
+        run: forge fmt --check
+
+      - name: Build (with deployed sizes)
+        run: forge build --sizes
+
+      - name: Test
+        run: forge test -vvv
+
+      - name: Coverage summary
+        # Coverage runs without via-ir; tolerate the occasional stack-too-deep on
+        # heavy test files without failing the gate, while still surfacing the
+        # report. Remove `|| true` once coverage is part of the merge bar.
+        run: forge coverage --report summary || true

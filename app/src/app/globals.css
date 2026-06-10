@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   THE ENGRAVED LEDGER — design tokens
+   ========================================================================== */
+:root {
+  --paper: #f7f4ec; /* warm ivory canvas */
+  --paper-deep: #efe9db; /* recessed sections */
+  --paper-panel: #fffdf8; /* raised cards / certificates */
+
+  --ink: #181a12; /* warm near-black */
+  --ink-soft: #5c5e4f; /* secondary text */
+  --ink-faint: #8c8d7d; /* tertiary / captions */
+
+  --viridian: #0f6b4a; /* primary — money, claims, success */
+  --viridian-bright: #16a06d; /* hover / live accents */
+  --viridian-wash: #e4eee6; /* tinted backgrounds */
+
+  --brass: #9c7a36; /* certificate hairline / seal */
+  --brass-soft: #c7a866;
+
+  --oxblood: #8a3326; /* danger / cancelled */
+
+  --line: rgba(24, 26, 18, 0.12);
+  --line-strong: rgba(24, 26, 18, 0.24);
+
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-sans: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* {
+  border-color: var(--line);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv01";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--viridian);
+  color: var(--paper-panel);
+}
+
+/* Keyboard focus — visible, viridian, WCAG-friendly (PRD §11). */
+:focus-visible {
+  outline: 2px solid var(--viridian);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ============================================================================
+   Texture: engraved guilloché security pattern + paper grain
+   ========================================================================== */
+.guilloche {
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 13px, rgba(15, 107, 74, 0.05) 13px 14px),
+    repeating-radial-gradient(circle at 18% 120%, transparent 0 19px, rgba(156, 122, 54, 0.05) 19px 20px),
+    repeating-radial-gradient(circle at 88% -20%, transparent 0 22px, rgba(24, 26, 18, 0.04) 22px 23px);
+}
+
+.paper-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* Hairline divider, certificate style */
+.rule-brass {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brass-soft) 18%, var(--brass-soft) 82%, transparent);
+}
+
+/* ============================================================================
+   Typographic primitives
+   ========================================================================== */
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+}
+
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Marquee tape gradient mask */
+.tape-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+/* Subtle skeleton shimmer for loading states */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper-deep);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 253, 248, 0.7), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,0 +1,53 @@
+# Dependabot keeps CorporaX dependencies patched.
+#
+# Coverage:
+#   - npm          : the root workspace (app + tooling/snapshot share one lockfile).
+#   - github-actions: pinned action versions in .github/workflows/*.
+#
+# Foundry dependencies (forge-std, openzeppelin-contracts) live under
+# contracts/lib and are VENDORED, not git submodules (there is no .gitmodules),
+# so the `gitsubmodule` ecosystem does not apply. Bump them manually with
+# `forge update <dep>` (or re-vendor a pinned tag) and re-run the contracts CI.
+# If they are ever converted to submodules, add a `package-ecosystem:
+# "gitsubmodule"` block pointing at contracts/lib.
+version: 2
+updates:
+  # JavaScript / TypeScript (npm workspaces rooted at the repo root).
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "javascript"
+    commit-message:
+      prefix: "deps"
+    groups:
+      # Batch low-risk minor/patch bumps into one PR to reduce noise.
+      npm-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions used by the workflows in this directory.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions-all:
+        patterns:
+          - "*"

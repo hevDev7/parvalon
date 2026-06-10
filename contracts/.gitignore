@@ -1,0 +1,14 @@
+# Foundry
+out/
+cache/
+broadcast/*/dry-run/
+broadcast/**/run-latest.json
+# Snapshot artifacts generated locally (committed copies live in /deployments)
+snapshots/*.json
+# Coverage
+lcov.info
+coverage/
+# Env
+.env
+.env.*
+!.env.example

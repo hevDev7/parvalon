@@ -1,0 +1,64 @@
+# Slither static analysis for the CorporaX contracts.
+#
+# Runs the crytic/slither-action on contracts/, filtering vendored OpenZeppelin
+# code (see contracts/slither.config.json). Findings are uploaded as SARIF so
+# they surface in the GitHub "Security > Code scanning" tab. The analysis is
+# advisory (continue-on-error) — Slither's high-FP detectors should inform, not
+# block, given the immutable / heavily-tested design.
+name: slither
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "contracts/**"
+      - ".github/workflows/slither.yml"
+  pull_request:
+    paths:
+      - "contracts/**"
+      - ".github/workflows/slither.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: slither-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  # Required to upload SARIF results to code scanning.
+  security-events: write
+
+jobs:
+  analyze:
+    name: slither static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # slither-action needs Foundry on PATH to compile this foundry project.
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Run Slither
+        uses: crytic/slither-action@v0.4.0
+        id: slither
+        continue-on-error: true
+        with:
+          target: contracts/
+          slither-config: contracts/slither.config.json
+          sarif: results.sarif
+          # Don't let the action fail the job; the SARIF upload below is the
+          # signal of record.
+          fail-on: none
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        # Only attempt the upload if Slither produced a SARIF file.
+        if: always() && steps.slither.outputs.sarif != ''
+        continue-on-error: true
+        with:
+          sarif_file: ${{ steps.slither.outputs.sarif }}
+          category: slither

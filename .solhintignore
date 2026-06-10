@@ -1,0 +1,19 @@
+# Solhint ignore list (paths relative to wherever solhint is invoked; this file
+# lives at the repo root and the lint command targets contracts/).
+#
+# Vendored dependencies and build output — not our code, not linted.
+contracts/lib/
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Mocks exist only to exercise the protocol in tests/local deploys; they are
+# not part of the production surface and intentionally cut corners.
+contracts/src/mocks/
+
+# Bare paths too, in case solhint is run from inside contracts/.
+lib/
+out/
+cache/
+broadcast/
+src/mocks/

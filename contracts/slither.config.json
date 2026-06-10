@@ -1,0 +1,14 @@
+{
+  "//": "Slither config for the CorporaX protocol. Run from contracts/: `slither . --config-file slither.config.json`. Used by .github/workflows/slither.yml.",
+  "//detectors": "Excludes vendored OZ + test/script/mock code from results so findings point at our production sources (src/, minus mocks). compile_force_framework pins Foundry.",
+  "compile_force_framework": "foundry",
+  "filter_paths": "lib/openzeppelin-contracts|lib/forge-std|test/|script/|src/mocks/",
+  "exclude_dependencies": true,
+  "exclude_informational": false,
+  "exclude_optimization": false,
+  "exclude_low": false,
+  "exclude_medium": false,
+  "exclude_high": false,
+  "disable_color": false,
+  "legacy_ast": false
+}

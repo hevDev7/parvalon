@@ -1,0 +1,17 @@
+{
+  "format": "corporax-merkle-v1",
+  "actionId": "1",
+  "chainId": 31337,
+  "asset": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+  "payoutToken": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "ratePerShare": "500000000000000000",
+  "recordBlock": 2,
+  "merkleRoot": "0x9daa2db93985d682fb9490802adb983d82f4922fc23cb599506238e84fd05a21",
+  "totalPayout": "12000000000000000000",
+  "holderCount": 2,
+  "leafEncoding": ["uint256 actionId", "uint256 index", "address account", "uint256 amount"],
+  "claims": {
+    "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc": { "index": 0, "amount": "7000000000000000000", "proof": ["0x1cb3790dba7b57c0a2f299cdf8733019551025dd79c98c01e08e94584c0075f7"] },
+    "0x70997970c51812dc3a010c7d01b50e0d17dc79c8": { "index": 1, "amount": "5000000000000000000", "proof": ["0x377dbb2e2e755cad65cb457cde143b8e66bfd58e838a9945f5de065973cfc524"] }
+  }
+}

@@ -1,0 +1,63 @@
+# CodeQL static analysis for the JavaScript/TypeScript surfaces of CorporaX
+# (the Next.js app + the snapshot CLI). Solidity is covered by slither.yml.
+#
+# Runs on push/PR and on a weekly schedule so newly-published CodeQL queries
+# catch issues even when the code is quiet.
+name: codeql
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "tooling/**"
+      - "abis/**"
+      - ".github/workflows/codeql.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - "tooling/**"
+      - "abis/**"
+      - ".github/workflows/codeql.yml"
+  schedule:
+    # Weekly, Mondays 06:00 UTC.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: CodeQL (javascript-typescript)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # `security-and-quality` adds maintainability queries on top of the
+          # default security pack.
+          queries: security-and-quality
+
+      # CodeQL autobuild is a no-op for interpreted JS/TS, but is the
+      # documented, forward-compatible step for this language pack.
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

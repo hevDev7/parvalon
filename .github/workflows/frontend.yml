@@ -1,0 +1,90 @@
+# Frontend CI for the CorporaX Next.js app (@corporax/app).
+#
+# NOTE (honest status): at the time of writing the `app/` workspace is a
+# placeholder — there is no package.json yet. To keep this gate green now and
+# automatically "light up" once the app lands, a guard step probes for
+# app/package.json and exports HAS_APP; every build step is conditioned on it.
+# Once the app exists this file needs no edits.
+name: frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "abis/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/frontend.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - "abis/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/frontend.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    name: lint / typecheck / build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          # Cache npm only when a lockfile is present (avoids a setup-node error
+          # on the bare placeholder repo). Re-enable unconditionally once the
+          # root package-lock.json is committed.
+          cache: ${{ hashFiles('package-lock.json') != '' && 'npm' || '' }}
+
+      # Detect whether the Next.js app workspace is present yet.
+      - name: Detect app workspace
+        id: detect
+        run: |
+          if [ -f app/package.json ]; then
+            echo "has_app=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_app=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::app/package.json not found — skipping frontend build (placeholder workspace)."
+          fi
+
+      # Use a lockfile-aware install: `npm ci` when a lockfile exists, else
+      # `npm install` so the very first PR that adds the app still builds.
+      - name: Install dependencies
+        if: steps.detect.outputs.has_app == 'true'
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Lint
+        if: steps.detect.outputs.has_app == 'true'
+        run: npm -w @corporax/app run lint
+
+      - name: Typecheck
+        if: steps.detect.outputs.has_app == 'true'
+        run: npm -w @corporax/app run typecheck
+
+      - name: Build
+        if: steps.detect.outputs.has_app == 'true'
+        # NEXT_PUBLIC_* are inlined at build time; supply inert, non-secret
+        # defaults so a no-network CI build of static/SSR pages succeeds.
+        env:
+          NEXT_PUBLIC_CHAIN_ID: "31337"
+          NEXT_PUBLIC_RPC_URL: "http://127.0.0.1:8545"
+          NEXT_PUBLIC_BLOCKSCOUT_URL: "https://explorer.testnet.chain.robinhood.com"
+        run: npm -w @corporax/app run build

@@ -1,0 +1,83 @@
+# Snapshot CLI CI for the Merkle generator (@corporax/snapshot).
+#
+# Typechecks and tests the off-chain snapshot tool that produces the canonical
+# `corporax-merkle-v1` proofs.json (leaf encoding is frozen in
+# docs/INTEGRATION.md §4-5).
+#
+# NOTE (honest status): tooling/snapshot is currently a placeholder (only an
+# empty src/ exists, no package.json). The detect step keeps this gate green
+# until the package lands and then runs the real scripts with no edits.
+name: cli
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tooling/snapshot/**"
+      - "abis/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/cli.yml"
+  pull_request:
+    paths:
+      - "tooling/snapshot/**"
+      - "abis/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/cli.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: cli-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    name: typecheck / test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: ${{ hashFiles('package-lock.json') != '' && 'npm' || '' }}
+
+      - name: Detect snapshot workspace
+        id: detect
+        run: |
+          if [ -f tooling/snapshot/package.json ]; then
+            echo "has_cli=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_cli=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::tooling/snapshot/package.json not found — skipping CLI checks (placeholder workspace)."
+          fi
+
+      - name: Install dependencies
+        if: steps.detect.outputs.has_cli == 'true'
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Typecheck
+        if: steps.detect.outputs.has_cli == 'true'
+        run: npm -w @corporax/snapshot run typecheck
+
+      - name: Test
+        if: steps.detect.outputs.has_cli == 'true'
+        # Guard `test` so a not-yet-written test script doesn't fail the gate;
+        # once a real `test` script exists this runs it.
+        run: |
+          if npm -w @corporax/snapshot run | grep -qE '^[[:space:]]+test'; then
+            npm -w @corporax/snapshot run test
+          else
+            echo "::notice::@corporax/snapshot has no \"test\" script yet — skipping."
+          fi

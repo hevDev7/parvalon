@@ -1,0 +1,49 @@
+import { NextResponse } from "next/server";
+import { formatUnits } from "viem";
+import { ACTIVE_CHAIN_ID, explorerAddressUrl } from "@/lib/chain";
+import { readActions } from "@/lib/actions";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+/**
+ * Public CAE-1 action feed (see docs/INTEGRATION.md §10). This is the
+ * machine-readable endpoint integrating protocols and AI agents consume to react
+ * to corporate actions. Amounts are human-decimal strings; raw wei stays on-chain.
+ */
+export async function GET() {
+  try {
+    const actions = await readActions();
+    const payload = {
+      chainId: ACTIVE_CHAIN_ID,
+      generatedAt: new Date().toISOString(),
+      schema: "CAE-1",
+      count: actions.length,
+      actions: actions.map((a) => ({
+        id: a.id,
+        asset: a.asset,
+        assetSymbol: a.assetSymbol,
+        actionType: a.actionType,
+        status: a.status,
+        ratePerShare: formatUnits(BigInt(a.ratePerShareWei || "0"), 18),
+        recordBlock: a.recordBlock,
+        payableAt: a.payableAt,
+        claimDeadline: a.claimDeadline,
+        payoutToken: a.payoutToken,
+        payoutSymbol: a.payoutSymbol,
+        merkleRoot: a.merkleRoot,
+        totalPayout: formatUnits(BigInt(a.totalPayoutWei || "0"), 18),
+        totalFunded: formatUnits(BigInt(a.totalFundedWei || "0"), 18),
+        totalClaimed: formatUnits(BigInt(a.totalClaimedWei || "0"), 18),
+        metadataURI: a.metadataURI,
+        explorerUrl: explorerAddressUrl(a.asset),
+      })),
+    };
+    return NextResponse.json(payload, {
+      headers: { "cache-control": "public, max-age=5, stale-while-revalidate=30" },
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to read actions";
+    return NextResponse.json({ error: message, actions: [] }, { status: 500 });
+  }
+}

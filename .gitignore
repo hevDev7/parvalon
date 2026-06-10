@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+.pnp.*
+.yarn/*
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/*/dry-run/
+contracts/lcov.info
+
+# Next.js
+app/.next/
+app/out/
+app/next-env.d.ts
+
+# TypeScript build
+**/dist/
+**/*.tsbuildinfo
+
+# Snapshot CLI working output (committed copies live in /deployments)
+tooling/snapshot/out/
+
+# Logs / OS
+*.log
+.DS_Store
+coverage/

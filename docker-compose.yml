@@ -1,0 +1,99 @@
+# ============================================================================
+# docker-compose.yml — full local CorporaX stack.
+#
+#   anvil     → local L2 devnet (chainId 31337, deterministic accounts)
+#   deployer  → one-shot: waits for anvil, runs Deploy.s.sol + Seed.s.sol,
+#               writing deployments/<id>.json + proofs-<id>-<n>.json into the
+#               mounted repo, then exits 0.
+#   frontend  → Next.js app, started after the deployer succeeds.
+#
+# Quick start:
+#   docker compose up --build            # bring up the whole stack
+#   docker compose up anvil deployer      # just chain + seed (for CLI/contract work)
+#   docker compose down -v                # stop and drop volumes
+#
+# The repo is bind-mounted into anvil/deployer at /work so forge scripts can
+# write to ./deployments (foundry.toml fs_permissions allow ../deployments).
+# Env defaults below mirror docs/INTEGRATION.md §8-9; override via a root .env.
+# ============================================================================
+
+services:
+  # --- Local devnet ---------------------------------------------------------
+  anvil:
+    build:
+      context: .
+      dockerfile: infra/anvil.Dockerfile
+    image: corporax/anvil
+    container_name: corporax-anvil
+    ports:
+      - "8545:8545"
+    environment:
+      ANVIL_HOST: 0.0.0.0
+      ANVIL_PORT: "8545"
+      # Canonical local chainId (docs/INTEGRATION.md §8).
+      ANVIL_CHAIN_ID: "31337"
+      ANVIL_BLOCK_TIME: "0"
+      ANVIL_MNEMONIC: "test test test test test test test test test test test junk"
+    healthcheck:
+      # cast ships in the foundry image; a successful block-number call means
+      # the RPC is serving.
+      test: ["CMD-SHELL", "cast block-number --rpc-url http://127.0.0.1:8545 || exit 1"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+      start_period: 2s
+
+  # --- One-shot deploy + seed ----------------------------------------------
+  deployer:
+    build:
+      # Reuse the anvil image: it carries forge/cast and the deploy scripts.
+      context: .
+      dockerfile: infra/anvil.Dockerfile
+    image: corporax/anvil
+    container_name: corporax-deployer
+    depends_on:
+      anvil:
+        condition: service_healthy
+    # Mount the repo so forge scripts write deployments/* back to the host.
+    volumes:
+      - ./:/work
+    working_dir: /work
+    environment:
+      RPC_URL: http://anvil:8545
+      # Anvil account #0 (admin/issuer in Deploy.s.sol). Override for non-local.
+      PRIVATE_KEY: ${PRIVATE_KEY:-0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80}
+      # D3 action-source mode: open demo on local.
+      AUTO_ATTEST: ${AUTO_ATTEST:-true}
+      # Leave token addresses unset on local so Deploy.s.sol deploys MockERC20s.
+      ADMIN_ADDRESS: ${ADMIN_ADDRESS:-}
+      ISSUER_ADDRESS: ${ISSUER_ADDRESS:-}
+    # Override the image's anvil entrypoint with the one-shot bootstrapper.
+    entrypoint: ["/bin/sh", "/work/infra/deployer-entrypoint.sh"]
+    restart: "no"
+
+  # --- Frontend -------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/frontend.Dockerfile
+      args:
+        # Browser-exposed config must be baked at build time. Point at the
+        # host-mapped anvil RPC and local chainId for the dev stack.
+        NEXT_PUBLIC_CHAIN_ID: "31337"
+        NEXT_PUBLIC_RPC_URL: "http://127.0.0.1:8545"
+        NEXT_PUBLIC_BLOCKSCOUT_URL: "https://explorer.testnet.chain.robinhood.com"
+    image: corporax/frontend
+    container_name: corporax-frontend
+    depends_on:
+      deployer:
+        # Start only after the deploy+seed one-shot completes successfully so
+        # the deployment/proofs artifacts exist for the app to read.
+        condition: service_completed_successfully
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      # Server-only secret (kept unprefixed per INTEGRATION.md §9). Optional.
+      ALCHEMY_API_KEY: ${ALCHEMY_API_KEY:-}
+    restart: unless-stopped

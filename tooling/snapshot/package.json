@@ -1,0 +1,41 @@
+{
+  "name": "@corporax/snapshot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CorporaX deterministic Merkle snapshot CLI — reconstructs token holder balances at a record block from on-chain Transfer logs and emits the canonical corporax-merkle-v1 proofs.json.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "corporax-snapshot": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "start": "tsx src/cli.ts",
+    "snapshot": "tsx src/cli.ts snapshot",
+    "verify": "tsx src/cli.ts verify"
+  },
+  "dependencies": {
+    "@openzeppelin/merkle-tree": "^1.0.7",
+    "commander": "^12.1.0",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

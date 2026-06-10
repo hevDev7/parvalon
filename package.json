@@ -1,0 +1,27 @@
+{
+  "name": "corporax",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The missing corporate-actions layer for tokenized stocks. On-chain dividends, splits, and record-date semantics for Robinhood Chain.",
+  "license": "MIT",
+  "workspaces": [
+    "app",
+    "tooling/snapshot"
+  ],
+  "scripts": {
+    "abi": "bash scripts/export-abi.sh",
+    "test:contracts": "cd contracts && forge test",
+    "build:contracts": "cd contracts && forge build",
+    "snapshot": "npm -w @corporax/snapshot run start --",
+    "dev": "npm -w @corporax/app run dev",
+    "build": "npm -w @corporax/app run build",
+    "lint": "npm -w @corporax/app run lint",
+    "typecheck": "npm -w @corporax/app run typecheck && npm -w @corporax/snapshot run typecheck",
+    "anvil": "anvil",
+    "deploy:local": "cd contracts && forge script script/Deploy.s.sol:Deploy --rpc-url http://127.0.0.1:8545 --broadcast",
+    "seed:local": "cd contracts && forge script script/Seed.s.sol:Seed --rpc-url http://127.0.0.1:8545 --broadcast"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
