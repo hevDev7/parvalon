@@ -5,7 +5,7 @@ export const metadata = { title: "Claim · CorporaX" };
 
 export default function ClaimPage() {
   return (
-    <div className="mx-auto max-w-4xl px-5 py-14 sm:px-8">
+    <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
       <header className="mb-10">
         <Kicker>For holders</Kicker>
         <h1 className="display mt-3 text-[clamp(2.4rem,5vw,3.6rem)] text-ink">Claim your dividend.</h1>
