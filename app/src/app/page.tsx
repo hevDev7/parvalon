@@ -1,12 +1,20 @@
 import Link from "next/link";
 import { Button, Card, Kicker } from "@/components/ui";
+import { WaveGrid } from "@/components/WaveGrid";
 
 export default function Home() {
   return (
     <div>
       {/* ───────────────────────────── Hero ───────────────────────────── */}
       <section className="relative overflow-hidden border-b border-line">
-        <div className="grid-bg bg-fade pointer-events-none absolute inset-0 -z-10" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden>
+          <WaveGrid />
+          {/* Melt the wave into the canvas at the edges + lift text contrast. */}
+          <div
+            className="absolute inset-0"
+            style={{ background: "radial-gradient(115% 95% at 50% 56%, transparent 42%, var(--surface) 100%)" }}
+          />
+        </div>
         <div className="mx-auto grid max-w-6xl gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:py-28">
           <div className="relative">
             <Kicker className="animate-rise">Corporate-actions infrastructure · Robinhood Chain</Kicker>
