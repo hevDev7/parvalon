@@ -157,8 +157,11 @@ contract CorporateActionRegistry is ICorporateActionRegistry, AccessControl, Pau
     function cancelAction(uint256 id) external {
         CorporateAction storage a = _requireAction(id);
         if (msg.sender != _assetIssuer[a.asset]) revert Unauthorized(msg.sender, a.asset);
-        // Cancellation is only safe before any value can have moved.
-        if (a.status != ActionStatus.ANNOUNCED && a.status != ActionStatus.ROOT_PUBLISHED) {
+        // Cancellation is restricted to ANNOUNCED. Funding can only begin once an
+        // action is ROOT_PUBLISHED, so this guarantees no tokens are ever stranded
+        // in the distributor by a cancellation (a CANCELLED action has no exit path
+        // for funds). To retire a published action instead, fund it and sweep.
+        if (a.status != ActionStatus.ANNOUNCED) {
             revert InvalidStatus(id, a.status, ActionStatus.ANNOUNCED);
         }
         _setStatus(a, ActionStatus.CANCELLED);

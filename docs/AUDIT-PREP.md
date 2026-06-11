@@ -10,8 +10,9 @@
 
 | Tool | Version | Command | Result |
 |---|---|---|---|
-| Foundry tests | forge 1.5.1 | `forge test` | **67 passed, 0 failed** (unit + fuzz + invariants) |
-| Slither | 0.11.5 | `slither . --config-file slither.config.json` | 9 results, **0 high / 0 medium** — all low / informational, dispositioned below |
+| Foundry tests | forge 1.5.1 | `forge test` | **72 passed, 0 failed** (unit + fuzz + invariants + audit-regression) |
+| Multi-agent review | 8 adversarial agents | (see §6) | 2 findings + 1 minor + leads — **all fixed** (§6), regression-tested |
+| Slither | 0.11.5 | `slither . --config-file slither.config.json` | 7 results, **0 high / 0 medium** — all low / informational, dispositioned below |
 | forge fmt | 1.5.1 | `forge fmt --check` | clean |
 | Gas | — | `forge test --gas-report` | `claim ≈ 82k`, `fund ≈ 108k` |
 
@@ -65,8 +66,25 @@ contracts mean a fix is a fresh audited deployment + migration (deliberate, tran
 
 ```bash
 cd contracts
-forge test                                   # 67 tests
+forge test                                   # 72 tests
 forge test --gas-report                      # gas table
 slither . --config-file slither.config.json  # static analysis
 forge fmt --check                            # formatting
 ```
+
+## 6. Resolved findings — multi-agent adversarial review
+
+An 8-agent adversarial pass (vector-scan, math, access-control, economic, execution-trace,
+invariant, periphery, first-principles) found the issues below. **All are fixed**, each with a
+regression test in `test/AuditRegression.t.sol`.
+
+| # | Severity | Finding | Fix | Regression test |
+|---|---|---|---|---|
+| 1 | **High** | `claim` had no per-action solvency cap — an action whose Merkle leaves exceed its funding (malicious issuer, or an honest snapshot bug) could drain USDG that other actions funded in the shared pool, breaking the "funds for one action are never accounted against another" invariant. | `claim` now reverts `ExceedsFunded` when `_claimedTotal[id] + amount > _funded[id]`. An action can never pay out more than it funded, regardless of root integrity. | `test_Audit1_ClaimCannotDrainSiblingAction` |
+| 2 | Medium | Cancelling a partially-funded action (`fund` is permissionless and deposits in `ROOT_PUBLISHED`) stranded the deposited tokens — no exit path for a `CANCELLED` action. | `cancelAction` restricted to `ANNOUNCED` only. Funding cannot begin until `ROOT_PUBLISHED`, so a cancellable action provably holds zero funds. | `test_Audit2_CannotCancelPartiallyFundedAction`, `test_Audit2_CancelStillWorksWhenAnnounced` |
+| 3 | Low | `sweepUnclaimed` lacked `whenNotPaused`, so value could exit to the issuer during an emergency pause while holders were frozen out of claiming. | Added `whenNotPaused` to `sweepUnclaimed` — the emergency stop now freezes all value movement symmetrically. | `test_Audit3_SweepBlockedWhilePaused` |
+| 4 | Lead→fixed | `fund` credited the *requested* amount, not the *received* balance — a fee-on-transfer / rebasing `payoutToken` could mark an action `CLAIMABLE` while under-funded. | `fund` now credits the measured balance delta (`balanceOf` before/after), so accounting always matches the real balance. Still: prefer the documented standard USDG and consider a `payoutToken` allowlist in production (see [LIMITATIONS.md](./LIMITATIONS.md)). | `test_Audit4_FeeOnTransferCreditsReceivedAmount` |
+
+Open leads still recommended for the external audit's attention: the `FunctionsActionSource`
+DON-binding (production CBOR arg-passing), attestation replay (no id/nonce in `dataHash`), the
+permissionless `fund` design choice, and the illustrative keeper-trust in `SplitAwareCollateral`.

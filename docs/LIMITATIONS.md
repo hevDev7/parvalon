@@ -37,7 +37,7 @@ The snapshot keeps **every address with balance > 0**, including contracts (AMM 
 
 There is one `DividendDistributor`, and each action pays in one `payoutToken` (USDG in the demo).
 
-**Why acceptable.** One distributor keeps custody and accounting in a single auditable place, with strict per-action isolation (`_funded`/`_claimed` keyed by `id`; the `Overfunded` cap; the solvency invariant). USDG is the ecosystem's native stablecoin and faithfully represents a cash dividend (D4). Multi-token payouts and additional distributors are a v2 concern, not a v1 safety gap.
+**Why acceptable.** One distributor keeps custody and accounting in a single auditable place, with strict per-action isolation enforced on-chain: `_funded`/`_claimedTotal` are keyed by `id`, `fund` is capped by `Overfunded`, and — following the security review — `claim` reverts `ExceedsFunded` if cumulative claims for an action would exceed its own funding, so one action can never spend another's pooled tokens regardless of root integrity. `fund` also credits the **measured balance delta** (not the requested amount), so a fee-on-transfer/rebasing `payoutToken` cannot mark an action claimable while under-funded. That said, the **documented and recommended `payoutToken` is standard USDG**; a production deployment using arbitrary tokens should add a `payoutToken` allowlist (PRODUCTION-READINESS §2/§7). USDG is the ecosystem's native stablecoin and faithfully represents a cash dividend (D4). Multi-token payouts and additional distributors are a v2 concern, not a v1 safety gap.
 
 ## 6. USDG decimals / `1e18` rate assumption
 

@@ -60,17 +60,24 @@ contract DividendDistributor is IDividendDistributor, AccessControl, Pausable, R
         if (a.status != ActionStatus.ROOT_PUBLISHED) revert WrongStatus(id);
         if (amount == 0) revert ZeroAmount(id);
 
-        uint256 newFunded = _funded[id] + amount;
+        // Credit the ACTUAL balance received, not the requested amount, so a
+        // fee-on-transfer / rebasing payout token can never mark an action
+        // CLAIMABLE while the contract holds less than `totalPayout`. Safe to
+        // transfer before updating state under `nonReentrant`.
+        IERC20 token = IERC20(a.payoutToken);
+        uint256 balanceBefore = token.balanceOf(address(this));
+        token.safeTransferFrom(msg.sender, address(this), amount);
+        uint256 received = token.balanceOf(address(this)) - balanceBefore;
+
+        uint256 newFunded = _funded[id] + received;
         if (newFunded > a.totalPayout) revert Overfunded(id, newFunded, a.totalPayout);
 
-        // Effects before interactions.
         _funded[id] = newFunded;
-        emit Funded(id, msg.sender, amount, newFunded);
+        emit Funded(id, msg.sender, received, newFunded);
 
-        // Pull the cash in first, then flip the registry status. Both are atomic
-        // with the effect above — any failure reverts the entire call.
-        IERC20(a.payoutToken).safeTransferFrom(msg.sender, address(this), amount);
-        if (newFunded == a.totalPayout) {
+        // `>=` is equivalent to `==` here (the Overfunded check above caps newFunded
+        // at totalPayout) but avoids a balance-derived strict equality.
+        if (newFunded >= a.totalPayout) {
             REGISTRY.markClaimable(id);
         }
     }
@@ -92,9 +99,14 @@ contract DividendDistributor is IDividendDistributor, AccessControl, Pausable, R
         bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(id, index, account, amount))));
         if (!MerkleProof.verify(proof, a.merkleRoot, leaf)) revert InvalidProof(id, index);
 
-        // Effects.
+        // Effects. Per-action solvency cap: an action can NEVER pay out more than
+        // it was funded, regardless of the published root's leaf sum. This is what
+        // isolates one action's funds from every other action sharing the payout
+        // token in this contract's pooled balance.
         _claimed[id].set(index);
-        _claimedTotal[id] += amount;
+        uint256 newClaimed = _claimedTotal[id] + amount;
+        if (newClaimed > _funded[id]) revert ExceedsFunded(id, newClaimed, _funded[id]);
+        _claimedTotal[id] = newClaimed;
         emit Claimed(id, index, account, amount);
 
         // Interaction — funds always settle to `account` (claim-on-behalf, FR-6).
@@ -102,7 +114,7 @@ contract DividendDistributor is IDividendDistributor, AccessControl, Pausable, R
     }
 
     /// @inheritdoc IDividendDistributor
-    function sweepUnclaimed(uint256 id) external nonReentrant {
+    function sweepUnclaimed(uint256 id) external nonReentrant whenNotPaused {
         ActionView memory a = REGISTRY.actionView(id);
         if (a.actionType != ActionType.CASH_DIVIDEND) revert NotADividend(id);
         if (a.status != ActionStatus.CLAIMABLE) revert WrongStatus(id);

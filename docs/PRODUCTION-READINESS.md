@@ -31,7 +31,7 @@ Functions subscription to fund, a cloud KMS to provision) — not code.
 | Item | What landed | Still needs (ops) |
 |---|---|---|
 | P0-1/P0-2 | `DeployGovernance.s.sol` + `Governance.t.sol`: `TimelockController` holds admin, Safe holds pauser | create the Safe; run the handover |
-| P0-3 | Expanded invariants (`InvariantLifecycle`), slither run, [AUDIT-PREP.md](./AUDIT-PREP.md) | engage an external audit firm |
+| P0-3 | Expanded invariants (`InvariantLifecycle`), slither (0 high/med), **8-agent adversarial review → 2 findings + 1 minor fixed + regression-tested** ([AUDIT-PREP.md](./AUDIT-PREP.md) §6) | engage an external audit firm |
 | P0-4 | `FunctionsActionSource` + `MockFunctionsRouter` + `DeployFunctionsSource.s.sol` | fund a Functions subscription; deploy the off-chain source |
 | P0-5 | Snapshot CLI over real `Transfer` logs (chunked/retry/resume) — parity-proven | — (already the production path) |
 | P0-6 | `@corporax/monitor` service (solvency + lifecycle alerts, webhook sink) | point at a prod RPC; wire the alert channel |

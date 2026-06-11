@@ -41,6 +41,9 @@ interface IDividendDistributor {
     error WrongStatus(uint256 id);
     /// @notice Funding would exceed the published totalPayout.
     error Overfunded(uint256 id, uint256 attempted, uint256 cap);
+    /// @notice Cumulative claims would exceed the amount actually funded for this
+    ///         action — the per-action solvency cap that isolates pooled funds.
+    error ExceedsFunded(uint256 id, uint256 attempted, uint256 funded);
     /// @notice The Merkle proof did not verify against the action's root.
     error InvalidProof(uint256 id, uint256 index);
     /// @notice This (action, index) leaf was already claimed.

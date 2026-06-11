@@ -568,6 +568,27 @@
   },
   {
     "type": "error",
+    "name": "ExceedsFunded",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "attempted",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "funded",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
     "name": "ExpectedPause",
     "inputs": []
   },
