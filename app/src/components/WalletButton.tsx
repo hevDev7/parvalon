@@ -24,19 +24,19 @@ export function WalletButton() {
       <div className="relative" ref={ref}>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex items-center gap-2 rounded-full border border-line bg-paper-panel px-3.5 py-2 text-sm shadow-inset transition hover:border-line-strong"
+          className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-raised px-3.5 py-2 text-sm shadow-inset transition hover:border-line-strong"
         >
-          <span className="h-2 w-2 rounded-full bg-viridian-bright" />
+          <span className="h-2 w-2 rounded-full bg-lime-bright" />
           <span className="tabular text-ink">{shortAddr(address)}</span>
         </button>
         {open && (
-          <div className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-line bg-paper-panel shadow-lift">
+          <div className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-line bg-surface-raised shadow-lift">
             <button
               onClick={() => {
                 disconnect();
                 setOpen(false);
               }}
-              className="block w-full px-4 py-3 text-left text-sm text-ink-soft transition hover:bg-paper-deep hover:text-oxblood"
+              className="block w-full px-4 py-3 text-left text-sm text-ink-soft transition hover:bg-surface-inset hover:text-danger"
             >
               Disconnect
             </button>
@@ -51,12 +51,12 @@ export function WalletButton() {
       <button
         onClick={() => setOpen((v) => !v)}
         disabled={isPending}
-        className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper-panel transition hover:bg-viridian disabled:opacity-60"
+        className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-medium text-surface-raised transition hover:bg-lime disabled:opacity-60"
       >
         {isPending ? "Connecting…" : "Connect"}
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-line bg-paper-panel shadow-lift">
+        <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-line bg-surface-raised shadow-lift">
           <p className="border-b border-line px-4 py-2.5 text-[0.7rem] uppercase tracking-kicker text-ink-faint">
             Choose a wallet
           </p>
@@ -67,7 +67,7 @@ export function WalletButton() {
                 connect({ connector: c });
                 setOpen(false);
               }}
-              className="block w-full px-4 py-3 text-left text-sm text-ink transition hover:bg-viridian-wash"
+              className="block w-full px-4 py-3 text-left text-sm text-ink transition hover:bg-lime-wash"
             >
               {c.name}
             </button>

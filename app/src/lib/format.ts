@@ -50,18 +50,18 @@ export const STATUS_LABEL: Record<ActionStatusName, string> = {
   CANCELLED: "Cancelled",
 };
 
-/** Returns the design tokens for a status chip. */
+/** Returns the design tokens for a status chip (dark-theme tints). */
 export function statusTone(s: ActionStatusName): { fg: string; bg: string; dot: string } {
   switch (s) {
     case "CLAIMABLE":
-      return { fg: "text-viridian", bg: "bg-viridian-wash", dot: "bg-viridian-bright" };
+      return { fg: "text-lime", bg: "bg-lime-wash", dot: "bg-lime-bright" };
     case "ROOT_PUBLISHED":
-      return { fg: "text-brass", bg: "bg-[#f4ecd9]", dot: "bg-brass" };
+      return { fg: "text-signal", bg: "bg-signal/10", dot: "bg-signal" };
     case "ANNOUNCED":
-      return { fg: "text-ink-soft", bg: "bg-paper-deep", dot: "bg-ink-faint" };
+      return { fg: "text-ink-soft", bg: "bg-surface-inset", dot: "bg-ink-faint" };
     case "FINALIZED":
-      return { fg: "text-ink-soft", bg: "bg-paper-deep", dot: "bg-ink-soft" };
+      return { fg: "text-ink-soft", bg: "bg-surface-inset", dot: "bg-ink-soft" };
     case "CANCELLED":
-      return { fg: "text-oxblood", bg: "bg-[#f3e3df]", dot: "bg-oxblood" };
+      return { fg: "text-danger", bg: "bg-danger/10", dot: "bg-danger" };
   }
 }

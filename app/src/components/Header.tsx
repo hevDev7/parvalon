@@ -14,7 +14,7 @@ const NAV = [
 export function Header() {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-line bg-surface/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
         <Logo />
         <nav className="hidden items-center gap-1 sm:flex">
@@ -29,7 +29,7 @@ export function Header() {
                 }`}
               >
                 {item.label}
-                {active && <span className="absolute inset-x-3.5 -bottom-[1px] h-px bg-viridian" />}
+                {active && <span className="absolute inset-x-3.5 -bottom-[1px] h-px bg-lime" />}
               </Link>
             );
           })}

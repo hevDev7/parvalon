@@ -160,10 +160,10 @@ export function IssuerConsole() {
               <span
                 className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[0.78rem] font-semibold transition ${
                   done
-                    ? "bg-viridian text-paper-panel"
+                    ? "bg-lime text-surface-raised"
                     : active
-                      ? "bg-ink text-paper-panel"
-                      : "border border-line bg-paper-panel text-ink-faint"
+                      ? "bg-ink text-surface-raised"
+                      : "border border-line bg-surface-raised text-ink-faint"
                 }`}
               >
                 {done ? "✓" : i + 1}
@@ -218,7 +218,7 @@ export function IssuerConsole() {
               Once the record block has passed, anyone can reconstruct the holder set from on-chain Transfer logs and
               build the Merkle root. Run the CLI, then paste the result below.
             </p>
-            <pre className="overflow-x-auto rounded-xl bg-ink p-4 text-[0.78rem] leading-relaxed text-paper-panel">
+            <pre className="overflow-x-auto rounded-xl border border-line bg-black/40 p-4 text-[0.78rem] leading-relaxed text-lime">
               <code>{cliCommand}</code>
             </pre>
             <Button variant="outline" onClick={() => setStep(2)}>
@@ -264,7 +264,7 @@ export function IssuerConsole() {
 
         {step === 4 && (
           <div className="space-y-4 text-center">
-            <span className="mx-auto grid h-14 w-14 animate-seal place-items-center rounded-full bg-viridian text-paper-panel">
+            <span className="mx-auto grid h-14 w-14 animate-seal place-items-center rounded-full bg-lime text-surface-raised">
               <span className="display text-2xl">✓</span>
             </span>
             <h3 className="display text-2xl text-ink">Action #{actionId?.toString()} is now claimable.</h3>
@@ -275,7 +275,7 @@ export function IssuerConsole() {
           </div>
         )}
 
-        {err && <p className="mt-4 text-sm text-oxblood">{err}</p>}
+        {err && <p className="mt-4 text-sm text-danger">{err}</p>}
         {tx && step !== 4 && (
           <a href={explorerTxUrl(tx)} target="_blank" rel="noreferrer" className="mt-4 block text-sm text-ink-soft hover:text-ink">
             Last transaction ↗

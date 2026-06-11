@@ -5,7 +5,8 @@ export default function Home() {
   return (
     <div>
       {/* ───────────────────────────── Hero ───────────────────────────── */}
-      <section className="paper-grain guilloche relative overflow-hidden border-b border-line">
+      <section className="relative overflow-hidden border-b border-line">
+        <div className="grid-bg bg-fade pointer-events-none absolute inset-0 -z-10" aria-hidden />
         <div className="mx-auto grid max-w-6xl gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:py-28">
           <div className="relative">
             <Kicker className="animate-rise">Corporate-actions infrastructure · Robinhood Chain</Kicker>
@@ -17,10 +18,10 @@ export default function Home() {
               <br />
               can finally pay
               <br />
-              <span className="relative text-viridian">
+              <span className="relative text-lime">
                 dividends
                 <svg className="absolute -bottom-2 left-0 w-full" height="10" viewBox="0 0 300 10" preserveAspectRatio="none" aria-hidden>
-                  <path d="M0 6 Q 75 0 150 5 T 300 4" stroke="var(--brass-soft)" strokeWidth="2" fill="none" />
+                  <path d="M0 6 Q 75 0 150 5 T 300 4" stroke="var(--signal)" strokeWidth="2" fill="none" />
                 </svg>
               </span>
               .
@@ -43,14 +44,14 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Certificate motif */}
+          {/* Dividend ticket */}
           <div className="relative hidden lg:block">
-            <DividendCertificate />
+            <DividendTicket />
           </div>
         </div>
 
         {/* Stat strip */}
-        <div className="border-t border-line bg-paper-panel/50">
+        <div className="border-t border-line bg-surface-raised/50">
           <dl className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-line px-5 sm:px-8 md:grid-cols-4">
             {[
               ["~1,997", "tokenized stocks on Arbitrum"],
@@ -97,7 +98,7 @@ export default function Home() {
       </section>
 
       {/* ───────────────────────── How it works ───────────────────────── */}
-      <section className="border-y border-line bg-paper-deep/40">
+      <section className="border-y border-line bg-surface-inset/40">
         <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
           <Kicker>One clean cycle, end to end</Kicker>
           <h2 className="display mt-3 text-4xl text-ink">From announcement to a holder&apos;s wallet.</h2>
@@ -108,8 +109,8 @@ export default function Home() {
               ["03", "Fund", "The issuer funds the pool in USDG. The action turns claimable."],
               ["04", "Claim", "Holders claim pro-rata — gaslessly — straight to their wallet."],
             ].map(([n, title, body]) => (
-              <li key={n} className="bg-paper-panel p-6">
-                <span className="tabular text-sm text-brass">{n}</span>
+              <li key={n} className="bg-surface-raised p-6">
+                <span className="tabular text-sm text-signal">{n}</span>
                 <h3 className="display mt-2 text-2xl text-ink">{title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
               </li>
@@ -138,7 +139,7 @@ export default function Home() {
                 "Claim-on-behalf: gasless relays and AI agents, with zero custody risk.",
               ].map((p) => (
                 <li key={p} className="flex gap-3">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-viridian" />
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-lime" />
                   {p}
                 </li>
               ))}
@@ -146,7 +147,7 @@ export default function Home() {
           </div>
           <Card className="p-7">
             <Kicker>For developers</Kicker>
-            <pre className="mt-3 overflow-x-auto rounded-xl bg-ink p-4 text-[0.8rem] leading-relaxed text-paper-panel">
+            <pre className="mt-3 overflow-x-auto rounded-xl border border-line bg-black/40 p-4 text-[0.8rem] leading-relaxed text-lime">
               <code>{`$ curl /api/actions
 
 {
@@ -172,37 +173,43 @@ export default function Home() {
   );
 }
 
-/* Decorative dividend certificate used in the hero. */
-function DividendCertificate() {
+/* Dark "dividend ticket" terminal panel used in the hero. */
+function DividendTicket() {
   return (
-    <div className="relative mx-auto max-w-sm rotate-1">
-      <div className="paper-grain relative overflow-hidden rounded-2xl border border-brass-soft bg-paper-panel p-7 shadow-certificate">
-        <div className="flex items-center justify-between">
-          <span className="kicker">Cash dividend</span>
-          <span className="grid h-9 w-9 place-items-center rounded-full border border-brass text-brass">
-            <span className="display text-lg">✓</span>
+    <div className="relative mx-auto max-w-sm">
+      <div className="absolute -inset-5 -z-10 rounded-[28px] bg-lime/5 blur-2xl" aria-hidden />
+      <div className="relative overflow-hidden rounded-2xl border border-line-strong bg-surface-raised shadow-panel">
+        <div className="flex items-center justify-between border-b border-line px-5 py-3">
+          <span className="kicker">cash_dividend</span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-lime-bright animate-pulse-glow" />
+            <span className="kicker text-lime">live</span>
           </span>
         </div>
-        <p className="mt-6 text-sm text-ink-faint">Payable to the holder of</p>
-        <p className="display text-4xl text-ink">TSLA</p>
-        <div className="rule-brass my-5" />
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-[0.72rem] text-ink-faint">Amount</p>
-            <p className="tabular text-2xl text-viridian">12.50 USDG</p>
+        <div className="px-5 py-6">
+          <p className="kicker">payable to holders of</p>
+          <p className="display mt-1.5 text-4xl text-ink">TSLA</p>
+          <div className="mt-6 flex items-end justify-between">
+            <div>
+              <p className="kicker">amount</p>
+              <p className="tabular mt-1 text-3xl font-medium text-lime">
+                12.50<span className="ml-1.5 text-base text-ink-faint">USDG</span>
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="kicker">record block</p>
+              <p className="tabular mt-1 text-sm text-ink">#8,041,233</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-[0.72rem] text-ink-faint">Record block</p>
-            <p className="tabular text-sm text-ink">#8,041,233</p>
-          </div>
+          <button className="mt-7 w-full rounded-xl bg-lime py-3 text-sm font-semibold text-surface shadow-glow transition hover:bg-lime-bright">
+            Claim — no gas needed
+          </button>
         </div>
-        <div className="mt-6 flex items-center gap-2">
-          <div className="h-px flex-1 bg-line" />
-          <span className="kicker">Verified on-chain</span>
-          <div className="h-px flex-1 bg-line" />
+        <div className="flex items-center gap-3 border-t border-dashed border-line px-5 py-3">
+          <span className="kicker">verified on-chain</span>
+          <span className="tabular ml-auto text-[0.7rem] text-ink-faint">cae-1 · merkle</span>
         </div>
       </div>
-      <div className="absolute -right-3 -top-3 -z-10 h-full w-full rounded-2xl border border-line bg-paper-deep" />
     </div>
   );
 }

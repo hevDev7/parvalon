@@ -10,10 +10,10 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const BTN: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  primary: "bg-viridian text-paper-panel hover:bg-viridian-bright shadow-lift",
-  ink: "bg-ink text-paper-panel hover:bg-viridian",
-  ghost: "bg-transparent text-ink-soft hover:text-ink hover:bg-paper-deep",
-  outline: "border border-line-strong bg-paper-panel text-ink hover:border-viridian hover:text-viridian",
+  primary: "bg-lime text-surface hover:bg-lime-bright shadow-lift",
+  ink: "bg-ink text-surface hover:bg-lime",
+  ghost: "bg-transparent text-ink-soft hover:text-ink hover:bg-surface-inset",
+  outline: "border border-line-strong bg-surface-raised text-ink hover:border-lime hover:text-lime",
 };
 
 export function Button({ variant = "primary", loading, children, className = "", disabled, ...rest }: ButtonProps) {
@@ -49,7 +49,7 @@ export function Card({
   as?: "div" | "section" | "article";
 }) {
   return (
-    <Tag className={`rounded-2xl border border-line bg-paper-panel shadow-certificate ${className}`}>{children}</Tag>
+    <Tag className={`rounded-2xl border border-line bg-surface-raised shadow-panel ${className}`}>{children}</Tag>
   );
 }
 
@@ -102,8 +102,8 @@ export function EmptyState({
   action?: { href: string; label: string };
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-paper-panel/60 px-6 py-16 text-center">
-      <div className="mb-4 grid h-12 w-12 place-items-center rounded-full border border-line bg-paper-deep">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-surface-raised/60 px-6 py-16 text-center">
+      <div className="mb-4 grid h-12 w-12 place-items-center rounded-full border border-line bg-surface-inset">
         <span className="display text-2xl text-ink-faint">∅</span>
       </div>
       <h3 className="display text-xl text-ink">{title}</h3>
@@ -139,4 +139,4 @@ export function Field({
 }
 
 export const inputClass =
-  "w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm text-ink shadow-inset outline-none transition placeholder:text-ink-faint focus:border-viridian";
+  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink shadow-inset outline-none transition placeholder:text-ink-faint focus:border-lime";

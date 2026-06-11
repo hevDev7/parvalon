@@ -3,32 +3,33 @@
 @tailwind utilities;
 
 /* ============================================================================
-   THE ENGRAVED LEDGER — design tokens
+   DARK INSTITUTIONAL ONCHAIN — design tokens
+   Deep graphite canvas, a single luminous lime accent, hairline grids, and
+   monospace data. Reads like an institutional on-chain terminal.
    ========================================================================== */
 :root {
-  --paper: #f7f4ec; /* warm ivory canvas */
-  --paper-deep: #efe9db; /* recessed sections */
-  --paper-panel: #fffdf8; /* raised cards / certificates */
+  --surface: #0e0f12; /* base canvas */
+  --surface-raised: #16181d; /* cards / panels */
+  --surface-inset: #1c1f26; /* inputs / wells */
 
-  --ink: #181a12; /* warm near-black */
-  --ink-soft: #5c5e4f; /* secondary text */
-  --ink-faint: #8c8d7d; /* tertiary / captions */
+  --ink: #e7e9ea; /* primary text */
+  --ink-soft: #9ba0a6; /* secondary */
+  --ink-faint: #6b7077; /* tertiary / captions */
 
-  --viridian: #0f6b4a; /* primary — money, claims, success */
-  --viridian-bright: #16a06d; /* hover / live accents */
-  --viridian-wash: #e4eee6; /* tinted backgrounds */
+  --lime: #c6f84e; /* primary accent — money, claims, live */
+  --lime-bright: #d7ff66; /* hover / glow */
+  --lime-dim: #9bc23a;
+  --lime-wash: rgba(198, 248, 78, 0.1);
 
-  --brass: #9c7a36; /* certificate hairline / seal */
-  --brass-soft: #c7a866;
+  --signal: #e8b339; /* amber — funded/awaiting state */
+  --danger: #ff5c5c; /* cancelled / errors */
 
-  --oxblood: #8a3326; /* danger / cancelled */
+  --line: rgba(231, 233, 234, 0.1); /* hairline */
+  --line-strong: rgba(231, 233, 234, 0.2);
 
-  --line: rgba(24, 26, 18, 0.12);
-  --line-strong: rgba(24, 26, 18, 0.24);
-
-  --font-display: "Instrument Serif", Georgia, serif;
-  --font-sans: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-display: "Archivo", system-ui, sans-serif;
+  --font-sans: "Archivo", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 * {
@@ -40,50 +41,54 @@ html {
 }
 
 body {
-  background-color: var(--paper);
+  background-color: var(--surface);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-feature-settings: "ss01", "cv01";
+  font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: var(--viridian);
-  color: var(--paper-panel);
+  background: var(--lime);
+  color: #0e0f12;
 }
 
-/* Keyboard focus — visible, viridian, WCAG-friendly (PRD §11). */
+/* Keyboard focus — luminous lime ring. */
 :focus-visible {
-  outline: 2px solid var(--viridian);
+  outline: 2px solid var(--lime);
   outline-offset: 2px;
   border-radius: 2px;
 }
 
 /* ============================================================================
-   Texture: engraved guilloché security pattern + paper grain
+   Textures: technical hairline grid, dot field, scanline
    ========================================================================== */
-.guilloche {
+.grid-bg {
   background-image:
-    repeating-radial-gradient(circle at 50% 50%, transparent 0 13px, rgba(15, 107, 74, 0.05) 13px 14px),
-    repeating-radial-gradient(circle at 18% 120%, transparent 0 19px, rgba(156, 122, 54, 0.05) 19px 20px),
-    repeating-radial-gradient(circle at 88% -20%, transparent 0 22px, rgba(24, 26, 18, 0.04) 22px 23px);
+    linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 34px 34px;
 }
 
-.paper-grain::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+.dot-bg {
+  background-image: radial-gradient(rgba(231, 233, 234, 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
-/* Hairline divider, certificate style */
-.rule-brass {
+/* Fade a background texture out toward the edges of a section. */
+.bg-fade {
+  -webkit-mask-image: radial-gradient(130% 90% at 50% 0%, #000 38%, transparent 100%);
+  mask-image: radial-gradient(130% 90% at 50% 0%, #000 38%, transparent 100%);
+}
+
+.rule {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--brass-soft) 18%, var(--brass-soft) 82%, transparent);
+  background: var(--line-strong);
+}
+
+/* Luminous lime edge — for the primary claim moment. */
+.glow-lime {
+  box-shadow: 0 0 0 1px rgba(198, 248, 78, 0.35), 0 0 30px -8px rgba(198, 248, 78, 0.5);
 }
 
 /* ============================================================================
@@ -91,16 +96,17 @@ body {
    ========================================================================== */
 .kicker {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink-faint);
 }
 
 .display {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   line-height: 0.98;
 }
 
@@ -110,24 +116,24 @@ body {
   font-feature-settings: "tnum";
 }
 
-/* Marquee tape gradient mask */
+/* Marquee tape edge mask */
 .tape-mask {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
 
-/* Subtle skeleton shimmer for loading states */
+/* Loading shimmer on dark */
 .skeleton {
   position: relative;
   overflow: hidden;
-  background: var(--paper-deep);
+  background: var(--surface-inset);
 }
 .skeleton::after {
   content: "";
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255, 253, 248, 0.7), transparent);
+  background: linear-gradient(90deg, transparent, rgba(231, 233, 234, 0.06), transparent);
   animation: shimmer 1.6s infinite;
 }
 

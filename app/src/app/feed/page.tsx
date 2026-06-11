@@ -34,7 +34,7 @@ export default async function FeedPage() {
           href="/api/actions"
           target="_blank"
           rel="noreferrer"
-          className="inline-flex w-fit items-center gap-2 rounded-full border border-line-strong bg-paper-panel px-4 py-2 text-sm font-medium text-ink transition hover:border-viridian hover:text-viridian"
+          className="inline-flex w-fit items-center gap-2 rounded-full border border-line-strong bg-surface-raised px-4 py-2 text-sm font-medium text-ink transition hover:border-lime hover:text-lime"
         >
           GET /api/actions ↗
         </a>
@@ -46,8 +46,8 @@ export default async function FeedPage() {
           body="Set NEXT_PUBLIC_REGISTRY_ADDRESS and NEXT_PUBLIC_DISTRIBUTOR_ADDRESS (or run a local anvil + deploy)."
         />
       ) : error ? (
-        <Card className="border-oxblood/30 p-6">
-          <p className="text-sm text-oxblood">Couldn&apos;t read the chain: {error}</p>
+        <Card className="border-danger/30 p-6">
+          <p className="text-sm text-danger">Couldn&apos;t read the chain: {error}</p>
         </Card>
       ) : actions.length === 0 ? (
         <EmptyState
@@ -72,14 +72,14 @@ export default async function FeedPage() {
               </thead>
               <tbody className="divide-y divide-line">
                 {actions.map((a) => (
-                  <tr key={a.id} className="transition hover:bg-paper-deep/40">
+                  <tr key={a.id} className="transition hover:bg-surface-inset/40">
                     <td className="px-5 py-4 tabular text-ink-faint">{a.id}</td>
                     <td className="px-5 py-4">
                       <a
                         href={explorerAddressUrl(a.asset)}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-medium text-ink underline-offset-2 hover:text-viridian hover:underline"
+                        className="font-medium text-ink underline-offset-2 hover:text-lime hover:underline"
                       >
                         {a.assetSymbol}
                       </a>
@@ -99,7 +99,7 @@ export default async function FeedPage() {
                       {a.actionType === "CASH_DIVIDEND" ? (
                         <span>
                           {fmtAmount(a.totalPayoutWei)} <span className="text-ink-faint">·</span>{" "}
-                          <span className="text-viridian">{fmtAmount(a.totalClaimedWei)}</span>
+                          <span className="text-lime">{fmtAmount(a.totalClaimedWei)}</span>
                         </span>
                       ) : (
                         <span className="text-ink-faint">—</span>
@@ -118,7 +118,7 @@ export default async function FeedPage() {
       <section className="mt-12 grid gap-6 lg:grid-cols-2">
         <Card className="p-6">
           <Kicker>Subscribe to events</Kicker>
-          <pre className="mt-3 overflow-x-auto rounded-xl bg-ink p-4 text-[0.78rem] leading-relaxed text-paper-panel">
+          <pre className="mt-3 overflow-x-auto rounded-xl border border-line bg-black/40 p-4 text-[0.78rem] leading-relaxed text-lime">
             <code>{`// CAE-1 — Corporate Action Events
 ActionAnnounced(id, asset, actionType,
   ratePerShare, recordBlock, payableAt,
@@ -131,7 +131,7 @@ Claimed(id, index, account, amount)`}</code>
         </Card>
         <Card className="p-6">
           <Kicker>Read the feed</Kicker>
-          <pre className="mt-3 overflow-x-auto rounded-xl bg-ink p-4 text-[0.78rem] leading-relaxed text-paper-panel">
+          <pre className="mt-3 overflow-x-auto rounded-xl border border-line bg-black/40 p-4 text-[0.78rem] leading-relaxed text-lime">
             <code>{`$ curl https://corporax.xyz/api/actions
 
 {

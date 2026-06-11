@@ -3,9 +3,9 @@ import { activeChain } from "@/lib/chain";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-line bg-paper-panel/50">
+    <footer className="border-t border-line bg-surface-raised/50">
       <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
-        <div className="rule-brass mb-8" />
+        <div className="rule mb-8" />
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-md">
             <p className="display text-xl text-ink">The transfer agent for the on-chain economy.</p>

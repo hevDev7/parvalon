@@ -79,7 +79,7 @@ export function ClaimPanel() {
   // ---- States --------------------------------------------------------------
   if (!isConnected) {
     return (
-      <Card className="paper-grain relative p-10 text-center">
+      <Card className="relative p-10 text-center">
         <Kicker>Step one</Kicker>
         <h2 className="display mt-3 text-3xl text-ink">See what you&apos;re owed.</h2>
         <p className="mx-auto mt-2 max-w-md text-ink-soft">
@@ -111,8 +111,8 @@ export function ClaimPanel() {
         {loading && <ClaimSkeletons />}
 
         {errored && !loading && (
-          <Card className="border-oxblood/30 p-6">
-            <p className="text-sm text-oxblood">We couldn&apos;t reach the network. Please try again.</p>
+          <Card className="border-danger/30 p-6">
+            <p className="text-sm text-danger">We couldn&apos;t reach the network. Please try again.</p>
             <Button variant="outline" className="mt-3" onClick={refetchAll}>
               Retry
             </Button>
@@ -144,7 +144,7 @@ export function ClaimPanel() {
             {history.map((c) => (
               <div key={`${c.actionId}-${c.index}`} className="flex items-center justify-between px-5 py-4">
                 <div className="flex items-center gap-3">
-                  <span className="grid h-9 w-9 place-items-center rounded-full bg-viridian-wash text-viridian">✓</span>
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-lime-wash text-lime">✓</span>
                   <div>
                     <p className="font-medium text-ink">{c.assetSymbol} dividend</p>
                     <p className="text-[0.78rem] text-ink-faint">Action #{c.actionId}</p>
@@ -204,28 +204,34 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
   const busy = phase === "submitting" || phase === "confirming";
 
   return (
-    <Card className="paper-grain relative overflow-hidden p-6">
-      <div className="flex items-start justify-between">
+    <Card className="relative overflow-hidden border-lime/25 p-6 transition hover:border-lime/40">
+      <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-lime/10 blur-2xl" aria-hidden />
+      <div className="relative flex items-start justify-between">
         <div>
-          <Kicker>{claim.assetSymbol} · cash dividend</Kicker>
+          <Kicker>{claim.assetSymbol} · cash_dividend</Kicker>
           <p className="display mt-3 text-2xl text-ink">Your dividend is ready</p>
         </div>
-        {phase === "done" && (
-          <span className="grid h-11 w-11 animate-seal place-items-center rounded-full bg-viridian text-paper-panel shadow-lift">
+        {phase === "done" ? (
+          <span className="grid h-11 w-11 animate-seal place-items-center rounded-full bg-lime text-surface shadow-glow">
             <span className="display text-xl">✓</span>
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 rounded-full border border-lime/30 bg-lime-wash px-2.5 py-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-lime-bright animate-pulse-glow" />
+            <span className="kicker text-lime">claimable</span>
           </span>
         )}
       </div>
 
-      <div className="mt-5 flex items-end gap-1.5">
-        <span className="tabular text-4xl text-viridian">{fmtAmount(claim.amountWei)}</span>
+      <div className="relative mt-5 flex items-end gap-1.5">
+        <span className="tabular text-[2.6rem] font-medium leading-none text-lime">{fmtAmount(claim.amountWei)}</span>
         <span className="mb-1 text-sm text-ink-faint">{claim.payoutSymbol}</span>
       </div>
 
       <div className="mt-6">
         {phase === "done" ? (
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-viridian">Sent to your wallet</span>
+            <span className="text-sm font-medium text-lime">Sent to your wallet</span>
             {hash && (
               <a
                 href={explorerTxUrl(hash)}
@@ -238,11 +244,11 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
             )}
           </div>
         ) : (
-          <Button variant="primary" className="w-full" onClick={onClaim} loading={busy} disabled={busy}>
+          <Button variant="primary" className="w-full shadow-glow" onClick={onClaim} loading={busy} disabled={busy}>
             {busy ? "Claiming…" : gaslessEnabled ? "Claim — no gas needed" : "Claim"}
           </Button>
         )}
-        {phase === "error" && error && <p className="mt-3 text-sm text-oxblood">{error}</p>}
+        {phase === "error" && error && <p className="mt-3 text-sm text-danger">{error}</p>}
         {gaslessEnabled && phase === "idle" && (
           <p className="mt-3 text-center text-[0.72rem] text-ink-faint">We cover the network fee for you.</p>
         )}
