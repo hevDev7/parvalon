@@ -1,7 +1,7 @@
 # Foundry
 out/
 cache/
-broadcast/*/dry-run/
+broadcast/
 broadcast/**/run-latest.json
 # Snapshot artifacts generated locally (committed copies live in /deployments)
 snapshots/*.json

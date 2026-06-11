@@ -150,8 +150,8 @@ The Merkle root is **deterministic and independently verifiable**: two runs of t
 | `abis/` | **Auto-generated** typed ABIs (`index.ts` `as const` + JSON). Import these; never hand-write ABIs. |
 | `deployments/` | `<chainId>.json` address registries + `proofs-<chainId>-<id>.json` artifacts + `chains.json` |
 | `docs/` | This documentation suite (see [below](#documentation)), incl. the [CAE-1 EIP draft](docs/eip/eip-cae1.md) |
-| `scripts/` | `export-abi.sh`, `deploy-and-verify.sh`, `drills.sh`, `onboard-issuer.sh`, `dr-restore.sh` |
-| `infra/` + `.github/` | Docker, CI (forge + TS + slither + codeql), Makefile |
+| `scripts/` | `export-abi.sh`, `e2e.sh` (live protocol test), `deploy-and-verify.sh`, `drills.sh`, `onboard-issuer.sh`, `dr-restore.sh` |
+| `infra/` + `.github/` | Docker, CI (forge + TS + frontend + slither + codeql + **live E2E**), Makefile |
 
 ## Contract addresses
 

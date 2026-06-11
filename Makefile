@@ -48,6 +48,10 @@ abi: ## Regenerate typed ABIs into /abis (scripts/export-abi.sh).
 test: ## Run the Foundry test suite (ci profile: 1000 fuzz / 256 invariant).
 	FOUNDRY_PROFILE=ci forge test -vvv --root $(CONTRACTS)
 
+.PHONY: e2e
+e2e: ## Live protocol E2E: anvil -> deploy -> seed -> claim -> CLI parity -> monitor (needs :8545 free).
+	bash scripts/e2e.sh
+
 .PHONY: fmt
 fmt: ## Format Solidity in place (forge fmt). Use `make fmt-check` in CI.
 	forge fmt --root $(CONTRACTS)

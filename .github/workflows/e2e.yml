@@ -1,0 +1,61 @@
+# Live protocol end-to-end test. Spins up anvil, deploys + seeds the protocol,
+# claims as a holder and asserts the exact pro-rata payout, confirms the production
+# snapshot CLI reproduces the on-chain Merkle root, and runs the monitor's solvency
+# check. Driven by scripts/e2e.sh (also runnable locally). This guards the whole
+# announce -> snapshot -> publish -> fund -> claim flow on every change to the
+# contracts, the CLI, or the deployment scripts.
+name: e2e
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "contracts/**"
+      - "tooling/snapshot/**"
+      - "tooling/monitor/**"
+      - "deployments/**"
+      - "scripts/e2e.sh"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/e2e.yml"
+  pull_request:
+    paths:
+      - "contracts/**"
+      - "tooling/snapshot/**"
+      - "tooling/monitor/**"
+      - "deployments/**"
+      - "scripts/e2e.sh"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/e2e.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: live protocol E2E
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run live E2E (anvil → deploy → seed → claim → CLI parity → monitor)
+        run: bash scripts/e2e.sh
