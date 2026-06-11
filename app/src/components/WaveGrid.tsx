@@ -65,7 +65,7 @@ export function WaveGrid() {
     function draw(time: number) {
       const t = reduce ? 1.2 : time * 0.00085;
       ctx.clearRect(0, 0, w, h);
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 0.6; // thin hairline for a smoother wave
 
       // Horizontal lines (constant depth) — the lime wave crests.
       for (let r = 0; r <= ROWS; r++) {
@@ -79,14 +79,11 @@ export function WaveGrid() {
           if (c === 0) ctx.moveTo(p.sx, p.sy);
           else ctx.lineTo(p.sx, p.sy);
         }
-        // Far lines fade out; crests glow brighter.
-        const base = 0.05 + gz * 0.28;
-        const a = Math.min(0.6, base + Math.max(0, peak) * 0.14 * gz);
+        // Thin, soft lines so the wave reads as a smooth gradient; far rows fade out.
+        const base = 0.03 + gz * 0.17;
+        const a = Math.min(0.32, base + Math.max(0, peak) * 0.07 * gz);
         ctx.strokeStyle = `rgba(198,248,78,${a})`;
-        ctx.shadowBlur = peak > 0.7 ? 6 : 0;
-        ctx.shadowColor = "rgba(198,248,78,0.6)";
         ctx.stroke();
-        ctx.shadowBlur = 0;
       }
 
       // Vertical lines (constant column) — faint structural rails.
@@ -99,7 +96,7 @@ export function WaveGrid() {
           if (r === 0) ctx.moveTo(p.sx, p.sy);
           else ctx.lineTo(p.sx, p.sy);
         }
-        ctx.strokeStyle = "rgba(231,233,234,0.045)";
+        ctx.strokeStyle = "rgba(231,233,234,0.028)";
         ctx.stroke();
       }
 
