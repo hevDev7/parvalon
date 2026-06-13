@@ -10,17 +10,17 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const BTN: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  primary: "bg-lime text-surface hover:bg-lime-bright shadow-lift",
-  ink: "bg-ink text-surface hover:bg-lime",
+  primary: "bg-ink text-on-ink hover:bg-black",
+  ink: "bg-brand text-on-ink hover:bg-brand-deep",
   ghost: "bg-transparent text-ink-soft hover:text-ink hover:bg-surface-inset",
-  outline: "border border-line-strong bg-surface-raised text-ink hover:border-lime hover:text-lime",
+  outline: "border border-line-strong bg-surface-raised text-ink hover:border-ink",
 };
 
 export function Button({ variant = "primary", loading, children, className = "", disabled, ...rest }: ButtonProps) {
   return (
     <button
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-55 ${BTN[variant]} ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-55 ${BTN[variant]} ${className}`}
       {...rest}
     >
       {loading && <Spinner />}
@@ -49,7 +49,7 @@ export function Card({
   as?: "div" | "section" | "article";
 }) {
   return (
-    <Tag className={`rounded-2xl border border-line bg-surface-raised shadow-panel ${className}`}>{children}</Tag>
+    <Tag className={`rounded-lg border border-line bg-surface-raised shadow-card ${className}`}>{children}</Tag>
   );
 }
 
@@ -63,7 +63,7 @@ export function StatusBadge({ status }: { status: ActionStatusName }) {
   const tone = statusTone(status);
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.72rem] font-medium ${tone.bg} ${tone.fg}`}
+      className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-[0.72rem] font-medium ${tone.bg} ${tone.fg}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
       {STATUS_LABEL[status]}
@@ -102,14 +102,12 @@ export function EmptyState({
   action?: { href: string; label: string };
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-surface-raised/60 px-6 py-16 text-center">
-      <div className="mb-4 grid h-12 w-12 place-items-center rounded-full border border-line bg-surface-inset">
-        <span className="display text-2xl text-ink-faint">∅</span>
-      </div>
-      <h3 className="display text-xl text-ink">{title}</h3>
-      <p className="mt-1.5 max-w-sm text-sm text-ink-soft">{body}</p>
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-line-strong bg-surface-raised px-6 py-16 text-center">
+      <p className="kicker">Nothing on record</p>
+      <h3 className="display mt-3 text-2xl text-ink">{title}</h3>
+      <p className="mt-2 max-w-sm text-sm text-ink-soft">{body}</p>
       {action && (
-        <Link href={action.href} className="mt-5">
+        <Link href={action.href} className="mt-6">
           <Button variant="outline">{action.label}</Button>
         </Link>
       )}
@@ -139,4 +137,4 @@ export function Field({
 }
 
 export const inputClass =
-  "w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink shadow-inset outline-none transition placeholder:text-ink-faint focus:border-lime";
+  "w-full rounded-md border border-line-strong bg-surface-raised px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-ink-faint focus:border-brand";

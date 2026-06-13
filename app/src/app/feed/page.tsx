@@ -26,15 +26,15 @@ export default async function FeedPage() {
           <Kicker>For integrators · CAE-1</Kicker>
           <h1 className="display mt-3 text-[clamp(2.4rem,5vw,3.6rem)] text-ink">The corporate-action feed.</h1>
           <p className="mt-3 max-w-xl text-ink-soft">
-            Every announcement, snapshot, funding and claim — as a standard event stream and a JSON endpoint. So
-            lending markets, AMMs and AI agents can finally react to corporate actions.
+            Every announcement, snapshot, funding and claim — as a standard event stream and a JSON endpoint, so
+            lending markets, AMMs and AI agents can react to corporate actions.
           </p>
         </div>
         <a
           href="/api/actions"
           target="_blank"
           rel="noreferrer"
-          className="inline-flex w-fit items-center gap-2 rounded-full border border-line-strong bg-surface-raised px-4 py-2 text-sm font-medium text-ink transition hover:border-lime hover:text-lime"
+          className="tabular inline-flex w-fit items-center gap-2 rounded-md border border-line-strong bg-surface-raised px-4 py-2 text-sm font-medium text-ink transition hover:border-brand hover:text-brand"
         >
           GET /api/actions ↗
         </a>
@@ -79,7 +79,7 @@ export default async function FeedPage() {
                         href={explorerAddressUrl(a.asset)}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-medium text-ink underline-offset-2 hover:text-lime hover:underline"
+                        className="font-medium text-ink underline-offset-2 hover:text-brand hover:underline"
                       >
                         {a.assetSymbol}
                       </a>
@@ -99,7 +99,7 @@ export default async function FeedPage() {
                       {a.actionType === "CASH_DIVIDEND" ? (
                         <span>
                           {fmtAmount(a.totalPayoutWei)} <span className="text-ink-faint">·</span>{" "}
-                          <span className="text-lime">{fmtAmount(a.totalClaimedWei)}</span>
+                          <span className="text-money">{fmtAmount(a.totalClaimedWei)}</span>
                         </span>
                       ) : (
                         <span className="text-ink-faint">—</span>
@@ -118,7 +118,7 @@ export default async function FeedPage() {
       <section className="mt-12 grid gap-6 lg:grid-cols-2">
         <Card className="p-6">
           <Kicker>Subscribe to events</Kicker>
-          <pre className="mt-3 overflow-x-auto rounded-xl border border-line bg-black/40 p-4 text-[0.78rem] leading-relaxed text-lime">
+          <pre className="mt-3 overflow-x-auto rounded-md bg-ink p-4 text-[0.78rem] leading-relaxed text-white/80">
             <code>{`// CAE-1 — Corporate Action Events
 ActionAnnounced(id, asset, actionType,
   ratePerShare, recordBlock, payableAt,
@@ -131,7 +131,7 @@ Claimed(id, index, account, amount)`}</code>
         </Card>
         <Card className="p-6">
           <Kicker>Read the feed</Kicker>
-          <pre className="mt-3 overflow-x-auto rounded-xl border border-line bg-black/40 p-4 text-[0.78rem] leading-relaxed text-lime">
+          <pre className="mt-3 overflow-x-auto rounded-md bg-ink p-4 text-[0.78rem] leading-relaxed text-white/80">
             <code>{`$ curl https://corporax.xyz/api/actions
 
 {

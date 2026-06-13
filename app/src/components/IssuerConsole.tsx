@@ -160,10 +160,10 @@ export function IssuerConsole() {
               <span
                 className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[0.78rem] font-semibold transition ${
                   done
-                    ? "bg-lime text-surface-raised"
+                    ? "bg-money text-on-ink"
                     : active
-                      ? "bg-ink text-surface-raised"
-                      : "border border-line bg-surface-raised text-ink-faint"
+                      ? "bg-ink text-on-ink"
+                      : "border border-line-strong bg-surface-raised text-ink-faint"
                 }`}
               >
                 {done ? "✓" : i + 1}
@@ -218,7 +218,7 @@ export function IssuerConsole() {
               Once the record block has passed, anyone can reconstruct the holder set from on-chain Transfer logs and
               build the Merkle root. Run the CLI, then paste the result below.
             </p>
-            <pre className="overflow-x-auto rounded-xl border border-line bg-black/40 p-4 text-[0.78rem] leading-relaxed text-lime">
+            <pre className="overflow-x-auto rounded-md bg-ink p-4 text-[0.78rem] leading-relaxed text-white/80">
               <code>{cliCommand}</code>
             </pre>
             <Button variant="outline" onClick={() => setStep(2)}>
@@ -264,7 +264,7 @@ export function IssuerConsole() {
 
         {step === 4 && (
           <div className="space-y-4 text-center">
-            <span className="mx-auto grid h-14 w-14 animate-seal place-items-center rounded-full bg-lime text-surface-raised">
+            <span className="mx-auto grid h-14 w-14 animate-seal place-items-center rounded-full bg-money-wash text-money">
               <span className="display text-2xl">✓</span>
             </span>
             <h3 className="display text-2xl text-ink">Action #{actionId?.toString()} is now claimable.</h3>

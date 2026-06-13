@@ -50,18 +50,18 @@ export const STATUS_LABEL: Record<ActionStatusName, string> = {
   CANCELLED: "Cancelled",
 };
 
-/** Returns the design tokens for a status chip (dark-theme tints). */
+/** Returns the design tokens for a status chip (light prospectus tints). */
 export function statusTone(s: ActionStatusName): { fg: string; bg: string; dot: string } {
   switch (s) {
     case "CLAIMABLE":
-      return { fg: "text-lime", bg: "bg-lime-wash", dot: "bg-lime-bright" };
+      return { fg: "text-money", bg: "bg-money-wash", dot: "bg-money" };
     case "ROOT_PUBLISHED":
-      return { fg: "text-signal", bg: "bg-signal/10", dot: "bg-signal" };
+      return { fg: "text-signal", bg: "bg-signal-wash", dot: "bg-signal" };
     case "ANNOUNCED":
       return { fg: "text-ink-soft", bg: "bg-surface-inset", dot: "bg-ink-faint" };
     case "FINALIZED":
       return { fg: "text-ink-soft", bg: "bg-surface-inset", dot: "bg-ink-soft" };
     case "CANCELLED":
-      return { fg: "text-danger", bg: "bg-danger/10", dot: "bg-danger" };
+      return { fg: "text-danger", bg: "bg-danger-wash", dot: "bg-danger" };
   }
 }

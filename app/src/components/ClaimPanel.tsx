@@ -79,15 +79,32 @@ export function ClaimPanel() {
   // ---- States --------------------------------------------------------------
   if (!isConnected) {
     return (
-      <Card className="relative p-10 text-center">
+      <Card className="relative overflow-hidden p-10 text-center">
         <Kicker>Step one</Kicker>
-        <h2 className="display mt-3 text-3xl text-ink">See what you&apos;re owed.</h2>
+        <h2 className="display mt-3 text-3xl text-ink">See what you’re owed.</h2>
         <p className="mx-auto mt-2 max-w-md text-ink-soft">
           Connect to check the dividends waiting for the tokenized stocks you hold. No seed phrase needed to look.
         </p>
         <div className="mt-7 flex justify-center">
           <WalletButton />
         </div>
+        {/* Greeked ledger preview — what connecting reveals. */}
+        <div className="mx-auto mt-10 max-w-md select-none text-left blur-[1.5px]" aria-hidden>
+          <div className="divide-y divide-line border-y border-line opacity-60">
+            {[
+              ["MSFT", "0.75 USDG / share", "18.75 USDG"],
+              ["AAPL", "0.26 USDG / share", "9.62 USDG"],
+              ["NVDA", "0.01 USDG / share", "0.40 USDG"],
+            ].map(([sym, rate, amt]) => (
+              <div key={sym} className="flex items-baseline justify-between py-2.5 text-sm">
+                <span className="font-medium text-ink">{sym}</span>
+                <span className="tabular text-ink-faint">{rate}</span>
+                <span className="tabular font-medium text-money">{amt}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="fine mt-3">Illustrative — connect to check your position.</p>
       </Card>
     );
   }
@@ -144,7 +161,7 @@ export function ClaimPanel() {
             {history.map((c) => (
               <div key={`${c.actionId}-${c.index}`} className="flex items-center justify-between px-5 py-4">
                 <div className="flex items-center gap-3">
-                  <span className="grid h-9 w-9 place-items-center rounded-full bg-lime-wash text-lime">✓</span>
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-money-wash text-money">✓</span>
                   <div>
                     <p className="font-medium text-ink">{c.assetSymbol} dividend</p>
                     <p className="text-[0.78rem] text-ink-faint">Action #{c.actionId}</p>
@@ -204,34 +221,28 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
   const busy = phase === "submitting" || phase === "confirming";
 
   return (
-    <Card className="relative overflow-hidden border-lime/25 p-6 transition hover:border-lime/40">
-      <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-lime/10 blur-2xl" aria-hidden />
+    <Card className="relative overflow-hidden p-6">
       <div className="relative flex items-start justify-between">
         <div>
-          <Kicker>{claim.assetSymbol} · cash_dividend</Kicker>
+          <Kicker>{claim.assetSymbol} · cash dividend</Kicker>
           <p className="display mt-3 text-2xl text-ink">Your dividend is ready</p>
         </div>
         {phase === "done" ? (
-          <span className="grid h-11 w-11 animate-seal place-items-center rounded-full bg-lime text-surface shadow-glow">
-            <span className="display text-xl">✓</span>
-          </span>
+          <span className="stamp animate-seal !rotate-0">Paid</span>
         ) : (
-          <span className="flex items-center gap-1.5 rounded-full border border-lime/30 bg-lime-wash px-2.5 py-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-lime-bright animate-pulse-glow" />
-            <span className="kicker text-lime">claimable</span>
-          </span>
+          <span className="stamp">Claimable</span>
         )}
       </div>
 
       <div className="relative mt-5 flex items-end gap-1.5">
-        <span className="tabular text-[2.6rem] font-medium leading-none text-lime">{fmtAmount(claim.amountWei)}</span>
+        <span className="tabular text-[2.6rem] font-medium leading-none text-money">{fmtAmount(claim.amountWei)}</span>
         <span className="mb-1 text-sm text-ink-faint">{claim.payoutSymbol}</span>
       </div>
 
       <div className="mt-6">
         {phase === "done" ? (
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-lime">Sent to your wallet</span>
+            <span className="text-sm font-medium text-money">Sent to your wallet</span>
             {hash && (
               <a
                 href={explorerTxUrl(hash)}
@@ -244,7 +255,7 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
             )}
           </div>
         ) : (
-          <Button variant="primary" className="w-full shadow-glow" onClick={onClaim} loading={busy} disabled={busy}>
+          <Button variant="primary" className="w-full" onClick={onClaim} loading={busy} disabled={busy}>
             {busy ? "Claiming…" : gaslessEnabled ? "Claim — no gas needed" : "Claim"}
           </Button>
         )}
@@ -261,7 +272,7 @@ function ClaimSkeletons() {
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       {[0, 1].map((i) => (
-        <div key={i} className="skeleton h-44 rounded-2xl" />
+        <div key={i} className="skeleton h-44 rounded-lg" />
       ))}
     </div>
   );

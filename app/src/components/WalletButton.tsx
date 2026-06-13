@@ -24,9 +24,9 @@ export function WalletButton() {
       <div className="relative" ref={ref}>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-raised px-3.5 py-2 text-sm shadow-inset transition hover:border-line-strong"
+          className="inline-flex items-center gap-2 rounded-md border border-line-strong bg-surface-raised px-3.5 py-2 text-sm transition hover:border-ink"
         >
-          <span className="h-2 w-2 rounded-full bg-lime-bright" />
+          <span className="h-2 w-2 rounded-full bg-money" />
           <span className="tabular text-ink">{shortAddr(address)}</span>
         </button>
         {open && (
@@ -51,7 +51,7 @@ export function WalletButton() {
       <button
         onClick={() => setOpen((v) => !v)}
         disabled={isPending}
-        className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-medium text-surface-raised transition hover:bg-lime disabled:opacity-60"
+        className="inline-flex items-center gap-2 rounded-md bg-ink px-4 py-2 text-sm font-medium text-on-ink transition hover:bg-black disabled:opacity-60"
       >
         {isPending ? "Connecting…" : "Connect"}
       </button>
@@ -67,7 +67,7 @@ export function WalletButton() {
                 connect({ connector: c });
                 setOpen(false);
               }}
-              className="block w-full px-4 py-3 text-left text-sm text-ink transition hover:bg-lime-wash"
+              className="block w-full px-4 py-3 text-left text-sm text-ink transition hover:bg-surface-inset"
             >
               {c.name}
             </button>

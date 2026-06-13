@@ -10,8 +10,8 @@ export default function IssuerPage() {
         <Kicker>For issuers &amp; transfer-agent ops</Kicker>
         <h1 className="display mt-3 text-[clamp(2.4rem,5vw,3.6rem)] text-ink">Issuer console.</h1>
         <p className="mt-3 max-w-xl text-ink-soft">
-          Run an entire corporate action — announce, snapshot, publish, fund — from one place. Transfer-agent
-          operations, finally in a box.
+          Run an entire corporate action — announce, snapshot, publish, fund — from one place. The full
+          transfer-agent workflow, in four signed transactions.
         </p>
       </header>
       <IssuerConsole />
