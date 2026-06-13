@@ -2,10 +2,12 @@ import { explorerAddressUrl } from "@/lib/chain";
 import { isConfigured } from "@/lib/contracts";
 import { readActions } from "@/lib/actions";
 import { fmtAmount, fmtDate } from "@/lib/format";
+import { tokenDecimals } from "@/lib/tokens";
 import type { ActionView } from "@/lib/types";
 import { Card, EmptyState, Kicker, Money, StatusBadge } from "@/components/ui";
+import { DappShell } from "@/components/DappShell";
 
-export const metadata = { title: "Feed · CorporaX" };
+export const metadata = { title: "Feed · Parvalon" };
 export const dynamic = "force-dynamic";
 
 export default async function FeedPage() {
@@ -20,21 +22,24 @@ export default async function FeedPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
+    <DappShell title="CAE-1 Event Feed">
       <header className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <Kicker>For integrators · CAE-1</Kicker>
-          <h1 className="display mt-3 text-[clamp(2.4rem,5vw,3.6rem)] text-ink">The corporate-action feed.</h1>
-          <p className="mt-3 max-w-xl text-ink-soft">
-            Every announcement, snapshot, funding and claim — as a standard event stream and a JSON endpoint, so
-            lending markets, AMMs and AI agents can react to corporate actions.
+          <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-black/40 flex items-center">
+            <span className="w-5 h-px bg-current mr-3 opacity-60" />
+            For integrators · CAE-1
+          </p>
+          <h2 className="display text-3xl mt-3 text-primary">The corporate-action feed.</h2>
+          <p className="mt-2 max-w-xl text-black/60">
+            Every announcement, snapshot, funding and claim — as a standard event stream and a JSON endpoint, so lending
+            markets, AMMs and AI agents can react to corporate actions.
           </p>
         </div>
         <a
           href="/api/actions"
           target="_blank"
           rel="noreferrer"
-          className="tabular inline-flex w-fit items-center gap-2 rounded-md border border-line-strong bg-surface-raised px-4 py-2 text-sm font-medium text-ink transition hover:border-brand hover:text-brand"
+          className="tabular inline-flex w-fit items-center gap-2 rounded-lg border border-border-subtle bg-surface-card px-4 py-2.5 text-sm font-semibold text-primary transition hover:border-black/20 hover:shadow-sm"
         >
           GET /api/actions ↗
         </a>
@@ -46,9 +51,9 @@ export default async function FeedPage() {
           body="Set NEXT_PUBLIC_REGISTRY_ADDRESS and NEXT_PUBLIC_DISTRIBUTOR_ADDRESS (or run a local anvil + deploy)."
         />
       ) : error ? (
-        <Card className="border-danger/30 p-6">
-          <p className="text-sm text-danger">Couldn&apos;t read the chain: {error}</p>
-        </Card>
+        <div className="rounded-2xl border border-accent-red/30 bg-accent-red/5 p-6">
+          <p className="text-sm text-accent-red">Couldn&apos;t read the chain: {error}</p>
+        </div>
       ) : actions.length === 0 ? (
         <EmptyState
           title="No corporate actions yet"
@@ -56,11 +61,11 @@ export default async function FeedPage() {
           action={{ href: "/issuer", label: "Open the issuer console" }}
         />
       ) : (
-        <Card className="overflow-hidden">
+        <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-line text-left text-[0.72rem] uppercase tracking-wider text-ink-faint">
+                <tr className="border-b border-border-subtle text-left text-[0.72rem] uppercase tracking-wider text-black/40">
                   <th className="px-5 py-3 font-medium">#</th>
                   <th className="px-5 py-3 font-medium">Asset</th>
                   <th className="px-5 py-3 font-medium">Type</th>
@@ -70,21 +75,21 @@ export default async function FeedPage() {
                   <th className="px-5 py-3 font-medium">Payable</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody className="divide-y divide-[var(--border-subtle)]">
                 {actions.map((a) => (
-                  <tr key={a.id} className="transition hover:bg-surface-inset/40">
-                    <td className="px-5 py-4 tabular text-ink-faint">{a.id}</td>
+                  <tr key={a.id} className="transition hover:bg-black/[0.02]">
+                    <td className="px-5 py-4 tabular text-black/40">{a.id}</td>
                     <td className="px-5 py-4">
                       <a
                         href={explorerAddressUrl(a.asset)}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-medium text-ink underline-offset-2 hover:text-brand hover:underline"
+                        className="font-semibold text-primary underline-offset-2 hover:text-accent-blue hover:underline"
                       >
                         {a.assetSymbol}
                       </a>
                     </td>
-                    <td className="px-5 py-4 text-ink-soft">{a.actionType.replace("_", " ").toLowerCase()}</td>
+                    <td className="px-5 py-4 text-black/60">{a.actionType.replace("_", " ").toLowerCase()}</td>
                     <td className="px-5 py-4">
                       <StatusBadge status={a.status} />
                     </td>
@@ -92,33 +97,33 @@ export default async function FeedPage() {
                       {a.actionType === "CASH_DIVIDEND" ? (
                         <Money wei={a.ratePerShareWei} symbol={a.payoutSymbol} />
                       ) : (
-                        <span className="text-ink-faint">—</span>
+                        <span className="text-black/30">—</span>
                       )}
                     </td>
                     <td className="px-5 py-4 text-right tabular">
                       {a.actionType === "CASH_DIVIDEND" ? (
                         <span>
-                          {fmtAmount(a.totalPayoutWei)} <span className="text-ink-faint">·</span>{" "}
-                          <span className="text-money">{fmtAmount(a.totalClaimedWei)}</span>
+                          {fmtAmount(a.totalPayoutWei, tokenDecimals(a.payoutToken))} <span className="text-black/30">·</span>{" "}
+                          <span className="text-money">{fmtAmount(a.totalClaimedWei, tokenDecimals(a.payoutToken))}</span>
                         </span>
                       ) : (
-                        <span className="text-ink-faint">—</span>
+                        <span className="text-black/30">—</span>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-ink-soft">{a.payableAt ? fmtDate(a.payableAt) : "—"}</td>
+                    <td className="px-5 py-4 text-black/60">{a.payableAt ? fmtDate(a.payableAt) : "—"}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Developer block */}
       <section className="mt-12 grid gap-6 lg:grid-cols-2">
-        <Card className="p-6">
+        <Card className="!rounded-2xl !border-border-subtle p-6">
           <Kicker>Subscribe to events</Kicker>
-          <pre className="mt-3 overflow-x-auto rounded-md bg-ink p-4 text-[0.78rem] leading-relaxed text-white/80">
+          <pre className="mt-3 overflow-x-auto rounded-xl bg-inverse-surface p-4 text-[0.78rem] leading-relaxed text-white/80">
             <code>{`// CAE-1 — Corporate Action Events
 ActionAnnounced(id, asset, actionType,
   ratePerShare, recordBlock, payableAt,
@@ -129,10 +134,10 @@ Funded(id, from, amount, totalFunded)
 Claimed(id, index, account, amount)`}</code>
           </pre>
         </Card>
-        <Card className="p-6">
+        <Card className="!rounded-2xl !border-border-subtle p-6">
           <Kicker>Read the feed</Kicker>
-          <pre className="mt-3 overflow-x-auto rounded-md bg-ink p-4 text-[0.78rem] leading-relaxed text-white/80">
-            <code>{`$ curl https://corporax.xyz/api/actions
+          <pre className="mt-3 overflow-x-auto rounded-xl bg-inverse-surface p-4 text-[0.78rem] leading-relaxed text-white/80">
+            <code>{`$ curl https://parvalon.xyz/api/actions
 
 {
   "schema": "CAE-1",
@@ -141,11 +146,11 @@ Claimed(id, index, account, amount)`}</code>
     "status": "CLAIMABLE", "totalPayout": "12.0" } ]
 }`}</code>
           </pre>
-          <p className="mt-4 text-sm text-ink-soft">
-            See <span className="font-medium text-ink">docs/CAE-1.md</span> for the full draft standard.
+          <p className="mt-4 text-sm text-black/60">
+            See <span className="font-semibold text-primary">docs/CAE-1.md</span> for the full draft standard.
           </p>
         </Card>
       </section>
-    </div>
+    </DappShell>
   );
 }

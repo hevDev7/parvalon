@@ -30,3 +30,6 @@ tooling/snapshot/out/
 *.log
 .DS_Store
 coverage/
+
+# Scratch design/prototype workspace (not part of the app)
+Desain/

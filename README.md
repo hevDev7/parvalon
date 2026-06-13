@@ -1,8 +1,10 @@
-# CorporaX
+# Parvalon
 
 **The missing corporate-actions layer for tokenized stocks. On-chain dividends, stock splits, and record-date semantics — for the tokens that already exist.**
 
 > Built on **Robinhood Chain** (Arbitrum Orbit L2) for the Arbitrum Open House London Buildathon.
+
+> **Naming.** This project was renamed **CorporaX → Parvalon**, and the brand migration is in progress. The npm workspace scope (`@corporax/*`), the in-source identifiers, the remaining `docs/` files, and the `PRD-CorporaX.md` filename still read `corporax` — so the package names, file paths, and commands below are shown exactly as they resolve in the repo today. The UI and this README use the new name; the rest is renamed in a follow-up pass.
 
 ---
 
@@ -16,11 +18,11 @@ If you actually hold a tokenized share today, there is:
 - **No signal for DeFi.** A lending market using a tokenized stock as collateral has no idea when a 4:1 split happens. An AMM has no idea when a token goes ex-dividend. That is a real, systemic risk once RWAs are used as collateral.
 - **No machine-readable feed for agents.** The on-chain agent economy can't react to corporate actions it can't read.
 
-Corporate actions are the **operational services layer** that institutional tokenization still lacks. CorporaX builds exactly that layer.
+Corporate actions are the **operational services layer** that institutional tokenization still lacks. Parvalon builds exactly that layer.
 
 ## The one-liner
 
-> *CorporaX is a permissionless corporate-actions and dividend protocol that works on tokenized stocks **we do not control** — no token changes, no issuer integration required.*
+> *Parvalon is a permissionless corporate-actions and dividend protocol that works on tokenized stocks **we do not control** — no token changes, no issuer integration required.*
 
 ## What it is
 
@@ -35,19 +37,19 @@ A focused, immutable, two-contract protocol plus the off-chain tooling around it
 
 The hard part of dividends on-chain is that you normally need to **own the token** — you add transfer hooks, you make it a rebasing or dividend-paying token, you require every issuer to integrate. That doesn't work for a Tesla token that Robinhood already deployed and that you have zero control over.
 
-CorporaX inverts this. It is an **overlay**, not an integration:
+Parvalon inverts this. It is an **overlay**, not an integration:
 
 - **Snapshot via `eth_getLogs`** reconstructs the holder set at any historical block. It works against *any* standard ERC-20 — permissionlessly, with no cooperation from the token contract.
 - **Record-date semantics map 1:1** to how corporate actions actually work in traditional markets: ownership is fixed at a record date, then payment follows. Our snapshot block *is* the record date.
 - **Splits and stock dividends are handled as informational actions** (standardized event + ratio metadata), because we honestly cannot rebase a token we don't control — and what integrators actually need is a *signal*, not a rebase.
 
-The result: CorporaX runs on the real TSLA/AMZN tokens on Robinhood Chain, today, with nothing required from the token issuer. That is the whole point.
+The result: Parvalon runs on the real TSLA/AMZN tokens on Robinhood Chain, today, with nothing required from the token issuer. That is the whole point.
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        CorporaX dApp (Next.js)                   │
+│                        Parvalon dApp (Next.js)                   │
 │   /claim (Holder) · /issuer (Console) · /feed (+ /api/actions)   │
 │   wagmi/viem · gasless claims via relayer (claim-on-behalf, FR-6)│
 └───────────────┬─────────────────────────────────┬───────────────┘
@@ -58,7 +60,7 @@ The result: CorporaX runs on the real TSLA/AMZN tokens on Robinhood Chain, today
 │  - announce/publish/state │ root │  - getLogs Transfer → balances│
 │  - per-asset issuer roles │      │    at recordBlock             │
 │  - CAE-1 events           │      │  - StandardMerkleTree + proofs│
-│  - IActionSource seam (D3)│      └──────────────────────────────┘
+│  - IActionSource seam (D3) │      └──────────────────────────────┘
 └────────────┬──────────────┘
              │ lifecycle (DISTRIBUTOR_ROLE)
              ▼
@@ -71,6 +73,8 @@ The result: CorporaX runs on the real TSLA/AMZN tokens on Robinhood Chain, today
 ```
 
 The split is deliberate: the **registry governs state** (and never touches value), the **distributor custodies and settles value** (and is the only party allowed to advance an action into `CLAIMABLE`/`FINALIZED`). See **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the full rationale, state machine, and sequence diagrams.
+
+The dApp also surfaces a **live coverage ticker** — real-time underlying-equity prices for the covered tokenized stocks (MSFT, AAPL, TSLA, AMZN, NVDA, …) via an embedded TradingView widget — so the corporate-actions lifecycle is shown against the live market it settles against.
 
 ## Quickstart (local, ~2 minutes)
 
@@ -138,13 +142,15 @@ The Merkle root is **deterministic and independently verifiable**: two runs of t
 
 ## Monorepo map
 
+> Package names are shown as they currently resolve in the repo (`@corporax/*`); the scope rename to Parvalon is part of the pending brand migration noted above.
+
 | Path | What |
 |---|---|
 | `contracts/` | Foundry protocol — `CorporateActionRegistry`, `DividendDistributor`, `AdminActionSource` + `FunctionsActionSource` (D3 seam), `SplitAdjuster` lib, `TimelockController` governance, mocks, **81 tests**, deploy/seed/governance scripts |
 | `tooling/snapshot/` | TypeScript (viem) deterministic Merkle snapshot CLI — exclusion lists, withholding, IPFS pinning |
 | `tooling/monitor/` | `@corporax/monitor` — solvency-invariant + lifecycle alerting service |
 | `packages/sdk/` | `@corporax/sdk` — typed client (reads/writes + CAE-1 watchers) for integrators |
-| `app/` | Next.js 14 dApp — `/claim`, `/issuer`, `/feed`, `/api/actions` |
+| `app/` | Next.js 14 dApp — `/claim`, `/issuer`, `/feed`, `/api/actions`, plus a live **TradingView coverage ticker** of the underlying equity prices |
 | `subgraph/` | The Graph subgraph indexing CAE-1 events (+ Allium SQL) |
 | `examples/agent/` | Example dividend-aware AI agent consuming CAE-1 (x402 narrative) |
 | `abis/` | **Auto-generated** typed ABIs (`index.ts` `as const` + JSON). Import these; never hand-write ABIs. |
@@ -196,7 +202,7 @@ The Merkle root is **deterministic and independently verifiable**: two runs of t
 | [eip/eip-cae1.md](docs/eip/eip-cae1.md) | Draft EIP for the **CAE-1** Corporate Action Events standard. |
 | [LIMITATIONS.md](docs/LIMITATIONS.md) | Honest current limitations and why each is acceptable for v1. |
 | [DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) | The <3-minute demo video script, mapped to the working flow. |
-| [PRD-CorporaX.md](PRD-CorporaX.md) | Product requirements — scope, priorities, decision log. |
+| [PRD-CorporaX.md](PRD-CorporaX.md) | Product requirements — scope, priorities, decision log. *(Filename retains the former name pending the code rename.)* |
 
 ## Design principles
 

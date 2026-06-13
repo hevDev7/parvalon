@@ -6,6 +6,7 @@ import { useAccount, useReadContracts, useWaitForTransactionReceipt, useWriteCon
 import { addresses, distributorAbi } from "@/lib/contracts";
 import { explorerTxUrl } from "@/lib/chain";
 import { fmtAmount } from "@/lib/format";
+import { tokenDecimals } from "@/lib/tokens";
 import { getEligibleClaims } from "@/lib/proofs";
 import { gaslessEnabled, relayClaim } from "@/lib/relay";
 import type { ActionLike, EligibleClaim } from "@/lib/types";
@@ -168,7 +169,7 @@ export function ClaimPanel() {
                   </div>
                 </div>
                 <span className="tabular text-ink">
-                  {fmtAmount(c.amountWei)} <span className="text-ink-faint">{c.payoutSymbol}</span>
+                  {fmtAmount(c.amountWei, tokenDecimals(c.payoutToken))} <span className="text-ink-faint">{c.payoutSymbol}</span>
                 </span>
               </div>
             ))}
@@ -235,7 +236,7 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
       </div>
 
       <div className="relative mt-5 flex items-end gap-1.5">
-        <span className="tabular text-[2.6rem] font-medium leading-none text-money">{fmtAmount(claim.amountWei)}</span>
+        <span className="tabular text-[2.6rem] font-medium leading-none text-money">{fmtAmount(claim.amountWei, tokenDecimals(claim.payoutToken))}</span>
         <span className="mb-1 text-sm text-ink-faint">{claim.payoutSymbol}</span>
       </div>
 

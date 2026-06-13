@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { parseUnits } from "viem";
 import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { addresses, distributorAbi, erc20Abi, registryAbi, selectableAssets, tokens } from "@/lib/contracts";
+import { PAYOUT_DECIMALS } from "@/lib/tokens";
 import { explorerTxUrl } from "@/lib/chain";
 import { Button, Card, Field, inputClass, Kicker } from "@/components/ui";
+import { StockSelect } from "@/components/StockSelect";
 import { WalletButton } from "@/components/WalletButton";
 
 const STEPS = ["Announce", "Snapshot", "Publish", "Fund"] as const;
@@ -74,7 +76,7 @@ export function IssuerConsole() {
         args: [
           asset as `0x${string}`,
           0, // CASH_DIVIDEND
-          parseUnits(rate || "0", 18),
+          parseUnits(rate || "0", PAYOUT_DECIMALS),
           BigInt(recordBlock || "0"),
           BigInt(toUnix(payableAt)),
           BigInt(toUnix(claimDeadline)),
@@ -99,7 +101,7 @@ export function IssuerConsole() {
         address: addresses.registry!,
         abi: registryAbi,
         functionName: "publishRoot",
-        args: [actionId!, root as `0x${string}`, parseUnits(totalPayout || "0", 18), BigInt(holderCount || "0")],
+        args: [actionId!, root as `0x${string}`, parseUnits(totalPayout || "0", PAYOUT_DECIMALS), BigInt(holderCount || "0")],
       });
       setTx(hash);
       setStep(3);
@@ -108,7 +110,7 @@ export function IssuerConsole() {
 
   async function onFund() {
     await guard(async () => {
-      const amount = parseUnits(totalPayout || "0", 18);
+      const amount = parseUnits(totalPayout || "0", PAYOUT_DECIMALS);
       await writeContractAsync({
         address: tokens.usdg!,
         abi: erc20Abi,
@@ -144,7 +146,7 @@ export function IssuerConsole() {
   const cliCommand = `npm run snapshot -- \\
   --token ${asset || "<asset>"} \\
   --record-block ${recordBlock || "<block>"} \\
-  --rate ${rate ? parseUnits(rate, 18).toString() : "<rateWei>"} \\
+  --rate ${rate ? parseUnits(rate, PAYOUT_DECIMALS).toString() : "<rateWei>"} \\
   --action-id ${actionId?.toString() ?? "<id>"} \\
   --out proofs.json`;
 
@@ -181,13 +183,7 @@ export function IssuerConsole() {
             <Kicker>Step 1 — record the action on-chain</Kicker>
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Asset">
-                <select className={inputClass} value={asset} onChange={(e) => setAsset(e.target.value)}>
-                  {selectableAssets.map((a) => (
-                    <option key={a.address} value={a.address}>
-                      {a.symbol}
-                    </option>
-                  ))}
-                </select>
+                <StockSelect options={selectableAssets} value={asset} onChange={setAsset} />
               </Field>
               <Field label="Rate per share" hint="USDG per 1 token">
                 <input className={inputClass} value={rate} onChange={(e) => setRate(e.target.value)} inputMode="decimal" />

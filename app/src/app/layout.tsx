@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
-import { Header } from "@/components/Header";
-import { Ticker } from "@/components/Ticker";
-import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "CorporaX — the corporate-actions layer for tokenized stocks",
+  title: "Parvalon — the corporate-actions layer for tokenized stocks",
   description:
     "On-chain dividends, splits, and record-date semantics for tokenized stocks. Permissionless. Works on the tokens that already exist — no token changes, no issuer integration required.",
-  metadataBase: new URL("https://corporax.xyz"),
+  metadataBase: new URL("https://parvalon.xyz"),
   openGraph: {
-    title: "CorporaX",
+    title: "Parvalon",
     description: "The missing corporate-actions layer for tokenized stocks.",
     type: "website",
   },
@@ -25,19 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
       </head>
       <body className="min-h-screen antialiased">
-        <Providers>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <Ticker />
-            <main className="flex-1">{children}</main>
-            <SiteFooter />
-          </div>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

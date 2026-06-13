@@ -3,41 +3,51 @@
 @tailwind utilities;
 
 /* ============================================================================
-   THE REGISTRAR — design tokens
-   A light, prospectus-grade system: warm paper canvas, near-black ink,
-   one deep cobalt accent, ledger green reserved for money, hairline rules,
-   serif display type and monospaced numerals. Reads like a fund document,
-   not a crypto landing page.
+   PARVALON — design tokens
+   Warm paper canvas, black primary, white cards, a red→orange→blue accent
+   gradient, Hanken Grotesk + JetBrains Mono. A modern onchain-infra brand.
+
+   Legacy --ink / --brand / --line / --money aliases are kept (remapped onto the
+   new palette) so the existing dApp components stay on-brand until re-skinned.
    ========================================================================== */
 :root {
-  --surface: #fafaf7; /* paper canvas */
-  --surface-raised: #ffffff; /* cards / documents */
-  --surface-inset: #f1f0ea; /* wells / inputs */
+  /* new design tokens */
+  --surface: #faf9f6; /* warm paper canvas */
+  --surface-dim: #dbdad7;
+  --surface-card: #ffffff;
+  --inverse-surface: #1b1b1b; /* dark bands / footer */
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --gradient-pulse: linear-gradient(135deg, #ff4f5e 0%, #ff8e3c 50%, #508cff 100%);
 
-  --ink: #15191d; /* primary text */
-  --ink-soft: #565b61; /* secondary */
-  --ink-faint: #6b7075; /* tertiary / captions — keeps AA on paper */
-  --on-ink: #ffffff; /* text on ink/brand fills */
+  /* alpha-aware channel tokens (for Tailwind opacity modifiers) */
+  --primary: 0 0 0;
+  --on-primary: 255 255 255;
+  --accent-red: 255 79 94;
+  --accent-orange: 255 142 60;
+  --accent-blue: 80 140 255;
 
-  --brand: #1a4fa0; /* deep cobalt — links, active states, signatures */
-  --brand-deep: #133a78; /* hover */
-  --brand-wash: #e9effa; /* pale tint */
-
-  --money: #0a6e45; /* ledger green — amounts, claimable, positive */
+  /* legacy aliases (plain values) — used by existing dApp components + CSS below */
+  --surface-raised: #ffffff;
+  --surface-inset: #f1f0ee;
+  --ink: #0a0a0a;
+  --ink-soft: #4b4b4b;
+  --ink-faint: #8a8a8a;
+  --on-ink: #ffffff;
+  --brand: #508cff;
+  --brand-deep: #2f6fe0;
+  --brand-wash: #eaf1ff;
+  --money: #0a6e45;
   --money-wash: #e7f2ec;
-
-  --signal: #8f6400; /* dark amber — pending / awaiting */
+  --signal: #8f6400;
   --signal-wash: #f7efdd;
-
-  --danger: #b23b30; /* cancelled / errors */
+  --danger: #b23b30;
   --danger-wash: #f9e9e7;
+  --line: #ececea;
+  --line-strong: #dcdbd7;
 
-  --line: #e5e4dd; /* hairline rule */
-  --line-strong: #cfcec5;
-
-  --font-display: "Newsreader", Georgia, serif;
-  --font-sans: "Public Sans", system-ui, -apple-system, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-display: "Hanken Grotesk", system-ui, sans-serif;
+  --font-sans: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 * {
@@ -58,13 +68,12 @@ body {
 }
 
 ::selection {
-  background: var(--brand);
-  color: var(--on-ink);
+  background: rgba(80, 140, 255, 0.18);
+  color: var(--ink);
 }
 
-/* Keyboard focus — cobalt ring. */
 :focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid #508cff;
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -72,38 +81,37 @@ body {
 /* ============================================================================
    Typographic primitives
    ========================================================================== */
-/* Section eyebrow — quiet small caps, often carrying a section number. */
+/* eyebrow / section label — mono small caps */
 .kicker {
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-faint);
 }
 
-/* Editorial serif display — prospectus headlines. */
+/* bold sans display headings */
 .display {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1.04;
+  line-height: 1.05;
   text-wrap: balance;
 }
 .display em,
 .display i {
   font-style: italic;
-  font-weight: 500;
+  font-weight: 700;
 }
 
-/* Monospaced, tabular figures — every number on the site. */
+/* tabular mono figures — every number on the site */
 .tabular {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
 
-/* Legal fine print. */
 .fine {
   font-size: 0.78rem;
   line-height: 1.6;
@@ -115,14 +123,21 @@ body {
   background: var(--line-strong);
 }
 
-/* Double rule — document chrome for certificate-style panels. */
 .rule-double {
   height: 4px;
   border-top: 1px solid var(--line-strong);
   border-bottom: 1px solid var(--line-strong);
 }
 
-/* Registrar stamp — claimable mark on the distribution notice. */
+/* gradient text fill */
+.text-gradient-pulse {
+  background: var(--gradient-pulse);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* status stamp (legacy dApp) */
 .stamp {
   display: inline-block;
   padding: 0.2rem 0.6rem;
@@ -134,10 +149,30 @@ body {
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  transform: rotate(-3deg);
 }
 
-/* Loading shimmer on paper. */
+/* Globe network — thin arcs with a gentle flowing dash */
+@keyframes arcFlow {
+  to {
+    stroke-dashoffset: -25;
+  }
+}
+
+/* Scroll-reveal — each section fades + rises as it enters the viewport */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* loading shimmer */
 .skeleton {
   position: relative;
   overflow: hidden;
@@ -148,8 +183,63 @@ body {
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(21, 25, 29, 0.05), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.05), transparent);
   animation: shimmer 1.6s infinite;
+}
+
+/* ── Night cityscape (hero) animations ── */
+@keyframes nightTwinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes windowFlicker {
+  0%,
+  38% {
+    opacity: 0.82;
+  }
+  41% {
+    opacity: 0.06;
+  }
+  47% {
+    opacity: 0.82;
+  }
+  68% {
+    opacity: 0.06;
+  }
+  73%,
+  100% {
+    opacity: 0.82;
+  }
+}
+@keyframes moonRise {
+  0% {
+    transform: translateY(72px);
+  }
+  100% {
+    transform: translateY(-44px);
+  }
+}
+@keyframes boatDrift {
+  from {
+    transform: translateX(-80px);
+  }
+  to {
+    transform: translateX(660px);
+  }
+}
+@keyframes waterShimmer {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.55;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

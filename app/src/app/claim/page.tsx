@@ -1,22 +1,23 @@
 import { ClaimPanel } from "@/components/ClaimPanel";
-import { GuillocheSeal } from "@/components/Guilloche";
-import { Kicker } from "@/components/ui";
+import { DappShell } from "@/components/DappShell";
 
-export const metadata = { title: "Claim · CorporaX" };
+export const metadata = { title: "Claim · Parvalon" };
 
 export default function ClaimPage() {
   return (
-    <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
-      <header className="relative mb-10">
-        <GuillocheSeal className="pointer-events-none absolute -top-8 right-0 hidden h-40 w-40 md:block" />
-        <Kicker>For holders</Kicker>
-        <h1 className="display mt-3 text-[clamp(2.4rem,5vw,3.6rem)] text-ink">Claim your dividend.</h1>
-        <p className="mt-3 max-w-xl text-ink-soft">
-          Hold a tokenized stock that declared a dividend? It’s yours. Claims are gasless and settle straight to your
-          wallet.
+    <DappShell title="Claimable Assets">
+      <div className="mb-8">
+        <p className="font-mono text-[11px] font-bold uppercase tracking-widest text-black/40 flex items-center">
+          <span className="w-5 h-px bg-current mr-3 opacity-60" />
+          For holders
         </p>
-      </header>
+        <h2 className="display text-3xl mt-3 text-primary">Claim your dividend.</h2>
+        <p className="mt-2 max-w-xl text-black/60">
+          Hold a tokenized stock that declared a dividend? It&apos;s yours. Claims are gasless and settle straight to
+          your wallet.
+        </p>
+      </div>
       <ClaimPanel />
-    </div>
+    </DappShell>
   );
 }

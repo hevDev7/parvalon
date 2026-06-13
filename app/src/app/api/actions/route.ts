@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { formatUnits } from "viem";
 import { ACTIVE_CHAIN_ID, explorerAddressUrl } from "@/lib/chain";
+import { tokenDecimals } from "@/lib/tokens";
 import { readActions } from "@/lib/actions";
 
 export const dynamic = "force-dynamic";
@@ -25,16 +26,16 @@ export async function GET() {
         assetSymbol: a.assetSymbol,
         actionType: a.actionType,
         status: a.status,
-        ratePerShare: formatUnits(BigInt(a.ratePerShareWei || "0"), 18),
+        ratePerShare: formatUnits(BigInt(a.ratePerShareWei || "0"), tokenDecimals(a.payoutToken)),
         recordBlock: a.recordBlock,
         payableAt: a.payableAt,
         claimDeadline: a.claimDeadline,
         payoutToken: a.payoutToken,
         payoutSymbol: a.payoutSymbol,
         merkleRoot: a.merkleRoot,
-        totalPayout: formatUnits(BigInt(a.totalPayoutWei || "0"), 18),
-        totalFunded: formatUnits(BigInt(a.totalFundedWei || "0"), 18),
-        totalClaimed: formatUnits(BigInt(a.totalClaimedWei || "0"), 18),
+        totalPayout: formatUnits(BigInt(a.totalPayoutWei || "0"), tokenDecimals(a.payoutToken)),
+        totalFunded: formatUnits(BigInt(a.totalFundedWei || "0"), tokenDecimals(a.payoutToken)),
+        totalClaimed: formatUnits(BigInt(a.totalClaimedWei || "0"), tokenDecimals(a.payoutToken)),
         metadataURI: a.metadataURI,
         explorerUrl: explorerAddressUrl(a.asset),
       })),

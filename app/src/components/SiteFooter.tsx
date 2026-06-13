@@ -1,86 +1,92 @@
-import Link from "next/link";
-import { activeChain } from "@/lib/chain";
+"use client";
 
-const NAV_COLUMNS: { title: string; links: { href: string; label: string; external?: boolean }[] }[] = [
-  {
-    title: "Holders",
-    links: [
-      { href: "/claim", label: "Claim a dividend" },
-      { href: "/feed", label: "Corporate-action feed" },
-    ],
-  },
-  {
-    title: "Issuers",
-    links: [
-      { href: "/issuer", label: "Issuer console" },
-      { href: "/feed", label: "Distribution records" },
-    ],
-  },
-  {
-    title: "Integrators",
-    links: [
-      { href: "/api/actions", label: "GET /api/actions", external: true },
-      { href: "/feed", label: "CAE-1 event stream" },
-    ],
-  },
-];
+function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
+  return (
+    <div>
+      <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-white/40 mb-6">{title}</h4>
+      <ul className="space-y-4 text-[14px] font-medium text-white/80">
+        {links.map(([label, href]) => (
+          <li key={label}>
+            <a href={href} className="hover:text-white transition-colors">
+              {label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export function SiteFooter() {
+  const year = new Date().getFullYear();
   return (
-    <footer className="border-t border-line-strong bg-surface-raised">
-      <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-[1.2fr_repeat(3,0.6fr)] md:items-baseline">
-          <div className="col-span-2 max-w-sm md:col-span-1">
-            <p className="display text-2xl text-ink">Corporate actions, on public rails.</p>
-            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-              Dividends, splits, record dates — recorded, funded, and settled where the tokens already live.
-            </p>
+    <footer className="bg-inverse-surface text-white pt-24 pb-12">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 border-b border-white/10 pb-16">
+        <div className="lg:col-span-5 pr-8">
+          <div className="flex items-center space-x-2 mb-6">
+            <span className="w-8 h-8 rounded shrink-0 overflow-hidden relative">
+              <span className="absolute inset-0 bg-gradient-pulse" />
+            </span>
+            <span className="font-bold text-2xl tracking-tight">Parvalon</span>
           </div>
-          {NAV_COLUMNS.map((col) => (
-            <div key={col.title}>
-              <p className="kicker">{col.title}</p>
-              <ul className="mt-3 space-y-1 text-sm">
-                {col.links.map((l) =>
-                  l.external ? (
-                    <li key={l.label}>
-                      <a href={l.href} className="inline-block py-1.5 text-ink-soft transition hover:text-brand">
-                        {l.label}
-                      </a>
-                    </li>
-                  ) : (
-                    <li key={l.label}>
-                      <Link href={l.href} className="inline-block py-1.5 text-ink-soft transition hover:text-brand">
-                        {l.label}
-                      </Link>
-                    </li>
-                  ),
-                )}
-              </ul>
-            </div>
-          ))}
+          <p className="text-white/60 text-[15px] mb-10 leading-relaxed max-w-md">
+            The permissionless corporate-actions and dividend protocol for tokenized stocks. Built on Robinhood Chain —
+            Arbitrum Orbit L2.
+          </p>
+          <form className="relative mb-8 max-w-sm" onSubmit={(e) => e.preventDefault()}>
+            <input
+              className="w-full bg-white/5 border border-white/10 rounded-lg py-3.5 px-5 text-[14px] text-white placeholder-white/40 focus:outline-none focus:border-white/30 transition-colors font-medium"
+              placeholder="you@email.com"
+              type="email"
+            />
+            <button
+              className="absolute right-1.5 top-1.5 bottom-1.5 bg-white text-black font-semibold text-[13px] px-5 rounded hover:bg-gray-200 transition-colors flex items-center"
+              type="submit"
+            >
+              Subscribe
+            </button>
+          </form>
         </div>
 
-        {/* Disclosures — fine print is part of the design, not an afterthought. */}
-        <div className="rule mt-12" />
-        <div className="fine mt-6 max-w-4xl space-y-2.5">
-          <p>
-            CorporaX is open-source infrastructure software, published under the MIT license. It is not a registered
-            transfer agent, broker-dealer, or investment adviser, and nothing on this site is an offer to sell or a
-            solicitation to buy any security.
-          </p>
-          <p>
-            Distribution records shown here are read directly from immutable smart contracts on{" "}
-            {activeChain.name}. Holder snapshots are reconstructed from public ERC-20 Transfer logs at the stated
-            record block and can be independently re-derived by anyone running the open-source snapshot CLI. Figures
-            marked ¹ ² ³ are explained in the notes on the homepage.
-          </p>
+        <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <FooterCol
+            title="Protocol"
+            links={[
+              ["Registry", "/#architecture"],
+              ["Distributor", "/#architecture"],
+              ["CAE-1 Spec", "/feed"],
+            ]}
+          />
+          <FooterCol
+            title="App"
+            links={[
+              ["Claim", "/claim"],
+              ["Issuer", "/issuer"],
+              ["Feed", "/feed"],
+            ]}
+          />
+          <FooterCol
+            title="Developers"
+            links={[
+              ["GET /api/actions", "/api/actions"],
+              ["Documentation", "#"],
+              ["GitHub", "#"],
+            ]}
+          />
+          <FooterCol
+            title="Ecosystem"
+            links={[
+              ["Robinhood Chain", "#"],
+              ["Arbitrum", "#"],
+            ]}
+          />
         </div>
+      </div>
 
-        <div className="mt-8 flex flex-col gap-1 border-t border-line pt-5 text-[0.72rem] text-ink-faint sm:flex-row sm:justify-between">
-          <span>© {new Date().getFullYear()} CorporaX · MIT · Built on Robinhood Chain</span>
-          <span className="tabular">
-            network: {activeChain.name} · chainId {activeChain.id}
-          </span>
+      <div className="max-w-7xl mx-auto px-6 mt-8 flex flex-col sm:flex-row gap-2 justify-between items-start sm:items-center text-[13px] text-white/40 font-medium tracking-wide">
+        <p>© {year} Parvalon · MIT · Built on Robinhood Chain</p>
+        <div className="flex gap-6 font-mono uppercase">
+          <span>Status: Operational</span>
         </div>
       </div>
     </footer>
