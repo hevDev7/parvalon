@@ -39,6 +39,10 @@ ok "anvil up"
 export PRIVATE_KEY
 PRIVATE_KEY="$(cast wallet private-key --mnemonic "$MNEMONIC")"
 
+# Deploy now defaults AUTO_ATTEST=false (fail-closed). This local anvil (31337)
+# demo announces a seeded action, so opt into auto-attest explicitly here.
+export AUTO_ATTEST="${AUTO_ATTEST:-true}"
+
 # --- 2. deploy + seed -------------------------------------------------------
 echo "▸ deploy + seed"
 (cd "$ROOT/contracts" && forge script script/Deploy.s.sol:Deploy --rpc-url "$RPC" --broadcast) \

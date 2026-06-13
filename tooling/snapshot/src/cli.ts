@@ -150,6 +150,19 @@ program
   // and a string default fights the parser's bigint return type. We default to
   // 5000n in code below when the flag is absent.
   .option("--chunk <n>", "eth_getLogs page size in blocks (default: 5000)", parseBigIntArg)
+  // Finality / reorg buffer. Default 0 = no head read, no guard (legacy), but the
+  // run prints a LOUD reorg-unsafe warning. Set this to your chain's reorg depth
+  // to REFUSE snapshotting a record block still inside the reorg window.
+  .option(
+    "--confirmations <n>",
+    "finality depth: refuse if head-recordBlock < n (default: 0 = unsafe, warns)",
+    parseBigIntArg,
+  )
+  .option(
+    "--finality <n>",
+    "alias for --confirmations",
+    parseBigIntArg,
+  )
   .option("--payout-token <addr>", "payout token address (written into the artifact)", parseAddressArg)
   .option("--chain-id <n>", "chain id to record (defaults to the RPC's reported id)", parseBigIntArg)
   // P1-3 exclusions
@@ -215,6 +228,10 @@ interface SnapshotOpts {
   rpc?: string;
   /** Parsed bigint when --chunk is supplied; undefined → default 5000n. */
   chunk?: bigint;
+  /** Finality depth (reorg buffer). undefined → 0 (unsafe, warns). */
+  confirmations?: bigint;
+  /** Alias for --confirmations. */
+  finality?: bigint;
   payoutToken?: Address;
   chainId?: bigint;
   // P1-3 exclusions
@@ -250,6 +267,10 @@ async function runSnapshot(opts: SnapshotOpts): Promise<void> {
 
   const chunkSize = opts.chunk ?? 5000n;
 
+  // Finality / reorg buffer. --confirmations and its --finality alias both feed
+  // the same guard; default 0 keeps legacy behavior but emits a loud warning.
+  const confirmations = opts.confirmations ?? opts.finality ?? 0n;
+
   // P1-3 — merge --exclude and --exclude-file into one deduped list (the
   // snapshot layer normalises/sorts; this just unions the sources).
   const excludeFromFile = opts.excludeFile ? readExcludeFile(opts.excludeFile) : [];
@@ -284,7 +305,7 @@ async function runSnapshot(opts: SnapshotOpts): Promise<void> {
     err(`[snapshot] withholding ${opts.withholdingBps} bps (net = gross*(10000-bps)/10000)`);
   }
 
-  const provider = new RpcBalanceProvider(client, { log: err });
+  const provider = new RpcBalanceProvider(client, { log: err, confirmations });
   let artifact = await generateSnapshot(input, provider);
 
   // Serialise once. If pinning is requested, content-address the EXACT bytes we

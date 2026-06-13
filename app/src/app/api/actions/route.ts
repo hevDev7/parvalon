@@ -42,8 +42,8 @@ export async function GET() {
     return NextResponse.json(payload, {
       headers: { "cache-control": "public, max-age=5, stale-while-revalidate=30" },
     });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Failed to read actions";
-    return NextResponse.json({ error: message, actions: [] }, { status: 500 });
+  } catch {
+    // Don't leak the RPC host / internal detail to callers.
+    return NextResponse.json({ error: "Failed to read actions", actions: [] }, { status: 500 });
   }
 }

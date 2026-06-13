@@ -47,7 +47,7 @@ Fill `.env` per [INTEGRATION.md §9](./INTEGRATION.md). The variables that matte
 **Sanity check before anything else:**
 
 ```bash
-npm run test:contracts          # expect: 42 tests passed
+npm run test:contracts          # expect: 81 tests passed
 cast chain-id --rpc-url "$ROBINHOOD_TESTNET_RPC_URL"   # expect: 46630
 cast balance <your-addr> --rpc-url "$ROBINHOOD_TESTNET_RPC_URL"  # need gas
 ```
@@ -320,20 +320,26 @@ When to pause:
 - **Distributor pause** — suspected invalid root/proof in the wild, a token integration anomaly, or a discovered claim issue. Stops claims and further funding **without redirecting any funds** (custody is untouched; pause is a halt, not a withdrawal).
 - **Registry pause** — suspected oracle/source compromise; blocks new announcements and root publishing while you investigate.
 
-`sweepUnclaimed` is intentionally **not** gated by `whenNotPaused`, so an issuer can still reclaim their own funds after the deadline even during a pause. There is no admin withdrawal of holder funds by design.
+`sweepUnclaimed` **is** gated by `whenNotPaused` (verified by `test_Audit3_SweepBlockedWhilePaused`): an emergency pause halts it too, so **unpausing is a prerequisite for issuer fund recovery**. This is deliberate — pause is a full freeze of token movement, not a withdrawal. There is no admin withdrawal of holder funds by design.
 
 ---
 
-## 10. Cancel an action (issuer)
+## 10. Cancel / recover an action (issuer)
 
-Before any value moves, the issuer may cancel:
+Two cancellation paths, selected by status:
 
 ```bash
+# ANNOUNCED (no root, no funds) — cancel directly on the registry:
 cast send "$REG" 'cancelAction(uint256)' <id> --rpc-url "$RPC_URL" --private-key <ISSUER_KEY>
-# valid only while status is ANNOUNCED or ROOT_PUBLISHED; reverts InvalidStatus once CLAIMABLE
+# reverts InvalidStatus once a root is published
+
+# ROOT_PUBLISHED (root published, possibly partially funded, not yet CLAIMABLE) —
+# cancel via the distributor, which REFUNDS any partial funding and marks it CANCELLED:
+cast send "$DIST" 'cancelPublishedAction(uint256)' <id> --rpc-url "$RPC_URL" --private-key <ISSUER_KEY>
+# issuer-only; reverts WrongStatus outside ROOT_PUBLISHED
 ```
 
-There is deliberately no cancel after `CLAIMABLE` — once holders can claim, only the post-deadline sweep returns the remainder.
+There is deliberately no cancel after `CLAIMABLE` — once holders can claim, only the post-deadline `sweepUnclaimed` returns the remainder. `cancelPublishedAction` is the exit for a published action that is never fully funded (claim and sweep both require CLAIMABLE), so no issuer capital can be permanently stranded.
 
 ---
 
@@ -341,7 +347,7 @@ There is deliberately no cancel after `CLAIMABLE` — once holders can claim, on
 
 **Daily / pre-demo:**
 
-- [ ] `npm run test:contracts` is green (42 tests).
+- [ ] `npm run test:contracts` is green (81 tests).
 - [ ] Both contracts show "Verified" on Blockscout.
 - [ ] Deployer/issuer wallets have gas; issuer holds enough USDG for any pending `fund`.
 - [ ] `deployments/<chainId>.json` and committed `proofs-*.json` match on-chain state.
@@ -357,7 +363,7 @@ There is deliberately no cancel after `CLAIMABLE` — once holders can claim, on
 **Incident triage:**
 
 1. **Claims failing / suspicious proof** → `pause()` the distributor; reproduce the root; compare against the published root; resume or re-issue.
-2. **Bad announcement** → if not yet `CLAIMABLE`, `cancelAction`; investigate the source/attester.
+2. **Bad announcement** → if `ANNOUNCED`, `cancelAction`; if `ROOT_PUBLISHED`, `cancelPublishedAction` (refunds any funding); if already `CLAIMABLE`, pause and sweep after the deadline. Investigate the source/attester.
 3. **Oracle/source concern** → `pause()` the registry; consider `setActionSource` to a known-good source.
 4. **Funds discrepancy** → check the solvency invariant on-chain: `usdg.balanceOf(distributor) == totalFunded(id) − totalClaimed(id)` for each live action. A mismatch is a P0 incident.
 5. Capture tx hashes and the `deployments/` snapshot; do not rotate keys mid-incident unless a key is the suspected cause.

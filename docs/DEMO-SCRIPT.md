@@ -50,7 +50,7 @@ This is the most visual moment — slow down. Zero jargon on screen: "Your divid
 Run `curl .../api/actions`, show the JSON, then flash a CAE-1 event snippet on `/feed`. The line: *"lending markets and AI agents can finally react to corporate actions."* Mention **claim-on-behalf** if there's a breath — it's what makes agent-driven claiming possible.
 
 ### 2:35–2:55 — Architecture + honesty close
-One architecture frame. State the evidence plainly: **two immutable contracts, 42 tests, ~82k gas/claim, verified on Blockscout.** Then the honesty note — *"issuer-fed oracle today, Chainlink Functions adapter next, and the seam is already in the code"* — which reads as senior engineering, not a gap. Close on the one-liner and "built on Robinhood Chain," with the QR + verified addresses on screen.
+One architecture frame. State the evidence plainly: **two immutable contracts, 81 tests, ~82k gas/claim, verified on Blockscout.** Then the honesty note — *"issuer-fed oracle today, Chainlink Functions adapter next, and the seam is already in the code"* — which reads as senior engineering, not a gap. Close on the one-liner and "built on Robinhood Chain," with the QR + verified addresses on screen.
 
 ---
 

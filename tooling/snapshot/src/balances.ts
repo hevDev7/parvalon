@@ -32,6 +32,36 @@ const TRANSFER_EVENT = parseAbiItem(
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
+/**
+ * Thrown when the snapshot's `--record-block` is still inside the chain's reorg
+ * window — i.e. fewer than `confirmations` blocks separate it from the current
+ * head. Logs at/just below an un-finalised record block can be reorged out after
+ * we read them, yet the Merkle root is committed immutably and pays the wrong
+ * holder set. We refuse rather than commit a root over non-final state.
+ *
+ * Typed so the CLI can map it to a clear, actionable non-zero exit.
+ */
+export class FinalityError extends Error {
+  override readonly name = "FinalityError";
+  constructor(
+    /** Current chain head observed via `eth_blockNumber`. */
+    readonly head: bigint,
+    /** The record block the operator asked to snapshot. */
+    readonly recordBlock: bigint,
+    /** Required finality depth (confirmations). */
+    readonly required: bigint,
+    /** Actual depth available: `head - recordBlock` (clamped at 0). */
+    readonly actual: bigint,
+  ) {
+    super(
+      `record-block ${recordBlock} is not final: only ${actual} confirmation(s) ` +
+        `behind head ${head}, but ${required} required. Refusing to snapshot ` +
+        `inside the reorg window — wait for the record block to bury deeper, or ` +
+        `lower --confirmations only if you accept reorg risk.`,
+    );
+  }
+}
+
 /** Tunables for the chunked scan. Conservative defaults that "just work". */
 export interface ScanOptions {
   /** Max retries per chunk before giving up. */
@@ -40,6 +70,17 @@ export interface ScanOptions {
   readonly backoffBaseMs: number;
   /** Smallest chunk we'll shrink to before declaring the provider unusable. */
   readonly minChunk: bigint;
+  /**
+   * Finality / reorg-buffer depth: the snapshot REFUSES (throws
+   * {@link FinalityError}) if `head - recordBlock < confirmations`, where `head`
+   * is read from `eth_blockNumber` at scan time.
+   *
+   * Default `0` preserves legacy behavior — the head is NOT read, no guard runs,
+   * but a LOUD reorg-unsafe warning is emitted so the default is visibly (not
+   * silently) unsafe. Set a chain-appropriate depth in production (e.g. enough
+   * blocks to clear the L2/Orbit reorg window) to make snapshots reorg-safe.
+   */
+  readonly confirmations: bigint;
   /** Sink for progress lines (defaults to stderr). */
   readonly log: (msg: string) => void;
 }
@@ -48,6 +89,7 @@ const DEFAULT_OPTIONS: ScanOptions = {
   maxRetries: 6,
   backoffBaseMs: 400,
   minChunk: 1n,
+  confirmations: 0n,
   log: (msg) => process.stderr.write(msg + "\n"),
 };
 
@@ -112,6 +154,13 @@ export class RpcBalanceProvider implements BalanceProvider {
       );
     }
 
+    // Finality / reorg-buffer guard. With confirmations > 0 we read the current
+    // head and REFUSE to snapshot a record block still inside the reorg window;
+    // committing a Merkle root over logs that can still be reorged out would pay
+    // the wrong holder set. With the default 0 we don't read the head at all
+    // (legacy behavior) but emit a LOUD warning so the default is visibly unsafe.
+    await this.assertFinal(recordBlock);
+
     const transfers = await this.scanTransfers(
       getAddress(asset),
       deployBlock,
@@ -122,6 +171,35 @@ export class RpcBalanceProvider implements BalanceProvider {
       `[snapshot] folded ${transfers.length} Transfer logs into balances`,
     );
     return foldTransfers(transfers);
+  }
+
+  /**
+   * Reorg-safety gate. When `confirmations > 0`, read the chain head and throw
+   * {@link FinalityError} if the record block is not yet buried under at least
+   * that many confirmations. When `confirmations === 0` we skip the head read
+   * entirely (deterministic, no-network legacy path) but warn LOUDLY so the
+   * unsafe default is never silent.
+   */
+  private async assertFinal(recordBlock: bigint): Promise<void> {
+    const required = this.options.confirmations;
+    if (required <= 0n) {
+      this.options.log(
+        "[snapshot] WARNING: --confirmations is 0 — NO finality/reorg buffer. " +
+          "Logs at or below the record block may still be reorged out, yet the " +
+          "Merkle root is committed immutably. Set --confirmations to your " +
+          "chain's reorg depth to make this snapshot reorg-safe.",
+      );
+      return;
+    }
+    const head = await this.client.getBlockNumber();
+    const actual = head > recordBlock ? head - recordBlock : 0n;
+    if (actual < required) {
+      throw new FinalityError(head, recordBlock, required, actual);
+    }
+    this.options.log(
+      `[snapshot] finality OK: record block ${recordBlock} is ${actual} ` +
+        `confirmation(s) behind head ${head} (>= ${required} required)`,
+    );
   }
 
   /**

@@ -15,6 +15,7 @@ export {
 export {
   foldTransfers,
   RpcBalanceProvider,
+  FinalityError,
   type ScanOptions,
 } from "./balances.js";
 export {

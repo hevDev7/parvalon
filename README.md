@@ -118,20 +118,20 @@ For the **production snapshot path** (against real `Transfer` logs instead of th
 ## Reproduce the tests & gas evidence
 
 ```bash
-npm run test:contracts                       # 67 forge tests
-npm run test:ts                              # 148 TS tests (sdk/snapshot/monitor/agent)
+npm run test:contracts                       # 81 forge tests
+npm run test:ts                              # 157 TS tests (sdk/snapshot/monitor/agent)
 cd contracts && forge test --gas-report      # per-function gas table
 cd contracts && slither . --config-file slither.config.json   # static analysis
 ```
 
 | Evidence | Result |
 |---|---|
-| Contract suite | **67 tests pass** (unit + fuzz + invariants), 0 failed |
-| TypeScript suites | **148 tests pass** — SDK 30, snapshot 49, monitor 51, agent 18 |
+| Contract suite | **81 tests pass** (unit + fuzz + invariants + audit-regression), 0 failed |
+| TypeScript suites | **157 tests pass** — SDK 30, snapshot 57, monitor 52, agent 18 |
 | Static analysis | slither 0.11.5 — **0 high / 0 medium** (see [AUDIT-PREP.md](docs/AUDIT-PREP.md)) |
 | Fuzz coverage | Full announce→claim cycle fuzzed up to **60 holders**; root determinism fuzzed |
 | Invariants | Solvency (`balance == funded − claimed`), claimed ≤ funded, funded capped — held over randomized claim orderings |
-| **`claim()` gas** | **~82,172** (measured by `test_Claim_GasUnderTarget`; under the 90k PRD target) |
+| **`claim()` gas** | **~82.4k** for a representative claim (`test_Claim_GasUnderTarget`, asserts < 150k; under the 90k PRD target); ~100k gas-report median across Merkle-proof depths |
 | Build | Solidity 0.8.26, OZ v5.1.0, optimizer 200 runs, deterministic bytecode |
 
 The Merkle root is **deterministic and independently verifiable**: two runs of the snapshot CLI produce an identical root (fuzz-tested), and anyone can re-derive it from public `Transfer` logs. That is auditability traditional transfer agents don't offer.
@@ -140,7 +140,7 @@ The Merkle root is **deterministic and independently verifiable**: two runs of t
 
 | Path | What |
 |---|---|
-| `contracts/` | Foundry protocol — `CorporateActionRegistry`, `DividendDistributor`, `AdminActionSource` + `FunctionsActionSource` (D3 seam), `SplitAdjuster` lib, `TimelockController` governance, mocks, **67 tests**, deploy/seed/governance scripts |
+| `contracts/` | Foundry protocol — `CorporateActionRegistry`, `DividendDistributor`, `AdminActionSource` + `FunctionsActionSource` (D3 seam), `SplitAdjuster` lib, `TimelockController` governance, mocks, **81 tests**, deploy/seed/governance scripts |
 | `tooling/snapshot/` | TypeScript (viem) deterministic Merkle snapshot CLI — exclusion lists, withholding, IPFS pinning |
 | `tooling/monitor/` | `@corporax/monitor` — solvency-invariant + lifecycle alerting service |
 | `packages/sdk/` | `@corporax/sdk` — typed client (reads/writes + CAE-1 watchers) for integrators |

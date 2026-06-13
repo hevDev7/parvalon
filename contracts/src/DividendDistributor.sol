@@ -135,6 +135,28 @@ contract DividendDistributor is IDividendDistributor, AccessControl, Pausable, R
         }
     }
 
+    /// @inheritdoc IDividendDistributor
+    function cancelPublishedAction(uint256 id) external nonReentrant whenNotPaused {
+        ActionView memory a = REGISTRY.actionView(id);
+        if (a.actionType != ActionType.CASH_DIVIDEND) revert NotADividend(id);
+        if (a.status != ActionStatus.ROOT_PUBLISHED) revert WrongStatus(id);
+        address issuer = REGISTRY.assetIssuer(a.asset);
+        if (msg.sender != issuer) revert Unauthorized(msg.sender, id);
+
+        // A ROOT_PUBLISHED action is pre-CLAIMABLE, so no claim can have run:
+        // `_claimedTotal[id]` is necessarily 0 and the full deposit is recoverable.
+        // Effects first (cancel via registry + zero accounting), refund last —
+        // mirroring sweepUnclaimed's finalize-then-transfer ordering under nonReentrant.
+        uint256 refund = _funded[id];
+        _funded[id] = 0;
+        REGISTRY.cancelPublishedAction(id);
+        emit PublishedActionCancelled(id, issuer, refund);
+
+        if (refund > 0) {
+            IERC20(a.payoutToken).safeTransfer(issuer, refund);
+        }
+    }
+
     /*//////////////////////////////////////////////////////////////
                             ADMIN GOVERNANCE
     //////////////////////////////////////////////////////////////*/

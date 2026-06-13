@@ -189,6 +189,19 @@ contract CorporateActionRegistry is ICorporateActionRegistry, AccessControl, Pau
         _setStatus(a, ActionStatus.FINALIZED);
     }
 
+    /// @inheritdoc ICorporateActionRegistry
+    function cancelPublishedAction(uint256 id) external onlyDistributor {
+        CorporateAction storage a = _requireAction(id);
+        // Distributor-gated so it is reachable only via the distributor's refund
+        // flow, which returns any escrowed funds in the same tx. ROOT_PUBLISHED is
+        // pre-CLAIMABLE, so no claim can have occurred — CANCELLED stays the
+        // "voided before any claim" terminal state.
+        if (a.status != ActionStatus.ROOT_PUBLISHED) {
+            revert InvalidStatus(id, a.status, ActionStatus.ROOT_PUBLISHED);
+        }
+        _setStatus(a, ActionStatus.CANCELLED);
+    }
+
     /*//////////////////////////////////////////////////////////////
                             ADMIN GOVERNANCE
     //////////////////////////////////////////////////////////////*/

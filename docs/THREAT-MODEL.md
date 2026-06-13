@@ -94,9 +94,10 @@ Low relevance — all action data is public by design (a corporate action *shoul
 |---|---|---|
 | Griefing claims by repeatedly claiming an index | First claim sets the bitmap; a repeat reverts `AlreadyClaimed` and changes nothing. | `BitMaps` + `claim` guard. Tests: double-claim revert; invariant over random claim orderings. |
 | One holder's failure blocks others | Claims are independent per index; no shared queue, no ordering dependency. | per-index bitmap; `invariant_*` hold under arbitrary claim order (`InvariantDistributorTest`). |
-| Unbounded loop / gas-bomb on the hot path | No loops in `claim`/`fund`/`sweep`; O(1) bitmap; off-chain O(N) snapshot. | `claim ≈ 82,172 gas` (`test_Claim_GasUnderTarget`). |
+| Unbounded loop / gas-bomb on the hot path | No loops in `claim`/`fund`/`sweep`; O(1) bitmap; off-chain O(N) snapshot. | `claim ≈ 82.4k gas` for a representative claim (`test_Claim_GasUnderTarget`, asserts < 150k); ~100k gas-report median across Merkle-proof depths. |
 | Malicious payout token reverts/consumes gas on transfer | `SafeERC20` for all movements; a token that always reverts only blocks *its own* action's claims/funding, isolated from other actions (per-action accounting). | `SafeERC20`; payout token is the issuer's own choice (USDG). |
-| Stuck funds if no one claims | `sweepUnclaimed` (post-deadline) returns the remainder to the issuer; **not** gated by `whenNotPaused` so it works even during a pause. | `DividendDistributor.sweepUnclaimed`. Tests: sweep before/after deadline. |
+| Stuck funds if no one claims | `sweepUnclaimed` (post-deadline) returns the remainder to the issuer. It **is** gated by `whenNotPaused`, so an emergency pause freezes it too (unpause to recover). | `DividendDistributor.sweepUnclaimed`. Tests: sweep before/after deadline; `test_Audit3_SweepBlockedWhilePaused`. |
+| Stuck funds in a never-fully-funded published action | `cancelPublishedAction` lets the issuer recover any partial funding and cancel a `ROOT_PUBLISHED` action before it is claimable — the exit that prevents stranded issuer capital. | `DividendDistributor.cancelPublishedAction`; `PublishedActionRecoveryTest`. |
 
 ### 4.6 Elevation of privilege
 
@@ -163,7 +164,7 @@ Tested in `InvariantDistributorTest` and the E2E fuzz suite (`E2EFuzz.t.sol`), e
 | **Root determinism** | same `(asset, recordBlock, rate)` ⇒ identical root | `testFuzz_RootDeterminism` |
 | **Full-cycle correctness** | announce→…→claim pays each of N holders exactly once, exact amount | `testFuzz_FullCycle_NHolders` (fuzzed to 60 holders) |
 
-The whole suite — **42 tests** (unit + fuzz + invariants) — passes. These invariants are the formal backstop behind the STRIDE mitigations above: even if a specific control were reasoned about incorrectly, a violation of solvency or no-overpayment would fail the suite.
+The whole suite — **81 tests** (unit + fuzz + invariants + audit-regression) — passes. These invariants are the formal backstop behind the STRIDE mitigations above: even if a specific control were reasoned about incorrectly, a violation of solvency or no-overpayment would fail the suite.
 
 ---
 

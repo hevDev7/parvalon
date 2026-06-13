@@ -89,7 +89,10 @@ interface ICorporateActionRegistry {
     ///      Sets status -> ROOT_PUBLISHED. The root is immutable thereafter.
     function publishRoot(uint256 id, bytes32 root, uint256 totalPayout, uint256 holderCount) external;
 
-    /// @notice Cancel an action before any value has moved (ANNOUNCED/ROOT_PUBLISHED only).
+    /// @notice Cancel an ANNOUNCED action before a root is published. Caller must be
+    ///         the issuer. To retire a ROOT_PUBLISHED action and recover any partial
+    ///         funding, use {IDividendDistributor-cancelPublishedAction} instead — it
+    ///         coordinates the refund and the {cancelPublishedAction} transition here.
     function cancelAction(uint256 id) external;
 
     /*//////////////////////////////////////////////////////////////
@@ -101,6 +104,13 @@ interface ICorporateActionRegistry {
 
     /// @notice Advance CLAIMABLE -> FINALIZED. Restricted to the linked distributor.
     function markFinalized(uint256 id) external;
+
+    /// @notice Cancel a ROOT_PUBLISHED action, moving it to the terminal CANCELLED
+    ///         state. Restricted to the linked distributor, which calls this only
+    ///         from {IDividendDistributor-cancelPublishedAction} so any partially
+    ///         deposited funds are refunded to the issuer in the same transaction.
+    ///         Safe because no claim can occur before CLAIMABLE.
+    function cancelPublishedAction(uint256 id) external;
 
     /*//////////////////////////////////////////////////////////////
                                  VIEWS

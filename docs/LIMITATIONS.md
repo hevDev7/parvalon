@@ -73,4 +73,4 @@ Gasless claiming is a UX layer, not a protocol guarantee — the protocol only r
 
 ## Summary
 
-Every limitation here is a *scoped simplification with a written upgrade path*, not an unknown gap. The properties that matter — solvency, no overpayment, non-replayable proofs, record-date integrity, bounded admin power — hold today and are backed by the 42-test suite and the invariants in [THREAT-MODEL.md §6](./THREAT-MODEL.md#6-invariants-the-safety-net). What v1 trades away is breadth and operational hardening, both of which are sequenced in [PRODUCTION-READINESS.md](./PRODUCTION-READINESS.md).
+Every limitation here is a *scoped simplification with a written upgrade path*, not an unknown gap. The properties that matter — solvency, no overpayment, non-replayable proofs, record-date integrity, bounded admin power — hold today and are backed by the 81-test suite and the invariants in [THREAT-MODEL.md §6](./THREAT-MODEL.md#6-invariants-the-safety-net). What v1 trades away is breadth and operational hardening, both of which are sequenced in [PRODUCTION-READINESS.md](./PRODUCTION-READINESS.md).

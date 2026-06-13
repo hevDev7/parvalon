@@ -8,7 +8,7 @@
 
 ```
 arbitrum/
-├── contracts/          Foundry — protocol (DEPLOYED, 42 tests green, claim ~82k gas)
+├── contracts/          Foundry — protocol (DEPLOYED, 81 tests green, claim ~82k gas)
 ├── tooling/snapshot/   TypeScript CLI (viem) — Merkle snapshot generator
 ├── app/                Next.js 14 — /claim /issuer /feed + /api/actions
 ├── abis/               AUTO-GENERATED ABIs (JSON + index.ts `as const`)  ← import these

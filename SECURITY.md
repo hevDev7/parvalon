@@ -103,7 +103,7 @@ produces or consumes claim data:
 - **Merkle claims** use OpenZeppelin `StandardMerkleTree` double-hashed leaves
   verified on-chain with commutative/sorted-pair `MerkleProof` — the encoding
   is frozen in `docs/INTEGRATION.md` §4.
-- **Tested:** 42 Foundry tests (unit + fuzz to 60 holders + invariants such as
+- **Tested:** 81 Foundry tests (unit + fuzz to 60 holders + invariants such as
   `Σ claimed ≤ funded`, claim idempotency, and post-`CLAIMABLE` root
   immutability). CI also runs Slither (`.github/workflows/slither.yml`) and
   CodeQL.

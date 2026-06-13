@@ -9,14 +9,13 @@
 # the root package.json / lockfile and imports the sibling abis/ package):
 #   docker build -f infra/frontend.Dockerfile -t corporax/frontend .
 #
-# NOTE (honest status): the app/ workspace is a placeholder at the time of
-# writing — this Dockerfile is the forward-looking contract for when it lands.
-# It assumes the standard workspace layout from docs/INTEGRATION.md §1.
+# Node 22 (alpine) matches the version used across CI so build/runtime behaviour
+# is identical between the pipeline and the production image.
 # ============================================================================
 
 # --- Stage 1: dependencies --------------------------------------------------
 # Install workspace deps once against the lockfile for reproducible builds.
-FROM node:20-alpine AS deps
+FROM node:22-alpine AS deps
 WORKDIR /app
 # libc compat for some native deps (e.g. certain crypto/bigint addons).
 RUN apk add --no-cache libc6-compat
@@ -28,7 +27,7 @@ COPY tooling/snapshot/package.json ./tooling/snapshot/package.json
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # --- Stage 2: build ---------------------------------------------------------
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 RUN apk add --no-cache libc6-compat
 COPY --from=deps /app/node_modules ./node_modules
@@ -53,7 +52,7 @@ RUN npm -w @corporax/app run build
 # --- Stage 3: runtime -------------------------------------------------------
 # Minimal runner using the traced standalone server. Runs as the built-in
 # non-root `node` user.
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \

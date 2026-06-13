@@ -44,13 +44,11 @@ cd /work/contracts
 echo "[deployer] running Deploy.s.sol ..."
 forge script script/Deploy.s.sol:Deploy \
   --rpc-url "$RPC_URL" \
-  --broadcast \
-  --skip-simulation
+  --broadcast
 
 echo "[deployer] running Seed.s.sol ..."
 forge script script/Seed.s.sol:Seed \
   --rpc-url "$RPC_URL" \
-  --broadcast \
-  --skip-simulation
+  --broadcast
 
 echo "[deployer] done. Wrote deployments/<chainId>.json + proofs-<chainId>-<id>.json."

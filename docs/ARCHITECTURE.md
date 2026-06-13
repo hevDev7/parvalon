@@ -182,7 +182,7 @@ Informational actions (`STOCK_SPLIT` / `STOCK_DIVIDEND`) live as `ANNOUNCED` and
 
 Gas optimization is concentrated where it is actually felt — the **claim**, which holders pay and which happens N times per action — and deliberately *not* spent on the rare issuer writes, where auditor clarity is worth more than a marginal `SSTORE` saving.
 
-**Claim bitmap.** Consumed claim indices are tracked with `mapping(uint256 id => BitMaps.BitMap)` (OZ `BitMaps`). One storage slot covers 256 holders. Marking a claim is a single warm `SSTORE`; checking double-claims is a single `SLOAD` and a bit test. Measured **`claim()` ≈ 82,172 gas** (`test_Claim_GasUnderTarget`), comfortably under the 90k PRD target — dominated by the unavoidable ERC-20 `safeTransfer`, not by protocol bookkeeping.
+**Claim bitmap.** Consumed claim indices are tracked with `mapping(uint256 id => BitMaps.BitMap)` (OZ `BitMaps`). One storage slot covers 256 holders. Marking a claim is a single warm `SSTORE`; checking double-claims is a single `SLOAD` and a bit test. Measured **`claim()` ≈ 82.4k gas** for a representative claim (`test_Claim_GasUnderTarget`, which asserts < 150k), under the 90k PRD target — dominated by the unavoidable ERC-20 `safeTransfer`, not by protocol bookkeeping. Deeper Merkle proofs raise the gas-report median to ~100k.
 
 **`actionView` projection.** The distributor reads action data through `actionView(id)` → the `ActionView` struct, a lean projection of `CorporateAction` that omits the unbounded `metadataURI` string and the fields the hot path doesn't need (`id`, `ratePerShare`, `recordBlock`). Reading the full struct on every claim would mean copying an arbitrary-length string into memory for no reason; the projection avoids that on the most frequent call.
 

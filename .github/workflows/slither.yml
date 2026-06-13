@@ -2,9 +2,9 @@
 #
 # Runs the crytic/slither-action on contracts/, filtering vendored OpenZeppelin
 # code (see contracts/slither.config.json). Findings are uploaded as SARIF so
-# they surface in the GitHub "Security > Code scanning" tab. The analysis is
-# advisory (continue-on-error) — Slither's high-FP detectors should inform, not
-# block, given the immutable / heavily-tested design.
+# they surface in the GitHub "Security > Code scanning" tab. The job BLOCKS the
+# merge on any high/medium finding (fail-on: medium); low/informational detectors
+# still surface in SARIF but do not fail the gate.
 name: slither
 
 on:
@@ -45,14 +45,15 @@ jobs:
       - name: Run Slither
         uses: crytic/slither-action@v0.4.0
         id: slither
+        # Keep going to the SARIF upload even when the gate fails, so findings are
+        # always visible; the explicit gate step below is what blocks the merge.
         continue-on-error: true
         with:
           target: contracts/
           slither-config: contracts/slither.config.json
           sarif: results.sarif
-          # Don't let the action fail the job; the SARIF upload below is the
-          # signal of record.
-          fail-on: none
+          # Block the merge on any high/medium finding.
+          fail-on: medium
 
       - name: Upload SARIF
         uses: github/codeql-action/upload-sarif@v3
@@ -62,3 +63,11 @@ jobs:
         with:
           sarif_file: ${{ steps.slither.outputs.sarif }}
           category: slither
+
+      - name: Fail on high/medium findings
+        # The Slither step is continue-on-error so SARIF always uploads; this gate
+        # turns a high/medium finding (fail-on: medium) into a blocking job failure.
+        if: steps.slither.outcome == 'failure'
+        run: |
+          echo "Slither reported a high/medium finding — see the Security > Code scanning tab." >&2
+          exit 1

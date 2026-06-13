@@ -66,6 +66,7 @@ corporax-snapshot snapshot \
 | `--action-id`          |    ✓     | Corporate-action id this snapshot is for (binds the leaves).                            |
 | `--out <path>`         |    ✓     | Output path for `proofs.json`.                                                           |
 | `--chunk <n>`          |          | `eth_getLogs` page size in blocks (default `5000`).                                     |
+| `--confirmations <n>`  |          | **Finality buffer.** Refuse to snapshot if `head - record-block < n`. Default `0` = no guard + loud reorg-unsafe warning. Alias: `--finality`. |
 | `--payout-token`       |          | Payout token address written into the artifact.                                         |
 | `--chain-id`           |          | Override the chain id (default: read from the RPC).                                     |
 | `--exclude <addrs>`    |          | **(P1-3)** Comma-separated addresses dropped from the eligible set *before* indexing.   |
@@ -107,6 +108,27 @@ net math (`net == net(gross, bps)`) for every claim. *This is the payout
 **mechanism** only — what rate to withhold, and all legal/KYC obligations, are
 the issuer's to determine and assert.*
 
+#### Finality / reorg buffer (`--confirmations`)
+
+The snapshot scans `Transfer` logs over `[deploy-block, record-block]` and commits
+the resulting Merkle root **immutably**. On an Orbit/L2 chain, logs at or just
+below `--record-block` read during snapshotting can still be reorged out, so
+paying that holder set is unsafe until the record block is buried under enough
+confirmations. `--confirmations <n>` (alias `--finality <n>`) reads the current
+chain head before scanning and **refuses** (non-zero exit, `FinalityError`) when:
+
+```
+head - record-block < confirmations
+```
+
+Set `n` to your chain's reorg depth so an operator cannot snapshot a record block
+still inside the reorg window. **Default is `0`** — which preserves legacy behavior
+(the head is never read, the scan is fully deterministic for tests) but emits a
+**loud reorg-unsafe warning** to `stderr`, so the unsafe default is visible, never
+silent. The on-chain `publishRoot` guard only enforces a single-block margin
+(`block.number > recordBlock`); this flag is the off-chain complement that closes
+the reorg window before the root is ever generated.
+
 #### IPFS pinning (P1-2)
 
 `--pin-ipfs` content-addresses the exact bytes written to disk so consumers can
@@ -146,9 +168,11 @@ any mismatch — drop it into CI to guard committed artifacts.
 
 ## Algorithm
 
-1. **Scan** — chunked `eth_getLogs` for ERC20 `Transfer(from,to,value)` from
-   `--deploy-block` through `--record-block`, with exponential backoff and
-   adaptive chunk halving on provider range/limit errors.
+1. **Scan** — first apply the **finality gate** (`--confirmations`): read the
+   chain head and refuse if `head - record-block < n` (default `0` = no gate +
+   loud reorg-unsafe warning). Then chunked `eth_getLogs` for ERC20
+   `Transfer(from,to,value)` from `--deploy-block` through `--record-block`, with
+   exponential backoff and adaptive chunk halving on provider range/limit errors.
 2. **Fold** — credit `to`, debit `from`, skip `address(0)` on both sides
    (mints/burns are supply, not a payable holder). BigInt throughout.
 3. **Exclude** *(P1-3)* — drop `--exclude` / `--exclude-file` addresses from the
@@ -237,7 +261,11 @@ including that input map **order** does not affect the root.
   `HttpPinner` targets a Pinata-/Kubo-compatible endpoint; swap in any `Pinner`
   implementation via the library API for other providers.
 - **Reorgs:** the tool reads at a fixed `--record-block`; run it only once that
-  block is final on your chain.
+  block is final on your chain. Pass `--confirmations <n>` (alias `--finality`) to
+  have the tool **enforce** this: it reads the chain head and refuses to snapshot
+  while `head - record-block < n`. The default `0` does not guard (legacy
+  behavior) but prints a loud reorg-unsafe warning — set a chain-appropriate depth
+  in production.
 - **Index assignment vs. `Seed.s.sol`:** this CLI assigns `index` by **address
   ascending** (the deterministic, reproducible rule). The dev `Seed.s.sol`
   fixture assigned indices in insertion order. Both are internally consistent and

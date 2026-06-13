@@ -20,7 +20,10 @@ import { Script, console2 } from "forge-std/Script.sol";
 ///      Optional env:
 ///        ADMIN_ADDRESS          governance/multisig (default: broadcaster)
 ///        ISSUER_ADDRESS         per-asset issuer (default: broadcaster)
-///        AUTO_ATTEST            "true"/"false" — D3 source mode (default: true on testnet)
+///        AUTO_ATTEST            "true"/"false" — D3 source mode. Default: FALSE
+///                               (fail-closed). `true` opens the provenance gate and
+///                               is permitted ONLY on known local/testnet chains
+///                               (31337 / 421614 / 46630); it reverts elsewhere.
 ///        USDG_ADDRESS           real USDG (else mock deployed, 18 dec)
 ///        TSLA_ADDRESS           real TSLA (else mock deployed, 18 dec)
 ///        AMZN_ADDRESS           real AMZN (else mock deployed, 18 dec)
@@ -29,7 +32,17 @@ contract Deploy is Script {
         address broadcaster = vm.addr(vm.envUint("PRIVATE_KEY"));
         address admin = vm.envOr("ADMIN_ADDRESS", broadcaster);
         address issuer = vm.envOr("ISSUER_ADDRESS", broadcaster);
-        bool autoAttest = vm.envOr("AUTO_ATTEST", true);
+        // Fail-closed default: a deployer must explicitly opt into auto-attest, and
+        // even then only on a known local/testnet chain. This prevents accidentally
+        // shipping an open provenance gate (any issuer can announce any action with
+        // no off-chain vouch) to a production / real-value deployment.
+        bool autoAttest = vm.envOr("AUTO_ATTEST", false);
+        if (autoAttest) {
+            uint256 cid = block.chainid;
+            bool devOrTestnet = cid == 31_337 || cid == 421_614 || cid == 46_630;
+            require(devOrTestnet, "AUTO_ATTEST=true forbidden off testnet; set AUTO_ATTEST=false for real value");
+            console2.log("!! WARNING AUTO_ATTEST=true: provenance gate OPEN (testnet/demo only). chainId", cid);
+        }
 
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
 
@@ -60,6 +73,7 @@ contract Deploy is Script {
         console2.log("registry    ", address(registry));
         console2.log("distributor ", address(distributor));
         console2.log("actionSource", address(source));
+        console2.log("autoAttest  ", source.autoAttest()); // false in production; verify before going live
         console2.log("usdg        ", usdg);
         console2.log("tsla        ", tsla);
         console2.log("amzn        ", amzn);

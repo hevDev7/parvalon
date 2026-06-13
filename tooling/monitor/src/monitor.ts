@@ -47,6 +47,8 @@ import {
 
 /** A read-only snapshot of the whole protocol, assembled each poll. */
 export interface ProtocolSnapshot {
+  /** The block height every read in this snapshot was pinned to. */
+  readonly blockNumber: bigint;
   readonly actionCount: bigint;
   readonly actions: ActionAccounting[];
   readonly balances: TokenBalance[];
@@ -91,14 +93,24 @@ export class Monitor {
    * Read the full protocol snapshot: every action's accounting + the
    * distributor's balance of each distinct payout token + both pause flags.
    * `actionCount()` defines the id range `1..N` (INTEGRATION.md §2).
+   *
+   * All reads are pinned to ONE block height (fetched once via
+   * `getBlockNumber()`) so the solvency invariant `balance == Σ(funded − claimed)`
+   * is evaluated from a coherent state — it only holds at a single height.
+   * Straddling blocks could otherwise spuriously page or false-clear a real
+   * shortfall for a poll cycle.
    */
   async readSnapshot(): Promise<ProtocolSnapshot> {
     const { registry, distributor } = this.config;
+
+    // Pin every read in this snapshot to a single, coherent block height.
+    const blockNumber = await this.client.getBlockNumber();
 
     const actionCount = (await this.client.readContract({
       address: registry,
       abi: registryAbi,
       functionName: "actionCount",
+      blockNumber,
     })) as bigint;
 
     const actions: ActionAccounting[] = [];
@@ -108,6 +120,7 @@ export class Monitor {
         abi: registryAbi,
         functionName: "actionView",
         args: [id],
+        blockNumber,
       })) as {
         actionType: number;
         status: number;
@@ -125,12 +138,14 @@ export class Monitor {
           abi: distributorAbi,
           functionName: "totalFunded",
           args: [id],
+          blockNumber,
         }),
         this.client.readContract({
           address: distributor,
           abi: distributorAbi,
           functionName: "totalClaimed",
           args: [id],
+          blockNumber,
         }),
       ])) as [bigint, bigint];
 
@@ -155,16 +170,17 @@ export class Monitor {
         abi: erc20Abi,
         functionName: "balanceOf",
         args: [distributor],
+        blockNumber,
       })) as bigint;
       balances.push({ token, balance });
     }
 
     const [registryPaused, distributorPaused] = (await Promise.all([
-      this.client.readContract({ address: registry, abi: registryAbi, functionName: "paused" }),
-      this.client.readContract({ address: distributor, abi: distributorAbi, functionName: "paused" }),
+      this.client.readContract({ address: registry, abi: registryAbi, functionName: "paused", blockNumber }),
+      this.client.readContract({ address: distributor, abi: distributorAbi, functionName: "paused", blockNumber }),
     ])) as [boolean, boolean];
 
-    return { actionCount, actions, balances, registryPaused, distributorPaused };
+    return { blockNumber, actionCount, actions, balances, registryPaused, distributorPaused };
   }
 
   /* ----------------------------- poll --------------------------------- */
@@ -194,12 +210,13 @@ export class Monitor {
 
     const produced: Alert[] = [];
 
-    // 1) Solvency invariant (the page-worthy one).
+    // 1) Solvency invariant (the page-worthy one). All reads are coherent at
+    //    snap.blockNumber, so the invariant holds at a single height.
     const { results, alerts: solvencyAlerts } = checkSolvency(snap.actions, snap.balances);
     for (const r of results) {
       this.log(
-        `[poll] token=${r.token} balance=${r.balance} obligation=${r.obligation} ` +
-          `surplus=${r.surplus} ${r.solvent ? "OK" : "INSOLVENT"}`,
+        `[poll] block=${snap.blockNumber} token=${r.token} balance=${r.balance} ` +
+          `obligation=${r.obligation} surplus=${r.surplus} ${r.solvent ? "OK" : "INSOLVENT"}`,
       );
     }
     produced.push(...solvencyAlerts);

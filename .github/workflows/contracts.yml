@@ -72,6 +72,12 @@ jobs:
       - name: Test
         run: forge test -vvv
 
+      - name: Gas regression check
+        # Pins gas for deterministic tests against the committed .gas-snapshot and
+        # fails on regression. Fuzz/invariant means vary with run count, so they are
+        # excluded from the gate; update with `forge snapshot` on intentional changes.
+        run: forge snapshot --check --no-match-test "testFuzz|invariant"
+
       - name: Coverage summary
         # Coverage runs without via-ir; tolerate the occasional stack-too-deep on
         # heavy test files without failing the gate, while still surfacing the

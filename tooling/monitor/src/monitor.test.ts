@@ -71,7 +71,11 @@ function fakeClient(state: FakeState): PublicClient {
     throw new Error(`unexpected read ${fn}`);
   };
   // Only the methods Monitor uses; cast through unknown for the test double.
-  return { readContract, watchContractEvent: () => () => {} } as unknown as PublicClient;
+  return {
+    readContract,
+    getBlockNumber: async () => 0n,
+    watchContractEvent: () => () => {},
+  } as unknown as PublicClient;
 }
 
 function cfg(): MonitorConfig {
@@ -153,6 +157,7 @@ describe("Monitor.pollOnce (mocked chain)", () => {
 
   it("an RPC read failure surfaces a notify rather than throwing", async () => {
     const broken = {
+      getBlockNumber: async () => 1n,
       readContract: async () => {
         throw new Error("connection refused");
       },
@@ -164,6 +169,45 @@ describe("Monitor.pollOnce (mocked chain)", () => {
     expect(produced).toHaveLength(1);
     expect(produced[0]!.code).toBe("rpc_error");
     expect(alerts[0]!.severity).toBe("notify");
+  });
+});
+
+describe("Monitor.readSnapshot block pinning", () => {
+  it("pins every read in one poll to a single block number", async () => {
+    const state: FakeState = {
+      actionCount: 2n,
+      views: {
+        "1": { status: 2 /* CLAIMABLE */, payoutToken: USDG, totalPayout: 12n * ONE },
+        "2": { status: 1 /* ROOT_PUBLISHED */, payoutToken: USDG, totalPayout: 3n * ONE },
+      },
+      funded: { "1": 12n * ONE, "2": 3n * ONE },
+      claimed: { "1": 5n * ONE, "2": 0n },
+      balances: { [USDG]: 10n * ONE }, // fully backed
+      registryPaused: false,
+      distributorPaused: false,
+    };
+
+    const PINNED = 4242n;
+    const seenBlocks: Array<bigint | undefined> = [];
+
+    // Wrap a real fake client, capturing the blockNumber every read is pinned to.
+    const base = fakeClient(state);
+    const pinning = {
+      getBlockNumber: async () => PINNED,
+      readContract: (req: { blockNumber?: bigint; [k: string]: unknown }) => {
+        seenBlocks.push(req.blockNumber);
+        return base.readContract(req as never);
+      },
+      watchContractEvent: () => () => {},
+    } as unknown as PublicClient;
+
+    const { sink } = capture();
+    const m = new Monitor(cfg(), sink, () => {}, pinning);
+    await m.pollOnce();
+
+    // Every read happened, and every read was pinned to the one fetched height.
+    expect(seenBlocks.length).toBeGreaterThan(0);
+    expect(seenBlocks.every((b) => b === PINNED)).toBe(true);
   });
 });
 

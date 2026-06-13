@@ -19,7 +19,7 @@ see [LIMITATIONS.md](./LIMITATIONS.md).
 
 - Two immutable, no-proxy, no-`delegatecall` contracts (`CorporateActionRegistry`, `DividendDistributor`) + the swappable `IActionSource` seam.
 - OZ v5.1.0 patterns throughout: `AccessControl`, `Pausable`, `ReentrancyGuard`, `SafeERC20`, `MerkleProof`, `BitMaps`. Custom errors, full NatSpec, an event for every state change.
-- **67 contract tests + 148 TS tests** (unit + fuzz to 60 holders + invariants) green; `claim() ≈ 82,172 gas`; deterministic, verifiable Merkle root (CLI reproduces the on-chain root from live logs).
+- **81 contract tests + 157 TS tests** (unit + fuzz to 60 holders + invariants + audit-regression) green; `claim() ≈ 82.4k gas` for a representative claim (~100k gas-report median across proof depths); deterministic, verifiable Merkle root (CLI reproduces the on-chain root from live logs).
 - The state-vs-value split caps blast radius; admin has no path to holder funds.
 
 ### 0.1 Code-complete in this repo (the P0/P1/P2 build-out)
@@ -30,7 +30,7 @@ Functions subscription to fund, a cloud KMS to provision) — not code.
 
 | Item | What landed | Still needs (ops) |
 |---|---|---|
-| P0-1/P0-2 | `DeployGovernance.s.sol` + `Governance.t.sol`: `TimelockController` holds admin, Safe holds pauser | create the Safe; run the handover |
+| P0-1/P0-2 | `DeployGovernance.s.sol` + `Governance.t.sol`: `TimelockController` holds admin, Safe holds pauser | create the Safe; run the handover — **no committed deployment has run it yet; every deployment to date is single-key** (admin == pauser == issuer EOA) |
 | P0-3 | Expanded invariants (`InvariantLifecycle`), slither (0 high/med), **8-agent adversarial review → 2 findings + 1 minor fixed + regression-tested** ([AUDIT-PREP.md](./AUDIT-PREP.md) §6) | engage an external audit firm |
 | P0-4 | `FunctionsActionSource` + `MockFunctionsRouter` + `DeployFunctionsSource.s.sol` | fund a Functions subscription; deploy the off-chain source |
 | P0-5 | Snapshot CLI over real `Transfer` logs (chunked/retry/resume) — parity-proven | — (already the production path) |

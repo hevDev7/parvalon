@@ -25,7 +25,10 @@ ffi = false
 [profile.ci]
 verbosity = 3
 fuzz = { runs = 1000 }
-invariant = { runs = 256, depth = 64, fail_on_revert = false }
+# fail_on_revert = true: every handler in our invariant suites guards its
+# preconditions and returns early instead of reverting, so a revert signals a real
+# handler/logic bug rather than an expected no-op. Keep it strict in CI.
+invariant = { runs = 256, depth = 64, fail_on_revert = true }
 
 [profile.default.fuzz]
 runs = 256
@@ -33,7 +36,7 @@ runs = 256
 [profile.default.invariant]
 runs = 128
 depth = 32
-fail_on_revert = false
+fail_on_revert = true
 
 [fmt]
 line_length = 120

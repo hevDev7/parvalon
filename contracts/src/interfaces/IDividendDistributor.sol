@@ -27,6 +27,10 @@ interface IDividendDistributor {
     /// @notice Emitted when the issuer sweeps unclaimed funds after the deadline.
     event UnclaimedSwept(uint256 indexed id, address indexed to, uint256 amount);
 
+    /// @notice Emitted when the issuer cancels a ROOT_PUBLISHED action before it
+    ///         becomes claimable; `refund` is the partial funding returned to them.
+    event PublishedActionCancelled(uint256 indexed id, address indexed issuer, uint256 refund);
+
     /*//////////////////////////////////////////////////////////////
                                  ERRORS
     //////////////////////////////////////////////////////////////*/
@@ -78,6 +82,14 @@ interface IDividendDistributor {
     /// @notice Return unclaimed funds to the issuer after `claimDeadline`.
     ///         Advances the action to FINALIZED.
     function sweepUnclaimed(uint256 id) external;
+
+    /// @notice Recover a ROOT_PUBLISHED action the issuer chooses to abandon before
+    ///         it becomes CLAIMABLE: refunds any partial funding and cancels the
+    ///         action. Issuer-only. This is the exit for a published action that is
+    ///         never fully funded (claim and sweep both require CLAIMABLE), so it
+    ///         cannot strand issuer capital. Safe by construction: no claim is
+    ///         possible before CLAIMABLE, so the full deposit is recoverable.
+    function cancelPublishedAction(uint256 id) external;
 
     /*//////////////////////////////////////////////////////////////
                                  VIEWS
