@@ -35,8 +35,10 @@ export const anvil = defineChain({
 
 const ALL = [robinhoodTestnet, arbitrumSepolia, anvil] as const;
 
-/** Active chain id — env-driven, defaulting to local anvil for zero-config dev. */
-export const ACTIVE_CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? 31337);
+/** Active chain id — env-driven, defaulting to the live Robinhood testnet (46630)
+ *  so the deployed app works with zero config. For local anvil dev, set
+ *  NEXT_PUBLIC_CHAIN_ID=31337. */
+export const ACTIVE_CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? 46630);
 
 export const activeChain = ALL.find((c) => c.id === ACTIVE_CHAIN_ID) ?? anvil;
 
