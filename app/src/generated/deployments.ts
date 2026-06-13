@@ -15,5 +15,16 @@ export const deployments: Record<string, Deployment> = {
     "registry": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
     "tsla": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
     "usdg": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+  },
+  "46630": {
+    "actionSource": "0x233f887881b6D4c5C1cD8b8CD5B37813a8BBEAb4",
+    "admin": "0x3c2143F402aaa26584a3c8AC546bb5Ea5330c907",
+    "amzn": "0xb4Cc63855439c5327341Fd2f791BF70dF15dAeeB",
+    "chainId": 46630,
+    "distributor": "0x73abAA73081520bcC9F504c74fF608D4668B4Db3",
+    "issuer": "0x3c2143F402aaa26584a3c8AC546bb5Ea5330c907",
+    "registry": "0x3a657c9aDA8195E61e1A7B93B12E32014F467d6f",
+    "tsla": "0xA813Af6C99d0a01ee91A114BF901A8cAB29618E1",
+    "usdg": "0x824C04960Da8afB58524a0D9F1a3Da8312a7E20a"
   }
 } as const;

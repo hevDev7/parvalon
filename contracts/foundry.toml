@@ -56,5 +56,7 @@ localhost = "http://127.0.0.1:8545"
 
 [etherscan]
 # Blockscout-compatible verification for Robinhood Chain testnet.
-robinhood_testnet = { key = "${BLOCKSCOUT_API_KEY}", url = "${ROBINHOOD_BLOCKSCOUT_API_URL}", chain = 46630 }
+# NOTE: forge does not recognise chainId 46630, so this entry is only used by
+# out-of-band verification (Blockscout API), not by `forge script`/`forge verify`.
+# arbitrum_sepolia is a forge-known chain and stays enabled.
 arbitrum_sepolia = { key = "${ARBISCAN_API_KEY}", chain = 421614 }

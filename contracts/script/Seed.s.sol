@@ -53,7 +53,12 @@ contract Seed is Script {
         s.amt2 = (SHARES_2 * RATE) / 1e18; // 7e18
         s.total = s.amt1 + s.amt2;
         // recordBlock in the immediate past so publishRoot passes in one run.
-        s.recordBlock = block.number == 0 ? 0 : uint64(block.number - 1);
+        // NOTE: on Arbitrum/Orbit the in-contract block.number is the *L1* block
+        // number, which differs from the L2 number tooling sees — so the default
+        // block.number-1 (an L2 value) would make publishRoot's `block.number >
+        // recordBlock` guard never pass. Pass RECORD_BLOCK explicitly there (a past
+        // L1 block). Default keeps anvil/Sepolia (consistent block.number) working.
+        s.recordBlock = uint64(vm.envOr("RECORD_BLOCK", block.number == 0 ? uint256(0) : block.number - 1));
 
         address issuer = vm.parseJsonAddress(dep, ".issuer");
 
