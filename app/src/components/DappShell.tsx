@@ -23,9 +23,8 @@ export function DappShell({ title, children }: { title: string; children: ReactN
       {/* Sidebar */}
       <aside className="hidden md:flex w-72 border-r border-border-subtle bg-surface-card flex-col z-10 shrink-0">
         <Link href="/" className="h-20 px-8 border-b border-border-subtle flex items-center space-x-3">
-          <span className="w-7 h-7 bg-primary rounded flex items-center justify-center overflow-hidden shrink-0">
-            <span className="w-full h-full bg-gradient-pulse opacity-90" />
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-parvalon.png" alt="Parvalon" className="w-9 h-9 rounded object-contain shrink-0" />
           <span className="font-bold text-2xl tracking-tight text-primary">Parvalon</span>
         </Link>
 

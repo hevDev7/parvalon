@@ -24,8 +24,9 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 border-b border-white/10 pb-16">
         <div className="lg:col-span-5 pr-8">
           <div className="flex items-center space-x-2 mb-6">
-            <span className="w-8 h-8 rounded shrink-0 overflow-hidden relative">
-              <span className="absolute inset-0 bg-gradient-pulse" />
+            <span className="w-9 h-9 rounded-md bg-white p-1 shrink-0 grid place-items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-parvalon.png" alt="Parvalon" className="w-full h-full object-contain" />
             </span>
             <span className="font-bold text-2xl tracking-tight">Parvalon</span>
           </div>

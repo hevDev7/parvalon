@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     description: "The missing corporate-actions layer for tokenized stocks.",
     type: "website",
   },
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/logo-parvalon.png", shortcut: "/logo-parvalon.png", apple: "/logo-parvalon.png" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
