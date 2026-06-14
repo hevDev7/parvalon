@@ -4,6 +4,23 @@
 
 <h1 align="center">Parvalon</h1>
 
+<p align="center">
+  <img alt="Arbitrum" src="https://img.shields.io/badge/Arbitrum-213147?style=for-the-badge&logo=arbitrum&logoColor=white">
+  <img alt="Robinhood Chain" src="https://img.shields.io/badge/Robinhood_Chain-00C805?style=for-the-badge&logo=robinhood&logoColor=white">
+  <img alt="Solidity" src="https://img.shields.io/badge/Solidity-363636?style=for-the-badge&logo=solidity&logoColor=white">
+  <img alt="Foundry" src="https://img.shields.io/badge/Foundry-2B2B2B?style=for-the-badge">
+  <img alt="OpenZeppelin" src="https://img.shields.io/badge/OpenZeppelin-4E5EE4?style=for-the-badge&logo=openzeppelin&logoColor=white">
+  <img alt="Chainlink" src="https://img.shields.io/badge/Chainlink-375BD2?style=for-the-badge&logo=chainlink&logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white">
+  <img alt="React" src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB">
+  <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white">
+  <img alt="wagmi / viem" src="https://img.shields.io/badge/wagmi_%2F_viem-1C1B1F?style=for-the-badge&logo=ethereum&logoColor=white">
+  <img alt="The Graph" src="https://img.shields.io/badge/The_Graph-6747ED?style=for-the-badge&logo=thegraph&logoColor=white">
+  <img alt="Alchemy" src="https://img.shields.io/badge/Alchemy-0210FF?style=for-the-badge&logo=alchemy&logoColor=white">
+  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-5FA04E?style=for-the-badge&logo=nodedotjs&logoColor=white">
+</p>
+
 **The missing corporate-actions layer for tokenized stocks** — on-chain dividends, splits, and record-date semantics for the tokens that already exist. A permissionless **overlay** that works on tokenized stocks you don't control: no token changes, no issuer integration.
 
 > Built on **Robinhood Chain** (Arbitrum Orbit L2, chainId 46630) for the Arbitrum Open House London Buildathon.
