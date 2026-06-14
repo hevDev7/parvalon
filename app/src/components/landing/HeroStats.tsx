@@ -15,10 +15,10 @@ export function Hero() {
         loop
         muted
         playsInline
-        preload="metadata"
+        preload="auto"
         aria-label="Financial district skyline"
       >
-        <source src="/hero-skyline.mp4" type="video/mp4" />
+        <source src="/hero-skyline.mp4?v=2" type="video/mp4" />
       </video>
       {/* legibility scrim — dark where the copy sits (left), clearing toward the footage (right) */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/20" />
