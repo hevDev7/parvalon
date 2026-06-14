@@ -65,6 +65,8 @@ export interface EligibleClaim {
   assetSymbol: string;
   /** Holder's balance of `asset` at the record block (asset wei), the basis for the dividend. */
   snapshotBalanceWei: string;
+  /** Payout rate per share (payout-token base units). */
+  ratePerShareWei: string;
   payoutToken: `0x${string}`;
   payoutSymbol: string;
   metadataURI: string;

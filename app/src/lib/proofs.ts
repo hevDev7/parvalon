@@ -71,6 +71,7 @@ export async function getEligibleClaims(address: string, actions: ActionLike[]):
         asset: a.asset,
         assetSymbol: a.assetSymbol,
         snapshotBalanceWei,
+        ratePerShareWei: a.ratePerShareWei,
         payoutToken: a.payoutToken,
         payoutSymbol: a.payoutSymbol || tokenSymbol(a.payoutToken),
         metadataURI: a.metadataURI,

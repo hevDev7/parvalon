@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useAccount, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { addresses, distributorAbi } from "@/lib/contracts";
 import { explorerTxUrl } from "@/lib/chain";
@@ -11,6 +11,7 @@ import { getEligibleClaims } from "@/lib/proofs";
 import { gaslessEnabled, relayClaim } from "@/lib/relay";
 import type { ActionLike, EligibleClaim } from "@/lib/types";
 import { Button, Card, EmptyState, Kicker, Spinner } from "@/components/ui";
+import { StockLogo } from "@/components/StockLogo";
 import { WalletButton } from "@/components/WalletButton";
 
 interface FeedAction {
@@ -41,6 +42,11 @@ async function fetchFeed(): Promise<ActionLike[]> {
     metadataURI: a.metadataURI,
   }));
 }
+
+/* ------------------------------------------------------------ cell helpers */
+const held = (c: EligibleClaim) => `${fmtAmount(c.snapshotBalanceWei, tokenDecimals(c.asset))} ${c.assetSymbol}`;
+const rate = (c: EligibleClaim) => `${fmtAmount(c.ratePerShareWei, tokenDecimals(c.payoutToken))} ${c.payoutSymbol}/sh`;
+const dividend = (c: EligibleClaim) => `${fmtAmount(c.amountWei, tokenDecimals(c.payoutToken))} ${c.payoutSymbol}`;
 
 export function ClaimPanel() {
   const { address, isConnected } = useAccount();
@@ -81,7 +87,7 @@ export function ClaimPanel() {
     feed.refetch();
   };
 
-  // ---- States --------------------------------------------------------------
+  // ---- Not connected -------------------------------------------------------
   if (!isConnected) {
     return (
       <Card className="relative overflow-hidden p-10 text-center">
@@ -93,21 +99,23 @@ export function ClaimPanel() {
         <div className="mt-7 flex justify-center">
           <WalletButton />
         </div>
-        {/* Greeked ledger preview — what connecting reveals. */}
-        <div className="mx-auto mt-10 max-w-md select-none text-left blur-[1.5px]" aria-hidden>
-          <div className="divide-y divide-line border-y border-line opacity-60">
+        {/* Greeked ledger preview — the columns connecting reveals. */}
+        <div className="mx-auto mt-10 max-w-xl select-none text-left blur-[1.5px]" aria-hidden>
+          <TableShell head={["Asset", "Held at record block", "Rate / share", "Dividend", ""]}>
             {[
-              ["MSFT", "0.75 USDG / share", "18.75 USDG"],
-              ["AAPL", "0.26 USDG / share", "9.62 USDG"],
-              ["NVDA", "0.01 USDG / share", "0.40 USDG"],
-            ].map(([sym, rate, amt]) => (
-              <div key={sym} className="flex items-baseline justify-between py-2.5 text-sm">
-                <span className="font-medium text-ink">{sym}</span>
-                <span className="tabular text-ink-faint">{rate}</span>
-                <span className="tabular font-medium text-money">{amt}</span>
-              </div>
+              ["MSFT", "25 MSFT", "0.75 USDG/sh", "18.75 USDG"],
+              ["AAPL", "37 AAPL", "0.26 USDG/sh", "9.62 USDG"],
+              ["NVDA", "40 NVDA", "0.01 USDG/sh", "0.40 USDG"],
+            ].map(([sym, h, r, d]) => (
+              <tr key={sym} className="opacity-60">
+                <Td><span className="font-medium text-ink">{sym}</span></Td>
+                <Td className="tabular text-ink-soft">{h}</Td>
+                <Td className="tabular text-ink-faint">{r}</Td>
+                <Td className="tabular text-right font-medium text-money">{d}</Td>
+                <Td />
+              </tr>
             ))}
-          </div>
+          </TableShell>
         </div>
         <p className="fine mt-3">Illustrative — connect to check your position.</p>
       </Card>
@@ -130,7 +138,7 @@ export function ClaimPanel() {
           </button>
         </div>
 
-        {loading && <ClaimSkeletons />}
+        {loading && <div className="skeleton h-40 rounded-lg" />}
 
         {errored && !loading && (
           <Card className="border-danger/30 p-6">
@@ -144,17 +152,17 @@ export function ClaimPanel() {
         {!loading && !errored && claimable.length === 0 && (
           <EmptyState
             title="Nothing to claim right now"
-            body="When a dividend is declared for a token you hold, it will appear here, ready in one tap."
+            body="When a dividend is declared for a token you held at its record block, it appears here — your snapshot balance and the amount you can claim, side by side."
             action={{ href: "/feed", label: "Browse all corporate actions" }}
           />
         )}
 
         {!loading && claimable.length > 0 && (
-          <div className="grid gap-5 sm:grid-cols-2">
+          <TableShell head={["Asset", "Held at record block", "Rate / share", "Dividend", ""]}>
             {claimable.map((c) => (
-              <ClaimCard key={`${c.actionId}-${c.index}`} claim={c} onClaimed={refetchAll} />
+              <ClaimRow key={`${c.actionId}-${c.index}`} claim={c} onClaimed={refetchAll} />
             ))}
-          </div>
+          </TableShell>
         )}
       </section>
 
@@ -162,34 +170,71 @@ export function ClaimPanel() {
         <section>
           <Kicker>History</Kicker>
           <h2 className="display mt-2 mb-4 text-2xl text-ink">Claimed</h2>
-          <Card className="divide-y divide-line">
+          <TableShell head={["Asset", "Held at record block", "Claimed", ""]}>
             {history.map((c) => (
-              <div key={`${c.actionId}-${c.index}`} className="flex items-center justify-between px-5 py-4">
-                <div className="flex items-center gap-3">
-                  <span className="grid h-9 w-9 place-items-center rounded-full bg-money-wash text-money">✓</span>
-                  <div>
-                    <p className="font-medium text-ink">{c.assetSymbol} dividend</p>
-                    <p className="text-[0.78rem] text-ink-faint">
-                      Action #{c.actionId} · held {fmtAmount(c.snapshotBalanceWei, tokenDecimals(c.asset))} {c.assetSymbol}
-                    </p>
-                  </div>
-                </div>
-                <span className="tabular text-ink">
-                  {fmtAmount(c.amountWei, tokenDecimals(c.payoutToken))} <span className="text-ink-faint">{c.payoutSymbol}</span>
-                </span>
-              </div>
+              <tr key={`${c.actionId}-${c.index}`} className="text-sm">
+                <Td>
+                  <AssetCell symbol={c.assetSymbol} sub={`Action #${c.actionId}`} />
+                </Td>
+                <Td className="tabular text-ink-soft">{held(c)}</Td>
+                <Td className="tabular text-right font-medium text-ink">{dividend(c)}</Td>
+                <Td className="text-right">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-money-wash px-2.5 py-1 text-xs font-medium text-money">
+                    ✓ Paid
+                  </span>
+                </Td>
+              </tr>
             ))}
-          </Card>
+          </TableShell>
         </section>
       )}
     </div>
   );
 }
 
-/* --------------------------------------------------------------- ClaimCard */
+/* --------------------------------------------------------------- table bits */
+function TableShell({ head, children }: { head: string[]; children: ReactNode }) {
+  return (
+    <div className="overflow-x-auto rounded-lg border border-line bg-surface-raised">
+      <table className="w-full min-w-[34rem] border-collapse text-sm">
+        <thead>
+          <tr className="border-b border-line text-left text-[0.68rem] uppercase tracking-wider text-ink-faint">
+            {head.map((h, i) => (
+              <th
+                key={i}
+                className={`px-4 py-3 font-medium ${i === 3 || (head.length === 4 && i === 2) ? "text-right" : ""}`}
+              >
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-line">{children}</tbody>
+      </table>
+    </div>
+  );
+}
+
+function Td({ children, className = "" }: { children?: ReactNode; className?: string }) {
+  return <td className={`px-4 py-3.5 align-middle ${className}`}>{children}</td>;
+}
+
+function AssetCell({ symbol, sub }: { symbol: string; sub?: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <StockLogo symbol={symbol} size={28} />
+      <div className="min-w-0">
+        <p className="font-medium text-ink">{symbol}</p>
+        {sub && <p className="text-[0.7rem] text-ink-faint">{sub}</p>}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------- ClaimRow */
 type Phase = "idle" | "submitting" | "confirming" | "done" | "error";
 
-function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () => void }) {
+function ClaimRow({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () => void }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [hash, setHash] = useState<`0x${string}` | undefined>();
   const [error, setError] = useState<string>();
@@ -205,7 +250,7 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
       return () => clearTimeout(t);
     }
     if (receipt.isError || receipt.data?.status === "reverted") {
-      setError("Transaction reverted on-chain");
+      setError("Reverted on-chain");
       setPhase("error");
     }
   }, [hash, receipt.isSuccess, receipt.isError, receipt.data?.status, onClaimed]);
@@ -216,8 +261,7 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
       setPhase("submitting");
       let tx: `0x${string}`;
       if (gaslessEnabled) {
-        const res = await relayClaim(claim);
-        tx = res.txHash;
+        tx = (await relayClaim(claim)).txHash;
       } else {
         tx = await writeContractAsync({
           address: addresses.distributor!,
@@ -227,7 +271,7 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
         });
       }
       setHash(tx);
-      setPhase("confirming"); // wait for the receipt before declaring success
+      setPhase("confirming");
     } catch (e) {
       setError(e instanceof Error ? e.message.split("\n")[0] : "Claim failed");
       setPhase("error");
@@ -237,67 +281,39 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
   const busy = phase === "submitting" || phase === "confirming";
 
   return (
-    <Card className="relative overflow-hidden p-6">
-      <div className="relative flex items-start justify-between">
-        <div>
-          <Kicker>{claim.assetSymbol} · cash dividend</Kicker>
-          <p className="display mt-3 text-2xl text-ink">Your dividend is ready</p>
-        </div>
+    <tr className="text-sm transition hover:bg-surface-inset">
+      <Td>
+        <AssetCell symbol={claim.assetSymbol} sub={`Action #${claim.actionId}`} />
+      </Td>
+      <Td className="tabular font-medium text-ink">{held(claim)}</Td>
+      <Td className="tabular text-ink-soft">{rate(claim)}</Td>
+      <Td className="tabular text-right text-base font-semibold text-money">{dividend(claim)}</Td>
+      <Td className="text-right">
         {phase === "done" ? (
-          <span className="stamp animate-seal !rotate-0">Paid</span>
-        ) : (
-          <span className="stamp">Claimable</span>
-        )}
-      </div>
-
-      <p className="relative mt-3 text-sm text-ink-soft">
-        You held{" "}
-        <span className="tabular font-medium text-ink">
-          {fmtAmount(claim.snapshotBalanceWei, tokenDecimals(claim.asset))} {claim.assetSymbol}
-        </span>{" "}
-        at the record block
-      </p>
-
-      <div className="relative mt-4 flex items-end gap-1.5">
-        <span className="tabular text-[2.6rem] font-medium leading-none text-money">{fmtAmount(claim.amountWei, tokenDecimals(claim.payoutToken))}</span>
-        <span className="mb-1 text-sm text-ink-faint">{claim.payoutSymbol}</span>
-      </div>
-
-      <div className="mt-6">
-        {phase === "done" ? (
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-money">Sent to your wallet</span>
+          <div className="flex items-center justify-end gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-money-wash px-2.5 py-1 text-xs font-medium text-money">
+              ✓ Paid
+            </span>
             {hash && (
-              <a
-                href={explorerTxUrl(hash)}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm text-ink-soft underline-offset-2 hover:text-ink hover:underline"
-              >
-                View receipt ↗
+              <a href={explorerTxUrl(hash)} target="_blank" rel="noreferrer" className="text-ink-faint hover:text-ink" title="View receipt">
+                ↗
               </a>
             )}
           </div>
         ) : (
-          <Button variant="primary" className="w-full" onClick={onClaim} loading={busy} disabled={busy}>
-            {busy ? "Claiming…" : gaslessEnabled ? "Claim — no gas needed" : "Claim"}
-          </Button>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              onClick={onClaim}
+              disabled={busy}
+              className="inline-flex min-h-0 items-center justify-center gap-1.5 rounded-md bg-ink px-4 py-2 text-xs font-semibold text-on-ink transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-55"
+            >
+              {busy && <Spinner className="h-3 w-3" />}
+              {busy ? "Claiming…" : gaslessEnabled ? "Claim · no gas" : "Claim"}
+            </button>
+            {phase === "error" && error && <span className="text-[0.7rem] text-danger">{error}</span>}
+          </div>
         )}
-        {phase === "error" && error && <p className="mt-3 text-sm text-danger">{error}</p>}
-        {gaslessEnabled && phase === "idle" && (
-          <p className="mt-3 text-center text-[0.72rem] text-ink-faint">We cover the network fee for you.</p>
-        )}
-      </div>
-    </Card>
-  );
-}
-
-function ClaimSkeletons() {
-  return (
-    <div className="grid gap-5 sm:grid-cols-2">
-      {[0, 1].map((i) => (
-        <div key={i} className="skeleton h-44 rounded-lg" />
-      ))}
-    </div>
+      </Td>
+    </tr>
   );
 }
