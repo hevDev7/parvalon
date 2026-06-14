@@ -445,8 +445,16 @@ client.events.onActionAnnounced((e) => { /* react to new actions */ });`}</Code>
           {/* ---------------------------------------------------- Faucet */}
           <Section id="faucet" kicker="14 — Get test tokens" title="Test faucet.">
             <p>
-              The real Robinhood <strong>stock</strong> tokens are not mintable by Parvalon — obtain them from the
-              official Robinhood Chain testnet faucet. The payout <strong>USDG</strong> is a faucet-mintable mock (the
+              The real Robinhood <strong>stock</strong> tokens are not mintable by Parvalon — get them from the{" "}
+              <a
+                href="https://faucet.testnet.chain.robinhood.com"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-primary underline underline-offset-2"
+              >
+                official Robinhood Chain testnet faucet ↗
+              </a>
+              . The payout <strong>USDG</strong> is a faucet-mintable mock (the
               real USDG faucet is rate-limited), so <Mono>/faucet</Mono> exposes a one-click <strong>Mint USDG</strong>
               button alongside balances, EIP-747 add-to-wallet, and copy-address.
             </p>
@@ -488,6 +496,7 @@ client.events.onActionAnnounced((e) => { /* react to new actions */ });`}</Code>
                 ["GitHub repository", GITHUB],
                 ["Block explorer", EXPLORER],
                 ["RPC endpoint", RPC],
+                ["Stock faucet", "https://faucet.testnet.chain.robinhood.com"],
                 ["CAE-1 feed", "/feed"],
               ].map(([label, href]) => (
                 <a key={label} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer"

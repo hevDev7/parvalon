@@ -188,7 +188,7 @@ The Merkle root is **deterministic and independently verifiable**: two runs of t
 
 ### Robinhood Chain testnet (chainId 46630) — live deployment
 
-Against the **real** Robinhood tokenized stocks (`tokenMode: real`). Authoritative copy: [`deployments/46630.json`](deployments/46630.json). Explorer: [`explorer.testnet.chain.robinhood.com`](https://explorer.testnet.chain.robinhood.com).
+Against the **real** Robinhood tokenized stocks (`tokenMode: real`). Authoritative copy: [`deployments/46630.json`](deployments/46630.json). Explorer: [`explorer.testnet.chain.robinhood.com`](https://explorer.testnet.chain.robinhood.com). Get the real stock tokens from the [Robinhood Chain testnet faucet](https://faucet.testnet.chain.robinhood.com); mint test USDG from the dApp `/faucet`.
 
 | Contract | Address |
 |---|---|

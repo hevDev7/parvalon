@@ -22,6 +22,9 @@ type Tok = { symbol: string; name: string; address: `0x${string}`; decimals: num
 /** How much test USDG one "Mint" click grants. */
 const MINT_USDG = 100_000;
 
+/** Official Robinhood Chain testnet faucet for the real stock tokens. */
+const STOCK_FAUCET_URL = "https://faucet.testnet.chain.robinhood.com";
+
 const LIST: Tok[] = [
   ...(tokens.usdg ? [{ symbol: "USDG", address: tokens.usdg as `0x${string}` }] : []),
   ...selectableAssets,
@@ -127,15 +130,26 @@ export function FaucetPanel() {
                 <span className="text-ink-faint">{copied === t.address ? "Copied ✓" : "Copy"}</span>
               </button>
 
-              {t.mintable && isConnected && (
-                <button
-                  onClick={() => mint(t)}
-                  disabled={minting === t.address}
-                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-brand py-2 text-sm font-semibold text-on-ink transition hover:bg-brand-deep disabled:cursor-not-allowed disabled:opacity-60"
+              {t.mintable ? (
+                isConnected && (
+                  <button
+                    onClick={() => mint(t)}
+                    disabled={minting === t.address}
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-brand py-2 text-sm font-semibold text-on-ink transition hover:bg-brand-deep disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {minting === t.address ? <Spinner className="h-3.5 w-3.5" /> : null}
+                    {minting === t.address ? "Minting…" : `Mint ${MINT_USDG.toLocaleString()} USDG`}
+                  </button>
+                )
+              ) : (
+                <a
+                  href={STOCK_FAUCET_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-md border border-line-strong bg-surface-raised py-2 text-sm font-semibold text-ink transition hover:border-ink"
                 >
-                  {minting === t.address ? <Spinner className="h-3.5 w-3.5" /> : null}
-                  {minting === t.address ? "Minting…" : `Mint ${MINT_USDG.toLocaleString()} USDG`}
-                </button>
+                  Get from faucet <span aria-hidden>↗</span>
+                </a>
               )}
 
               <button
@@ -162,8 +176,16 @@ export function FaucetPanel() {
           {USING_REAL_TOKENS ? (
             <>
               The <strong>stocks</strong> (TSLA, AMZN, PLTR, NFLX, AMD) are the <strong>real Robinhood Chain
-              testnet</strong> contracts (chainId 46630, 18 decimals) — not mintable here; obtain them from the
-              official Robinhood Chain testnet faucet.{" "}
+              testnet</strong> contracts (chainId 46630, 18 decimals) — not mintable here; get them from the{" "}
+              <a
+                href={STOCK_FAUCET_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-ink underline decoration-line-strong underline-offset-2 hover:decoration-ink"
+              >
+                official Robinhood Chain testnet faucet ↗
+              </a>
+              .{" "}
               {PAYOUT_USDG_IS_MOCK ? (
                 <>
                   The payout <strong>USDG</strong> is a faucet-mintable 6-decimal test token (the real USDG faucet is

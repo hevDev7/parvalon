@@ -13,8 +13,17 @@ export default function FaucetPage() {
         </p>
         <h2 className="display text-3xl mt-3 text-primary">Test tokens.</h2>
         <p className="mt-2 max-w-xl text-black/60">
-          The real Robinhood Chain testnet contracts Parvalon runs on. Check balances, add each token to your wallet,
-          and grab them from the Robinhood faucet — then claim a dividend on what you hold.
+          The real Robinhood Chain testnet contracts Parvalon runs on. Mint test USDG here, check balances, add each
+          token to your wallet, and grab the stocks from the{" "}
+          <a
+            href="https://faucet.testnet.chain.robinhood.com"
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium text-primary underline underline-offset-2"
+          >
+            Robinhood faucet ↗
+          </a>{" "}
+          — then claim a dividend on what you hold.
         </p>
       </div>
       <FaucetPanel />
