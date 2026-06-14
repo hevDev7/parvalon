@@ -4,7 +4,7 @@
 
 > Built on **Robinhood Chain** (Arbitrum Orbit L2, chainId 46630) for the Arbitrum Open House London Buildathon.
 
-> **Live on Robinhood Chain testnet.** The protocol is deployed against **real** Robinhood tokenized stocks and USDG — addresses in [Contract addresses](#contract-addresses), explorer [`explorer.testnet.chain.robinhood.com`](https://explorer.testnet.chain.robinhood.com).
+> **Live on Robinhood Chain testnet.** The protocol is deployed against the **real** Robinhood tokenized stocks, settling in USDG — addresses in [Contract addresses](#contract-addresses), explorer [`explorer.testnet.chain.robinhood.com`](https://explorer.testnet.chain.robinhood.com). (On testnet the USDG *payout* token defaults to a faucet-mintable mock, since the real USDG faucet is rate-limited — see [Contract addresses](#contract-addresses).)
 
 > **Naming.** Formerly **Corporax** → now **Parvalon**. The rename is complete across the UI, this README, the npm workspace scope (`@parvalon/*`), the root package, the PRD (`PRD-Parvalon.md`), and the docs. A few frozen wire/format identifiers intentionally keep the legacy string for backward compatibility — most notably the Merkle artifact format `corporax-merkle-v1` (baked into every committed `proofs.json` and the leaf domain) and the `corporax-snapshot`/`corporax-monitor` CLI bin names. Those are format constants, not branding.
 
@@ -45,7 +45,7 @@ Parvalon inverts this. It is an **overlay**, not an integration:
 - **Record-date semantics map 1:1** to how corporate actions actually work in traditional markets: ownership is fixed at a record date, then payment follows. Our snapshot block *is* the record date.
 - **Splits and stock dividends are handled as informational actions** (standardized event + ratio metadata), because we honestly cannot rebase a token we don't control — and what integrators actually need is a *signal*, not a rebase.
 
-The result: Parvalon runs on the **real** TSLA, AMZN, PLTR, NFLX and AMD tokens on Robinhood Chain, today, settling in **real USDG**, with nothing required from the token issuer. That is the whole point.
+The result: Parvalon runs on the **real** TSLA, AMZN, PLTR, NFLX and AMD tokens on Robinhood Chain, today, settling in USDG, with nothing required from the token issuer. That is the whole point.
 
 ### Orbit detail: record dates on the right clock (ArbSys)
 
@@ -188,18 +188,21 @@ The Merkle root is **deterministic and independently verifiable**: two runs of t
 
 ### Robinhood Chain testnet (chainId 46630) — live deployment
 
-Against **real** Robinhood tokenized stocks and USDG (`tokenMode: real`). Authoritative copy: [`deployments/46630.json`](deployments/46630.json). Explorer: [`explorer.testnet.chain.robinhood.com`](https://explorer.testnet.chain.robinhood.com).
+Against the **real** Robinhood tokenized stocks (`tokenMode: real`). Authoritative copy: [`deployments/46630.json`](deployments/46630.json). Explorer: [`explorer.testnet.chain.robinhood.com`](https://explorer.testnet.chain.robinhood.com).
 
 | Contract | Address |
 |---|---|
 | `CorporateActionRegistry` | [`0xE3d21a220400BB523d77852fA5bc706dcc8c4e90`](https://explorer.testnet.chain.robinhood.com/address/0xE3d21a220400BB523d77852fA5bc706dcc8c4e90) |
 | `DividendDistributor` | [`0xbbCeD23e5900aBd0F0B67c34769D3f04340e426A`](https://explorer.testnet.chain.robinhood.com/address/0xbbCeD23e5900aBd0F0B67c34769D3f04340e426A) |
 | `AdminActionSource` (D3 oracle, v1) | [`0xB3Ae014A3d052d6350E48B46194CA9D1fdD17a78`](https://explorer.testnet.chain.robinhood.com/address/0xB3Ae014A3d052d6350E48B46194CA9D1fdD17a78) |
-| USDG (real, payout, 6-dec) | [`0x7E955252E15c84f5768B83c41a71F9eba181802F`](https://explorer.testnet.chain.robinhood.com/address/0x7E955252E15c84f5768B83c41a71F9eba181802F) |
+| **USDG mock** — faucet-mintable payout **default** (6-dec) | [`0x6e61B4444f40FBc0a7725c29572cC014b76064f5`](https://explorer.testnet.chain.robinhood.com/address/0x6e61B4444f40FBc0a7725c29572cC014b76064f5) |
+| USDG (real, 6-dec) — rate-limited faucet | [`0x7E955252E15c84f5768B83c41a71F9eba181802F`](https://explorer.testnet.chain.robinhood.com/address/0x7E955252E15c84f5768B83c41a71F9eba181802F) |
 | TSLA (real) | [`0xC9f9c86933092BbbfFF3CCb4b105A4A94bf3Bd4E`](https://explorer.testnet.chain.robinhood.com/address/0xC9f9c86933092BbbfFF3CCb4b105A4A94bf3Bd4E) |
 | AMZN (real) | [`0x5884aD2f920c162CFBbACc88C9C51AA75eC09E02`](https://explorer.testnet.chain.robinhood.com/address/0x5884aD2f920c162CFBbACc88C9C51AA75eC09E02) |
 | Admin / Issuer (EOA) | [`0x3c2143F402aaa26584a3c8AC546bb5Ea5330c907`](https://explorer.testnet.chain.robinhood.com/address/0x3c2143F402aaa26584a3c8AC546bb5Ea5330c907) |
 
+> **Payout USDG.** The real USDG faucet is rate-limited (~100/24h) — too little to fund a meaningful multi-holder dividend. So the dApp defaults the payout/settlement token to the **faucet-mintable mock USDG** above (6-dec, open `mint`, self-serve from `/faucet`); the **stock** tokens stay real. Set `NEXT_PUBLIC_USDG_ADDRESS` to the real USDG to switch back. Either way the protocol is indifferent — the payout token is chosen per-action and there is no payout-token allowlist (LIMITATIONS §5).
+>
 > Live control is currently a **single EOA** (admin == issuer). The `TimelockController` + Gnosis Safe governance handover (`script/DeployGovernance.s.sol`) is implemented but **not yet deployed** on 46630 — see [LIMITATIONS.md](docs/LIMITATIONS.md) §8 and [PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md). PLTR/NFLX/AMD are wired in the dApp and onboardable, but the seeded demo dividend uses TSLA/AMZN.
 
 ### Local (anvil, chainId 31337) — committed dev deployment

@@ -1,22 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { formatUnits } from "viem";
-import { useAccount, useReadContracts } from "wagmi";
+import { formatUnits, parseUnits } from "viem";
+import { useAccount, useReadContracts, useWriteContract } from "wagmi";
 import { erc20Abi, knownTokens, selectableAssets, tokens } from "@/lib/contracts";
-import { tokenDecimals, USING_REAL_TOKENS } from "@/lib/tokens";
+import { tokenDecimals, USING_REAL_TOKENS, PAYOUT_USDG_IS_MOCK } from "@/lib/tokens";
 import { shortAddr } from "@/lib/format";
 import { Card, Kicker, Spinner } from "@/components/ui";
 import { StockLogo } from "@/components/StockLogo";
 import { WalletButton } from "@/components/WalletButton";
 
 /**
- * Test-token helper. On Robinhood Chain these are the REAL token contracts —
+ * Test-token helper. On Robinhood Chain the STOCK contracts are the REAL tokens —
  * not faucet-mintable by us — so this page surfaces balances, lets you add each
- * token to your wallet (EIP-747), copy its address, and points to the official
- * Robinhood testnet faucet to obtain them.
+ * token to your wallet (EIP-747), and copy its address. The payout **USDG** is a
+ * faucet-mintable mock (the real USDG faucet is rate-limited to ~100/24h), so when
+ * it is active you can self-serve mint test USDG straight from here.
  */
-type Tok = { symbol: string; name: string; address: `0x${string}`; decimals: number };
+type Tok = { symbol: string; name: string; address: `0x${string}`; decimals: number; mintable: boolean };
+
+/** How much test USDG one "Mint" click grants. */
+const MINT_USDG = 100_000;
 
 const LIST: Tok[] = [
   ...(tokens.usdg ? [{ symbol: "USDG", address: tokens.usdg as `0x${string}` }] : []),
@@ -26,11 +30,15 @@ const LIST: Tok[] = [
   address: t.address,
   decimals: tokenDecimals(t.address),
   name: knownTokens[t.address.toLowerCase()]?.name ?? t.symbol,
+  // Only the mock payout USDG has an open mint; real stocks/USDG do not.
+  mintable: PAYOUT_USDG_IS_MOCK && t.address.toLowerCase() === (tokens.usdg ?? "").toLowerCase(),
 }));
 
 export function FaucetPanel() {
   const { address, isConnected } = useAccount();
   const [copied, setCopied] = useState<string | null>(null);
+  const [minting, setMinting] = useState<string | null>(null);
+  const { writeContractAsync } = useWriteContract();
 
   const balances = useReadContracts({
     contracts: LIST.map((t) => ({
@@ -41,6 +49,25 @@ export function FaucetPanel() {
     })),
     query: { enabled: Boolean(address), refetchInterval: 15_000 },
   });
+
+  async function mint(t: Tok) {
+    if (!address) return;
+    setMinting(t.address);
+    try {
+      await writeContractAsync({
+        address: t.address,
+        abi: erc20Abi,
+        functionName: "mint",
+        args: [address, parseUnits(String(MINT_USDG), t.decimals)],
+      });
+      // Give the node a moment, then refresh balances.
+      setTimeout(() => balances.refetch(), 2500);
+    } catch {
+      /* user rejected or tx failed */
+    } finally {
+      setMinting((m) => (m === t.address ? null : m));
+    }
+  }
 
   async function addToWallet(t: Tok) {
     const eth = (typeof window !== "undefined" ? (window as unknown as { ethereum?: { request: (a: unknown) => Promise<unknown> } }).ethereum : undefined);
@@ -100,6 +127,17 @@ export function FaucetPanel() {
                 <span className="text-ink-faint">{copied === t.address ? "Copied ✓" : "Copy"}</span>
               </button>
 
+              {t.mintable && isConnected && (
+                <button
+                  onClick={() => mint(t)}
+                  disabled={minting === t.address}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-brand py-2 text-sm font-semibold text-on-ink transition hover:bg-brand-deep disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {minting === t.address ? <Spinner className="h-3.5 w-3.5" /> : null}
+                  {minting === t.address ? "Minting…" : `Mint ${MINT_USDG.toLocaleString()} USDG`}
+                </button>
+              )}
+
               <button
                 onClick={() => addToWallet(t)}
                 className="mt-3 w-full rounded-md border border-line-strong bg-surface-raised py-2 text-sm font-semibold text-ink transition hover:border-ink"
@@ -123,9 +161,18 @@ export function FaucetPanel() {
         <p className="mt-2 text-sm text-ink-soft">
           {USING_REAL_TOKENS ? (
             <>
-              These are the <strong>real Robinhood Chain testnet</strong> contracts (chainId 46630) — USDG is 6
-              decimals, the stocks are 18. They are not mintable here; obtain balances from the official Robinhood
-              Chain testnet faucet, then use Parvalon to receive a dividend on what you hold.
+              The <strong>stocks</strong> (TSLA, AMZN, PLTR, NFLX, AMD) are the <strong>real Robinhood Chain
+              testnet</strong> contracts (chainId 46630, 18 decimals) — not mintable here; obtain them from the
+              official Robinhood Chain testnet faucet.{" "}
+              {PAYOUT_USDG_IS_MOCK ? (
+                <>
+                  The payout <strong>USDG</strong> is a faucet-mintable 6-decimal test token (the real USDG faucet is
+                  rate-limited to ~100/24h), so use <strong>Mint {MINT_USDG.toLocaleString()} USDG</strong> above to
+                  fund and claim dividends at scale.
+                </>
+              ) : (
+                <>USDG is 6 decimals.</>
+              )}
             </>
           ) : (
             <>Local mock tokens — mint them with the Foundry CLI (see the repo README) for a fully self-served demo.</>

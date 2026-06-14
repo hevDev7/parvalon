@@ -2,7 +2,7 @@
 export type Deployment = {
   chainId: number; registry: `0x${string}`; distributor: `0x${string}`;
   actionSource: `0x${string}`; usdg: `0x${string}`; tsla: `0x${string}`; amzn: `0x${string}`;
-  admin: `0x${string}`; issuer: `0x${string}`;
+  admin: `0x${string}`; issuer: `0x${string}`; usdgMock?: `0x${string}`;
 };
 export const deployments: Record<string, Deployment> = {
   "31337": {
@@ -25,6 +25,7 @@ export const deployments: Record<string, Deployment> = {
     "issuer": "0x3c2143F402aaa26584a3c8AC546bb5Ea5330c907",
     "registry": "0xE3d21a220400BB523d77852fA5bc706dcc8c4e90",
     "tsla": "0xC9f9c86933092BbbfFF3CCb4b105A4A94bf3Bd4E",
-    "usdg": "0x7E955252E15c84f5768B83c41a71F9eba181802F"
+    "usdg": "0x7E955252E15c84f5768B83c41a71F9eba181802F",
+    "usdgMock": "0x6e61B4444f40FBc0a7725c29572cC014b76064f5"
   }
 } as const;

@@ -1,7 +1,7 @@
 import { registryAbi, distributorAbi, actionSourceAbi, erc20Abi } from "@/generated/abi";
 import { deployments } from "@/generated/deployments";
 import { ACTIVE_CHAIN_ID } from "@/lib/chain";
-import { ROBINHOOD, USING_REAL_TOKENS } from "@/lib/tokens";
+import { ROBINHOOD, USING_REAL_TOKENS, PAYOUT_USDG } from "@/lib/tokens";
 
 export { registryAbi, distributorAbi, actionSourceAbi, erc20Abi };
 
@@ -28,7 +28,7 @@ export const addresses = {
  * from the bundled deployment.
  */
 export const tokens = USING_REAL_TOKENS
-  ? { usdg: ROBINHOOD.usdg as Addr, tsla: stock("TSLA"), amzn: stock("AMZN") }
+  ? { usdg: PAYOUT_USDG as Addr, tsla: stock("TSLA"), amzn: stock("AMZN") }
   : {
       usdg: asAddr(process.env.NEXT_PUBLIC_USDG_ADDRESS) ?? (local?.usdg as Addr | undefined),
       tsla: asAddr(process.env.NEXT_PUBLIC_TSLA_ADDRESS) ?? (local?.tsla as Addr | undefined),
@@ -49,6 +49,8 @@ export const selectableAssets: { symbol: string; address: Addr }[] = (
 export const knownTokens: Record<string, { symbol: string; name: string }> = {};
 if (USING_REAL_TOKENS) {
   knownTokens[ROBINHOOD.usdg.toLowerCase()] = { symbol: "USDG", name: "USD for Global" };
+  knownTokens[ROBINHOOD.usdgMock.toLowerCase()] = { symbol: "USDG", name: "USD for Global (testnet)" };
+  if (tokens.usdg) knownTokens[tokens.usdg.toLowerCase()] = { symbol: "USDG", name: "USD for Global (testnet)" };
   knownTokens[ROBINHOOD.weth.toLowerCase()] = { symbol: "WETH", name: "Wrapped Ether" };
   for (const s of ROBINHOOD.stocks) knownTokens[s.address.toLowerCase()] = { symbol: s.symbol, name: s.name };
 } else if (local) {

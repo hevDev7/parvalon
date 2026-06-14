@@ -263,12 +263,19 @@ npm -w @parvalon/app run dev   # http://localhost:3000`}</Code>
           {/* ---------------------------------------------------- Tokens */}
           <Section id="tokens" kicker="06 — Real Robinhood tokens" title="Tokens & decimals.">
             <p>
-              Parvalon targets the <strong>real</strong> token contracts from the Robinhood Chain docs. The payout
-              stablecoin <strong>USDG is 6 decimals</strong>; the tokenized stocks are 18 decimals. All USDG amounts are
-              parsed/formatted per the payout token&apos;s decimals — never a hardcoded 18.
+              Parvalon targets the <strong>real</strong> tokenized-stock contracts from the Robinhood Chain docs. The
+              payout stablecoin <strong>USDG is 6 decimals</strong>; the tokenized stocks are 18 decimals. All USDG
+              amounts are parsed/formatted per the payout token&apos;s decimals — never a hardcoded 18.
+            </p>
+            <p className="fine">
+              <strong>Testnet payout token.</strong> The real USDG faucet is rate-limited (~100/24h), too little to fund
+              a meaningful multi-holder dividend — so the dApp defaults the payout token to a faucet-mintable 6-decimal{" "}
+              <strong>mock USDG</strong> Parvalon deployed on 46630 (mint it from <Mono>/faucet</Mono>). The stock tokens
+              stay real. Point <Mono>NEXT_PUBLIC_USDG_ADDRESS</Mono> at the real USDG to switch back.
             </p>
             <div className="rounded-xl border border-border-subtle bg-surface-card p-5">
-              <Row k="USDG · payout" v={ROBINHOOD.usdg} note="6 dp" />
+              <Row k="USDG · payout (testnet default)" v={ROBINHOOD.usdgMock} note="6 dp · faucet-mintable mock" />
+              <Row k="USDG · real" v={ROBINHOOD.usdg} note="6 dp · rate-limited faucet" />
               {ROBINHOOD.stocks.map((s) => (
                 <Row key={s.symbol} k={`${s.symbol} · ${s.name}`} v={s.address} note="18 dp" />
               ))}
@@ -438,13 +445,14 @@ client.events.onActionAnnounced((e) => { /* react to new actions */ });`}</Code>
           {/* ---------------------------------------------------- Faucet */}
           <Section id="faucet" kicker="14 — Get test tokens" title="Test faucet.">
             <p>
-              The real Robinhood testnet tokens are not mintable by Parvalon. The <Mono>/faucet</Mono> page surfaces your
-              balances, lets you add each token to your wallet (EIP-747), and copies addresses — obtain balances from the
-              official Robinhood Chain testnet faucet, then run the lifecycle yourself.
+              The real Robinhood <strong>stock</strong> tokens are not mintable by Parvalon — obtain them from the
+              official Robinhood Chain testnet faucet. The payout <strong>USDG</strong> is a faucet-mintable mock (the
+              real USDG faucet is rate-limited), so <Mono>/faucet</Mono> exposes a one-click <strong>Mint USDG</strong>
+              button alongside balances, EIP-747 add-to-wallet, and copy-address.
             </p>
             <p className="fine">
-              To demonstrate a full claim you need real USDG (to fund) and real stock holders at a record block — both
-              sourced from Robinhood. Announce + snapshot work without either.
+              So to fund a dividend you can mint as much test USDG as you need; to be a <em>claimable</em> holder you
+              still need real stock at the record block. Announce + snapshot work without either.
             </p>
           </Section>
 
