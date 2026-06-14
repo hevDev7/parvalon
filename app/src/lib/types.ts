@@ -51,7 +51,7 @@ export interface ProofsFile {
 /** Minimal action shape needed to resolve a holder's eligible claims. */
 export type ActionLike = Pick<
   ActionView,
-  "id" | "actionType" | "status" | "payoutToken" | "payoutSymbol" | "assetSymbol" | "metadataURI"
+  "id" | "actionType" | "status" | "payoutToken" | "payoutSymbol" | "assetSymbol" | "metadataURI" | "asset" | "ratePerShareWei"
 >;
 
 export interface EligibleClaim {
@@ -60,9 +60,13 @@ export interface EligibleClaim {
   account: `0x${string}`;
   amountWei: string;
   proof: `0x${string}`[];
+  /** Underlying stock the holder was snapshotted on (e.g. TSLA). */
+  asset: `0x${string}`;
+  assetSymbol: string;
+  /** Holder's balance of `asset` at the record block (asset wei), the basis for the dividend. */
+  snapshotBalanceWei: string;
   payoutToken: `0x${string}`;
   payoutSymbol: string;
-  assetSymbol: string;
   metadataURI: string;
   status: ActionStatusName;
 }

@@ -58,15 +58,21 @@ export async function getEligibleClaims(address: string, actions: ActionLike[]):
     dividends.map(async (a) => {
       const entry = await fetchProofEntry(a.id, addr);
       if (!entry) return null;
+      // Recover the holder's snapshot balance from the dividend amount and rate:
+      // amount = balanceWei * ratePerShare / 1e18  ⇒  balanceWei = amount * 1e18 / ratePerShare.
+      const rate = BigInt(a.ratePerShareWei || "0");
+      const snapshotBalanceWei = rate > 0n ? ((BigInt(entry.amount) * 10n ** 18n) / rate).toString() : "0";
       const claim: EligibleClaim = {
         actionId: a.id,
         index: entry.index,
         account: address as `0x${string}`,
         amountWei: entry.amount,
         proof: entry.proof,
+        asset: a.asset,
+        assetSymbol: a.assetSymbol,
+        snapshotBalanceWei,
         payoutToken: a.payoutToken,
         payoutSymbol: a.payoutSymbol || tokenSymbol(a.payoutToken),
-        assetSymbol: a.assetSymbol,
         metadataURI: a.metadataURI,
         status: a.status,
       };

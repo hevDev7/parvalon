@@ -19,7 +19,9 @@ interface FeedAction {
   status: ActionLike["status"];
   payoutToken: `0x${string}`;
   payoutSymbol: string;
+  asset: `0x${string}`;
   assetSymbol: string;
+  ratePerShareWei: string;
   metadataURI: string;
 }
 
@@ -33,7 +35,9 @@ async function fetchFeed(): Promise<ActionLike[]> {
     status: a.status,
     payoutToken: a.payoutToken,
     payoutSymbol: a.payoutSymbol,
+    asset: a.asset,
     assetSymbol: a.assetSymbol,
+    ratePerShareWei: a.ratePerShareWei,
     metadataURI: a.metadataURI,
   }));
 }
@@ -165,7 +169,9 @@ export function ClaimPanel() {
                   <span className="grid h-9 w-9 place-items-center rounded-full bg-money-wash text-money">✓</span>
                   <div>
                     <p className="font-medium text-ink">{c.assetSymbol} dividend</p>
-                    <p className="text-[0.78rem] text-ink-faint">Action #{c.actionId}</p>
+                    <p className="text-[0.78rem] text-ink-faint">
+                      Action #{c.actionId} · held {fmtAmount(c.snapshotBalanceWei, tokenDecimals(c.asset))} {c.assetSymbol}
+                    </p>
                   </div>
                 </div>
                 <span className="tabular text-ink">
@@ -244,7 +250,15 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
         )}
       </div>
 
-      <div className="relative mt-5 flex items-end gap-1.5">
+      <p className="relative mt-3 text-sm text-ink-soft">
+        You held{" "}
+        <span className="tabular font-medium text-ink">
+          {fmtAmount(claim.snapshotBalanceWei, tokenDecimals(claim.asset))} {claim.assetSymbol}
+        </span>{" "}
+        at the record block
+      </p>
+
+      <div className="relative mt-4 flex items-end gap-1.5">
         <span className="tabular text-[2.6rem] font-medium leading-none text-money">{fmtAmount(claim.amountWei, tokenDecimals(claim.payoutToken))}</span>
         <span className="mb-1 text-sm text-ink-faint">{claim.payoutSymbol}</span>
       </div>

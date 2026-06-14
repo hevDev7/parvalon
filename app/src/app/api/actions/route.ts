@@ -27,6 +27,7 @@ export async function GET() {
         actionType: a.actionType,
         status: a.status,
         ratePerShare: formatUnits(BigInt(a.ratePerShareWei || "0"), tokenDecimals(a.payoutToken)),
+        ratePerShareWei: a.ratePerShareWei,
         recordBlock: a.recordBlock,
         payableAt: a.payableAt,
         claimDeadline: a.claimDeadline,
