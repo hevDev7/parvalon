@@ -29,7 +29,7 @@ export function IssuerConsole() {
   const [recordBlock, setRecordBlock] = useState("");
   const [payableAt, setPayableAt] = useState("");
   const [claimDeadline, setClaimDeadline] = useState("");
-  const [metadataURI, setMetadataURI] = useState("ipfs://corporax/tsla-dividend.json");
+  const [metadataURI, setMetadataURI] = useState("ipfs://parvalon/tsla-dividend.json");
 
   // Snapshot inputs (pasted from proofs.json)
   const [root, setRoot] = useState("");
