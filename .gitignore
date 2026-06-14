@@ -33,3 +33,6 @@ coverage/
 
 # Scratch design/prototype workspace (not part of the app)
 Desain/
+
+# Large per-action proof shards served by /api/proof (regenerable from snapshot)
+.proofs-store/
