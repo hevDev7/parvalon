@@ -46,6 +46,12 @@ contract Deploy is Script {
 
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
 
+        // On the real-token Robinhood chain the payout currency MUST be the real
+        // 6-decimal USDG — refuse to silently deploy an 18-dec mock and mis-pay.
+        if (block.chainid == 46_630) {
+            require(vm.envOr("USDG_ADDRESS", address(0)) != address(0), "USDG_ADDRESS (real 6-dec) required on 46630");
+        }
+
         // --- Payout + underlying assets (real or mock) ---
         address usdg = _resolveToken("USDG_ADDRESS", "USD for Global", "USDG", 18);
         address tsla = _resolveToken("TSLA_ADDRESS", "Tesla Tokenized Stock", "TSLA", 18);
@@ -59,10 +65,14 @@ contract Deploy is Script {
         // Wire the distributor as the only lifecycle authority.
         registry.grantRole(registry.DISTRIBUTOR_ROLE(), address(distributor));
 
-        // Onboard the issuer for the demo assets (admin == broadcaster path).
+        // Onboard the issuer for every provided asset (admin == broadcaster path).
         if (admin == broadcaster) {
             registry.setAssetIssuer(tsla, issuer);
             registry.setAssetIssuer(amzn, issuer);
+            // Additional real stocks (no mock fallback): onboarded only when provided.
+            _onboardIfSet(registry, "PLTR_ADDRESS", issuer);
+            _onboardIfSet(registry, "NFLX_ADDRESS", issuer);
+            _onboardIfSet(registry, "AMD_ADDRESS", issuer);
         }
 
         vm.stopBroadcast();
@@ -77,6 +87,12 @@ contract Deploy is Script {
         console2.log("usdg        ", usdg);
         console2.log("tsla        ", tsla);
         console2.log("amzn        ", amzn);
+    }
+
+    /// @dev Onboards `issuer` for the asset at env var `key`, if one is provided.
+    function _onboardIfSet(CorporateActionRegistry registry, string memory key, address issuer) internal {
+        address asset = vm.envOr(key, address(0));
+        if (asset != address(0)) registry.setAssetIssuer(asset, issuer);
     }
 
     /// @dev Returns the env-provided token, or deploys a mint-faucet mock.

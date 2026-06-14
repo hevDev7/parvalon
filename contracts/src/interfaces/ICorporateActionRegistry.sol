@@ -56,7 +56,9 @@ interface ICorporateActionRegistry {
     error ActionNotFound(uint256 id);
     /// @notice Action is not in the status this operation requires.
     error InvalidStatus(uint256 id, ActionStatus current, ActionStatus required);
-    /// @notice `publishRoot` called before `block.number > recordBlock` (FR-3).
+    /// @notice `publishRoot` called before the record block has passed (FR-3). The
+    ///         current block is the L2 block number (ArbSys `arbBlockNumber()` on
+    ///         Arbitrum/Orbit, `block.number` off-Arbitrum) — see {publishRoot}.
     error RecordNotTaken(uint256 id, uint64 recordBlock, uint256 currentBlock);
     /// @notice A supplied parameter is structurally invalid (zero address, bad dates...).
     error InvalidParams(string reason);
@@ -85,8 +87,11 @@ interface ICorporateActionRegistry {
     ) external returns (uint256 id);
 
     /// @notice Publish the snapshot Merkle root and exact funding target.
-    /// @dev Valid only when status == ANNOUNCED and block.number > recordBlock.
-    ///      Sets status -> ROOT_PUBLISHED. The root is immutable thereafter.
+    /// @dev Valid only when status == ANNOUNCED and the record block has passed,
+    ///      compared against the L2 block number (ArbSys `arbBlockNumber()` on
+    ///      Arbitrum/Orbit — the same height the snapshot tooling reads — falling
+    ///      back to `block.number` off-Arbitrum). Sets status -> ROOT_PUBLISHED;
+    ///      the root is immutable thereafter.
     function publishRoot(uint256 id, bytes32 root, uint256 totalPayout, uint256 holderCount) external;
 
     /// @notice Cancel an ANNOUNCED action before a root is published. Caller must be

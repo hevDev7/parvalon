@@ -2,7 +2,6 @@
 pragma solidity 0.8.26;
 
 import { IActionSource } from "./interfaces/IActionSource.sol";
-import { IArbSys } from "./interfaces/IArbSys.sol";
 import { ICorporateActionRegistry } from "./interfaces/ICorporateActionRegistry.sol";
 import { ActionStatus, ActionType, ActionView, CorporateAction } from "./libraries/CorporateActionTypes.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
@@ -285,13 +284,18 @@ contract CorporateActionRegistry is ICorporateActionRegistry, AccessControl, Pau
                                 INTERNAL
     //////////////////////////////////////////////////////////////*/
 
-    /// @dev The block number record-date enforcement compares against. Uses the
-    ///      Arbitrum L2 block number (ArbSys) when the precompile is present, so it
-    ///      matches the L2 height the snapshot tooling reads; falls back to
-    ///      `block.number` on chains without ArbSys (local anvil / non-Arbitrum).
+    /// @dev The block number record-date enforcement compares against. On
+    ///      Arbitrum/Orbit it returns the L2 block number via the ArbSys precompile
+    ///      (`arbBlockNumber()`), so the on-chain guard matches the L2 height the
+    ///      snapshot tooling reads — the raw EVM `block.number` on Orbit is the L1
+    ///      block, which would make the guard unsatisfiable. A low-level staticcall
+    ///      is used (not `extcodesize`, whose value for precompiles is
+    ///      implementation-defined): when ArbSys is absent (local anvil / non-Arbitrum)
+    ///      the call returns no data and we fall back to `block.number`.
     function _recordChainBlock() private view returns (uint256) {
-        if (ARB_SYS.code.length != 0) {
-            return IArbSys(ARB_SYS).arbBlockNumber();
+        (bool ok, bytes memory ret) = ARB_SYS.staticcall(abi.encodeWithSignature("arbBlockNumber()"));
+        if (ok && ret.length == 32) {
+            return abi.decode(ret, (uint256));
         }
         return block.number;
     }
