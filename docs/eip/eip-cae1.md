@@ -2,7 +2,7 @@
 eip: 7XXXX
 title: Corporate Action Events
 description: A permissionless event vocabulary and Merkle leaf binding for on-chain corporate actions over tokens the publisher does not control.
-author: CorporaX (@corporax)
+author: Parvalon (@corporax)
 discussions-to: https://ethereum-magicians.org/t/erc-corporate-action-events/00000
 status: Draft
 type: Standards Track
@@ -361,7 +361,7 @@ Versioning rules:
 
 ## Reference Implementation
 
-A complete, deployed reference implementation lives in the CorporaX repository
+A complete, deployed reference implementation lives in the Parvalon repository
 that accompanies this draft:
 
 - `contracts/src/CorporateActionRegistry.sol` — the registry: announces actions,

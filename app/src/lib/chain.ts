@@ -1,7 +1,7 @@
 import { defineChain } from "viem";
 
 /**
- * Chains CorporaX targets. Robinhood Chain is primary; Arbitrum Sepolia is the
+ * Chains Parvalon targets. Robinhood Chain is primary; Arbitrum Sepolia is the
  * documented fallback; anvil is local dev. Chain definitions are intentionally
  * explicit so the app works against any of them by env alone.
  */

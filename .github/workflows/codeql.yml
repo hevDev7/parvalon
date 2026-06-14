@@ -1,4 +1,4 @@
-# CodeQL static analysis for the JavaScript/TypeScript surfaces of CorporaX
+# CodeQL static analysis for the JavaScript/TypeScript surfaces of Parvalon
 # (the Next.js app + the snapshot CLI). Solidity is covered by slither.yml.
 #
 # Runs on push/PR and on a weekly schedule so newly-published CodeQL queries

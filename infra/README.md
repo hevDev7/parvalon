@@ -1,6 +1,6 @@
-# CorporaX — Infra & DevOps
+# Parvalon — Infra & DevOps
 
-DevOps surface for CorporaX: CI/CD, container images, the local Docker stack,
+DevOps surface for Parvalon: CI/CD, container images, the local Docker stack,
 and security tooling config. Everything here is reproducible and labelled where
 it is **dev/demo-only**.
 
@@ -134,8 +134,8 @@ GitHub Actions under `../.github/workflows/`:
 | Workflow | Triggers on | Does |
 |---|---|---|
 | `contracts.yml` | `contracts/**` | `forge fmt --check`, `forge build --sizes`, `forge test -vvv`, `forge coverage --report summary` (ci profile). Caches `~/.svm` + build artifacts. |
-| `frontend.yml` | `app/**`, `abis/**`, root manifests | `npm ci` → lint → typecheck → build for `@corporax/app`. **Self-guards** when `app/package.json` is absent. |
-| `cli.yml` | `tooling/snapshot/**`, `abis/**` | typecheck + test for `@corporax/snapshot`. Self-guards when absent. |
+| `frontend.yml` | `app/**`, `abis/**`, root manifests | `npm ci` → lint → typecheck → build for `@parvalon/app`. **Self-guards** when `app/package.json` is absent. |
+| `cli.yml` | `tooling/snapshot/**`, `abis/**` | typecheck + test for `@parvalon/snapshot`. Self-guards when absent. |
 | `slither.yml` | `contracts/**` | `crytic/slither-action` (advisory), uploads SARIF to code scanning. |
 | `codeql.yml` | JS/TS paths + weekly | CodeQL `security-and-quality` for JavaScript/TypeScript. |
 
@@ -159,8 +159,8 @@ cd contracts && slither . --config-file slither.config.json  # filters vendored 
 
 # Frontend / CLI (once those workspaces exist)
 npm ci
-npm -w @corporax/app run lint && npm -w @corporax/app run typecheck && npm -w @corporax/app run build
-npm -w @corporax/snapshot run typecheck && npm -w @corporax/snapshot run test
+npm -w @parvalon/app run lint && npm -w @parvalon/app run typecheck && npm -w @parvalon/app run build
+npm -w @parvalon/snapshot run typecheck && npm -w @parvalon/snapshot run test
 ```
 
 To dry-run the workflows themselves, use [`act`](https://github.com/nektos/act):

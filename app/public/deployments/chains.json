@@ -1,6 +1,6 @@
 {
   "$schema": "corporax-chains-v1",
-  "description": "CorporaX multichain registry. chainId -> deploy/runtime metadata. The address registries live in deployments/<chainId>.json; this file maps each chain to its name, the env var holding its RPC URL, its explorer, and its type. Tooling resolves a chain by id, reads rpcEnv from the environment (no secrets in git), and writes/reads deployments/<chainId>.json accordingly.",
+  "description": "Parvalon multichain registry. chainId -> deploy/runtime metadata. The address registries live in deployments/<chainId>.json; this file maps each chain to its name, the env var holding its RPC URL, its explorer, and its type. Tooling resolves a chain by id, reads rpcEnv from the environment (no secrets in git), and writes/reads deployments/<chainId>.json accordingly.",
   "chains": {
     "46630": {
       "name": "Robinhood Chain testnet",

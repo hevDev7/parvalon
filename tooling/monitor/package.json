@@ -1,8 +1,8 @@
 {
-  "name": "@corporax/monitor",
+  "name": "@parvalon/monitor",
   "version": "1.0.0",
   "private": true,
-  "description": "CorporaX monitoring & alerting service — watches the on-chain solvency invariant, lifecycle events, funding/claim/sweep anomalies and pause state, and pages on violation (PRODUCTION-READINESS.md §4, P0-6).",
+  "description": "Parvalon monitoring & alerting service — watches the on-chain solvency invariant, lifecycle events, funding/claim/sweep anomalies and pause state, and pages on violation (PRODUCTION-READINESS.md §4, P0-6).",
   "license": "MIT",
   "type": "module",
   "bin": {

@@ -9,7 +9,7 @@
  * or a signed payment authorization), then retries the request carrying an
  * `X-PAYMENT` header proving settlement; the server verifies and returns 200.
  *
- * For a CorporaX agent the natural use is a PREMIUM corporate-actions feed:
+ * For a Parvalon agent the natural use is a PREMIUM corporate-actions feed:
  * the public `/api/actions` feed (eip-cae1.md) is free and event-derived, but a
  * value-added provider might gate, say, a low-latency or enriched feed (tax
  * lots, ex-date forecasts, cross-venue holdings) behind x402 so the agent pays

@@ -1,11 +1,11 @@
-# @corporax/snapshot
+# @parvalon/snapshot
 
-Deterministic Merkle **snapshot CLI** for the CorporaX corporate-actions
+Deterministic Merkle **snapshot CLI** for the Parvalon corporate-actions
 protocol. It reconstructs token-holder balances at a record block from on-chain
 `Transfer` logs and emits the canonical `corporax-merkle-v1` `proofs.json`
 consumed by the contracts (`DividendDistributor.claim`) and the frontend.
 
-> **Why a snapshot at all?** CorporaX is a *permissionless overlay*: it does not
+> **Why a snapshot at all?** Parvalon is a *permissionless overlay*: it does not
 > control the stock token and cannot install transfer hooks. The only honest way
 > to know who held what at a record block is to replay the token's `Transfer`
 > history up to that block. Anyone can re-run this tool and get the **same root**
@@ -24,9 +24,9 @@ or from this directory:
 
 ```bash
 npm install
-npm run -w @corporax/snapshot build      # tsc -> dist/
-npm run -w @corporax/snapshot typecheck  # strict, no emit
-npm run -w @corporax/snapshot test       # vitest
+npm run -w @parvalon/snapshot build      # tsc -> dist/
+npm run -w @parvalon/snapshot typecheck  # strict, no emit
+npm run -w @parvalon/snapshot test       # vitest
 ```
 
 > Use **npm**, not pnpm (pnpm is broken on the dev machine).
@@ -217,7 +217,7 @@ extensions below. **Do not gate parsing on `schemaMinor`.**
 `announceAction`'s `metadataURI` (e.g. `ipfs://<cid>`) should resolve to a JSON
 document with these standardised fields. The snapshot tool both **reads** these
 semantics and **echoes** them into the artifact's `metadata` block. These are
-*issuer-asserted* — CorporaX does not validate or enforce any legal/KYC claim;
+*issuer-asserted* — Parvalon does not validate or enforce any legal/KYC claim;
 it only standardises the shape so issuer feeds, this CLI, and the frontend agree.
 
 ```jsonc

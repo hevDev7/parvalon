@@ -5,7 +5,7 @@ import { IActionSource } from "../interfaces/IActionSource.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title AdminActionSource
-/// @author CorporaX
+/// @author Parvalon
 /// @notice The v1 (testnet/hackathon) implementation of the {IActionSource} seam.
 ///         It models the real-world fact that a corporate action's authenticity
 ///         originates with the issuer / registrar. Authorized attesters vouch for

@@ -1,4 +1,4 @@
-// CorporaX subgraph mappings (AssemblyScript).
+// Parvalon subgraph mappings (AssemblyScript).
 //
 // Materialises the CAE-1 event stream (INTEGRATION.md §3) into the entities
 // declared in schema.graphql. Design rules:

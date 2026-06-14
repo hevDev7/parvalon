@@ -1,6 +1,6 @@
-# @corporax/monitor
+# @parvalon/monitor
 
-Monitoring & alerting service for the CorporaX corporate-actions protocol —
+Monitoring & alerting service for the Parvalon corporate-actions protocol —
 **P0-6** in [`docs/PRODUCTION-READINESS.md`](../../docs/PRODUCTION-READINESS.md).
 It watches the protocol on-chain and **pages** when the solvency invariant breaks,
 and **notifies** on lifecycle / funding / claim / sweep / pause anomalies.
@@ -170,7 +170,7 @@ The pure checks are exported for dashboards / tests / other tooling:
 import {
   checkSolvency, type ActionAccounting, type TokenBalance,
   Monitor, resolveConfig, ConsoleNotifier, CompositeNotifier,
-} from "@corporax/monitor";
+} from "@parvalon/monitor";
 
 const { results, alerts } = checkSolvency(actions, balances); // pure, no chain
 ```

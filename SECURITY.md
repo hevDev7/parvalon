@@ -1,6 +1,6 @@
 # Security Policy
 
-CorporaX is a corporate-actions and dividend protocol for tokenized stocks on
+Parvalon is a corporate-actions and dividend protocol for tokenized stocks on
 Robinhood Chain (Arbitrum Orbit L2). It moves real value (payout-token
 dividends) against on-chain holder snapshots, so we take security seriously and
 welcome coordinated disclosure.

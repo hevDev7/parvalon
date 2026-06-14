@@ -1,4 +1,4 @@
-# CorporaX subgraph schema — CAE-1 event index
+# Parvalon subgraph schema — CAE-1 event index
 #
 # Mirrors the FROZEN integration contract (docs/INTEGRATION.md §3 CAE-1 events,
 # §2 enums, §10 /api/actions feed shape). The Graph Node materialises these

@@ -1,5 +1,5 @@
 # ============================================================================
-# infra/frontend.Dockerfile — production image for the CorporaX Next.js app.
+# infra/frontend.Dockerfile — production image for the Parvalon Next.js app.
 #
 # Multi-stage build targeting Next.js "standalone" output (next.config:
 # `output: "standalone"`), which traces only the runtime files needed and
@@ -47,7 +47,7 @@ ARG NEXT_PUBLIC_BLOCKSCOUT_URL=https://explorer.testnet.chain.robinhood.com
 ENV NEXT_PUBLIC_CHAIN_ID=$NEXT_PUBLIC_CHAIN_ID \
     NEXT_PUBLIC_RPC_URL=$NEXT_PUBLIC_RPC_URL \
     NEXT_PUBLIC_BLOCKSCOUT_URL=$NEXT_PUBLIC_BLOCKSCOUT_URL
-RUN npm -w @corporax/app run build
+RUN npm -w @parvalon/app run build
 
 # --- Stage 3: runtime -------------------------------------------------------
 # Minimal runner using the traced standalone server. Runs as the built-in

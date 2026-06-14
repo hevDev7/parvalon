@@ -82,7 +82,7 @@ ok "holder received exactly $AMT (pro-rata)"
 
 # --- 4. production CLI reproduces the on-chain root --------------------------
 echo "▸ CLI snapshot parity + verify"
-[ -f "$ROOT/tooling/snapshot/dist/cli.js" ] || (cd "$ROOT" && npm -w @corporax/snapshot run build >/dev/null 2>&1)
+[ -f "$ROOT/tooling/snapshot/dist/cli.js" ] || (cd "$ROOT" && npm -w @parvalon/snapshot run build >/dev/null 2>&1)
 RB=$(cast block-number --rpc-url "$RPC")
 seed_root=$(jq -r .merkleRoot "$PROOFS")
 node "$ROOT/tooling/snapshot/dist/cli.js" snapshot \
@@ -96,7 +96,7 @@ ok "CLI reproduces on-chain root + verify OK"
 
 # --- 5. monitor solvency check ----------------------------------------------
 echo "▸ monitor solvency check"
-[ -f "$ROOT/tooling/monitor/dist/cli.js" ] || (cd "$ROOT" && npm -w @corporax/monitor run build >/dev/null 2>&1)
+[ -f "$ROOT/tooling/monitor/dist/cli.js" ] || (cd "$ROOT" && npm -w @parvalon/monitor run build >/dev/null 2>&1)
 RPC_URL="$RPC" node "$ROOT/tooling/monitor/dist/cli.js" check --rpc "$RPC" --chain-id 31337 >/dev/null 2>&1 \
   || fail "monitor reported a solvency/state violation"
 ok "monitor: solvent"

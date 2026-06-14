@@ -4,9 +4,9 @@ pragma solidity 0.8.26;
 import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 
 /// @title SplitAdjuster
-/// @author CorporaX
+/// @author Parvalon
 /// @notice Math integrators (lending markets, AMMs, oracles) use to react to a
-///         `STOCK_SPLIT` corporate action. CorporaX emits splits as *informational*
+///         `STOCK_SPLIT` corporate action. Parvalon emits splits as *informational*
 ///         signals (it never rebases a token it doesn't control); this library is
 ///         how a protocol turns that signal into a correct price/quantity adjustment.
 ///

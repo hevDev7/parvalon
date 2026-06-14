@@ -1,4 +1,4 @@
-# Slither static analysis for the CorporaX contracts.
+# Slither static analysis for the Parvalon contracts.
 #
 # Runs the crytic/slither-action on contracts/, filtering vendored OpenZeppelin
 # code (see contracts/slither.config.json). Findings are uploaded as SARIF so

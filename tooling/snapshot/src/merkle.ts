@@ -1,5 +1,5 @@
 /**
- * Canonical CorporaX Merkle construction & verification.
+ * Canonical Parvalon Merkle construction & verification.
  *
  * The leaf encoding and tree are FROZEN by INTEGRATION.md §4:
  *

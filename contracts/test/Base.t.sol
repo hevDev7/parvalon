@@ -9,7 +9,7 @@ import { AdminActionSource } from "../src/oracle/AdminActionSource.sol";
 import { MerkleHelper } from "./utils/MerkleHelper.sol";
 import { Test } from "forge-std/Test.sol";
 
-/// @notice Shared deployment + lifecycle helpers for the CorporaX test suite.
+/// @notice Shared deployment + lifecycle helpers for the Parvalon test suite.
 /// @dev Mirrors the real deploy order: source -> registry -> distributor -> grant
 ///      DISTRIBUTOR_ROLE -> onboard an issuer for the asset.
 abstract contract BaseTest is Test {

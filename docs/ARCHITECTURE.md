@@ -1,4 +1,4 @@
-# CorporaX — Architecture
+# Parvalon — Architecture
 
 > How the protocol is built and **why** it is built this way. For the frozen
 > cross-package API (exact signatures, schemas, env vars) see
@@ -16,7 +16,7 @@ A corporate action in traditional markets is a four-beat sequence:
 3. **Payment** — funds are distributed pro-rata to the record-date holders.
 4. **Reconciliation** — unclaimed amounts are handled; the action closes.
 
-CorporaX reproduces exactly this sequence on-chain, with one hard constraint: **we do not control the token.** The TSLA/AMZN tokens on Robinhood Chain are deployed and owned by Robinhood. We cannot add transfer hooks, we cannot make them rebasing or dividend-paying, and we cannot require their issuer to call into us. Every architectural decision below falls out of that constraint.
+Parvalon reproduces exactly this sequence on-chain, with one hard constraint: **we do not control the token.** The TSLA/AMZN tokens on Robinhood Chain are deployed and owned by Robinhood. We cannot add transfer hooks, we cannot make them rebasing or dividend-paying, and we cannot require their issuer to call into us. Every architectural decision below falls out of that constraint.
 
 The decisive consequence is the **Merkle-snapshot model** (design decision **D1**). Because we cannot observe transfers from inside the token, we observe them from outside: `eth_getLogs` over the token's `Transfer` events up to the record block reconstructs the exact holder set, permissionlessly, for *any* standard ERC-20. The "record date" becomes a **record block**. This is not a workaround — it is a faithful, and arguably cleaner, mapping of how corporate actions actually work.
 
@@ -36,7 +36,7 @@ The decisive consequence is the **Merkle-snapshot model** (design decision **D1*
                 └───────────────────────────┘    │   • IActionSource seam (D3)       │
                                                   └──────────────┬────────────────────┘
                 ┌───────────────────────────┐                   │ DISTRIBUTOR_ROLE
-                │  CorporaX dApp (Next.js)  │                   │ (markClaimable / markFinalized)
+                │  Parvalon dApp (Next.js)  │                   │ (markClaimable / markFinalized)
                 │  /claim  /issuer  /feed   │     viem/wagmi     ▼
                 │  /api/actions             │◄─────────►┌──────────────────────────────────┐
                 │  wagmi/viem · gasless     │           │  DividendDistributor              │
@@ -212,7 +212,7 @@ interface IActionSource {
 
 ## 9. Trust assumptions
 
-What you must trust, and what you must not, when using CorporaX v1:
+What you must trust, and what you must not, when using Parvalon v1:
 
 | Party | Trusted for | **Not** trusted for / bounded by |
 |---|---|---|

@@ -1,8 +1,8 @@
 {
-  "name": "@corporax/snapshot",
+  "name": "@parvalon/snapshot",
   "version": "1.0.0",
   "private": true,
-  "description": "CorporaX deterministic Merkle snapshot CLI — reconstructs token holder balances at a record block from on-chain Transfer logs and emits the canonical corporax-merkle-v1 proofs.json.",
+  "description": "Parvalon deterministic Merkle snapshot CLI — reconstructs token holder balances at a record block from on-chain Transfer logs and emits the canonical corporax-merkle-v1 proofs.json.",
   "license": "MIT",
   "type": "module",
   "bin": {

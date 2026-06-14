@@ -1,4 +1,4 @@
-# Publish @corporax/sdk to npm.
+# Publish @parvalon/sdk to npm.
 #
 # Trigger: push a tag `sdk-vX.Y.Z` (must match packages/sdk/package.json version),
 # or run manually (workflow_dispatch) — manual runs default to --dry-run.
@@ -59,8 +59,8 @@ jobs:
 
       - name: Build + test the SDK
         run: |
-          npm -w @corporax/sdk run build
-          npm -w @corporax/sdk run test
+          npm -w @parvalon/sdk run build
+          npm -w @parvalon/sdk run test
 
       - name: Publish to npm
         env:
@@ -68,16 +68,16 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
             echo "Dry run — packing and validating, not publishing."
-            npm publish -w @corporax/sdk --provenance --access public --dry-run
+            npm publish -w @parvalon/sdk --provenance --access public --dry-run
           else
-            npm publish -w @corporax/sdk --provenance --access public
+            npm publish -w @parvalon/sdk --provenance --access public
           fi
 
       - name: Summary
         if: always()
         run: |
           {
-            echo "### @corporax/sdk release"
+            echo "### @parvalon/sdk release"
             echo "- ref: \`${GITHUB_REF_NAME}\`"
             echo "- version: \`$(node -p "require('./packages/sdk/package.json').version")\`"
             echo "- event: \`${{ github.event_name }}\`"

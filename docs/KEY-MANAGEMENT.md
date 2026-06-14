@@ -1,4 +1,4 @@
-# CorporaX — Key Management (HSM / KMS)
+# Parvalon — Key Management (HSM / KMS)
 
 > Custody, policy, and audit logging for the three privileged key classes —
 > **admin**, **issuer**, **relayer** — plus how to wire a cloud KMS signer into

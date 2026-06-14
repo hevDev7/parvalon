@@ -4,7 +4,7 @@ pragma solidity 0.8.26;
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /// @title MockERC20
-/// @author CorporaX
+/// @author Parvalon
 /// @notice Minimal mintable ERC20 with configurable decimals. Stands in for both
 ///         the payout token (USDG) and the tokenized stocks (TSLA/AMZN) on local
 ///         and fallback (Arbitrum Sepolia) networks where the real assets do not

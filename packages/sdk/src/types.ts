@@ -1,5 +1,5 @@
 /**
- * CorporaX SDK — domain types.
+ * Parvalon SDK — domain types.
  *
  * Every shape here mirrors docs/INTEGRATION.md (FROZEN). The enums, struct field
  * orders, the `corporax-merkle-v1` proofs schema and the CAE-1 event payloads are
@@ -202,7 +202,7 @@ export interface Deployment {
 }
 
 /** The minimal address set the SDK actually needs to operate. */
-export interface CorporaXAddresses {
+export interface ParvalonAddresses {
   readonly registry: Address;
   readonly distributor: Address;
 }

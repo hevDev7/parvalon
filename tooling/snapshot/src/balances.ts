@@ -1,7 +1,7 @@
 /**
  * On-chain balance reconstruction from ERC20 Transfer logs.
  *
- * CorporaX is a *permissionless overlay*: we do not control the stock token and
+ * Parvalon is a *permissionless overlay*: we do not control the stock token and
  * cannot install transfer hooks, so the only honest way to know who held what at
  * a record block is to replay the token's entire Transfer history up to that
  * block and fold it into a balance map. This module does exactly that, with the

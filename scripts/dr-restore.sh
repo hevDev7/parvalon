@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# CorporaX — disaster recovery: rebuild the operational picture from on-chain
+# Parvalon — disaster recovery: rebuild the operational picture from on-chain
 # truth + committed artifacts (P2-6). Pairs with docs/DR.md.
 #
 # PRINCIPLE: the chain is the source of truth. Everything operational can be

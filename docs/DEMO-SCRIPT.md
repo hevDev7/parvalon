@@ -1,4 +1,4 @@
-# CorporaX — Demo Video Script (< 3 minutes)
+# Parvalon — Demo Video Script (< 3 minutes)
 
 > A tight, judge-facing screen-recording script mapped to the **actual working
 > flow**. Screen recording + English voice-over, subtitles, one take per segment.
@@ -23,12 +23,12 @@
 
 | Time | Segment | On screen | Voice-over (core script) |
 |---|---|---|---|
-| **0:00–0:20** | **Hook** | Title card → a tokenized-stock holder page | "There are almost two thousand tokenized stocks on Arbitrum — and if you actually hold one, there is still no way to claim a dividend on-chain. Tokenization solved issuance. CorporaX is the operations layer — and it works on the tokens that already exist. No token changes, no issuer integration required." |
+| **0:00–0:20** | **Hook** | Title card → a tokenized-stock holder page | "There are almost two thousand tokenized stocks on Arbitrum — and if you actually hold one, there is still no way to claim a dividend on-chain. Tokenization solved issuance. Parvalon is the operations layer — and it works on the tokens that already exist. No token changes, no issuer integration required." |
 | **0:20–0:45** | **The problem** | Three quick icons: holder, lending market, agent | "Three parties are blind. Holders have no rail to receive a dividend. DeFi protocols using tokenized stocks as collateral don't know when a split or an ex-dividend date hits — that's real collateral risk. And AI agents have no machine-readable corporate-action data to act on." |
 | **0:45–1:30** | **Issuer flow** | `/issuer` console → terminal snapshot CLI → publish → fund | "Here's the issuer side. Announce a Tesla cash dividend — fifty cents a share — with an on-chain record block. Once that block passes, the snapshot reconstructs every holder's balance straight from on-chain Transfer logs and builds a Merkle root. **Anyone can re-run this and get the same root** — that's auditability a traditional transfer agent can't give you. Publish the root, fund it in USDG, and the action goes claimable." |
 | **1:30–2:10** | **Holder claim ⭐** | `/claim` → connect → "Your dividend is ready" → one tap → USDG arrives → Blockscout `Claimed` tx | *(slow down here — this is the moment)* "Now the holder. Connect — and the dividend is already waiting: five USDG, no jargon on screen. One tap. The claim is gasless — a relayer covers the fee, and because claims always pay the holder, never the submitter, there's zero custody risk. The USDG lands in the wallet. Here it is on the explorer, verifiable." |
 | **2:10–2:35** | **Integrator + CAE-1** | Terminal: `curl /api/actions` → JSON → `/feed` event snippet | "And it's machine-readable. One endpoint returns every corporate action as JSON, alongside a standardized event stream we call **CAE-1**. Lending markets and AI agents can finally subscribe and react to corporate actions — automatically." |
-| **2:35–2:55** | **Architecture + honesty + close** | Architecture diagram (one frame) → QR + verified addresses | "Two immutable contracts, forty-two tests, eighty-two-thousand gas per claim. The oracle is issuer-fed today, with a Chainlink Functions adapter as the production path — and the seam is already in the code. CorporaX: the transfer-agent layer for the on-chain economy. Built on Robinhood Chain." |
+| **2:35–2:55** | **Architecture + honesty + close** | Architecture diagram (one frame) → QR + verified addresses | "Two immutable contracts, forty-two tests, eighty-two-thousand gas per claim. The oracle is issuer-fed today, with a Chainlink Functions adapter as the production path — and the seam is already in the code. Parvalon: the transfer-agent layer for the on-chain economy. Built on Robinhood Chain." |
 
 ---
 

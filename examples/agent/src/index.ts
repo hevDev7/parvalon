@@ -1,7 +1,7 @@
 /**
- * @corporax/example-agent — public surface.
+ * @parvalon/example-agent — public surface.
  *
- * A dividend-aware autonomous agent for CorporaX / CAE-1. The decision core
+ * A dividend-aware autonomous agent for Parvalon / CAE-1. The decision core
  * (`decideOnAnnouncement`) is pure and unit-tested; the rest subscribes to
  * `ActionAnnounced` and prints strategy decisions. See README.md.
  */

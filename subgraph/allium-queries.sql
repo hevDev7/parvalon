@@ -1,10 +1,10 @@
 -- =============================================================================
--- CorporaX — Allium SQL reference (production indexer alternative to The Graph)
+-- Parvalon — Allium SQL reference (production indexer alternative to The Graph)
 -- =============================================================================
 --
 -- Allium is named as the production indexer alternative. These queries
 -- reconstruct the SAME action + claim dataset the subgraph exposes, straight
--- from Allium's decoded-logs tables, so a data team can run CorporaX analytics
+-- from Allium's decoded-logs tables, so a data team can run Parvalon analytics
 -- in the warehouse without operating a Graph Node.
 --
 -- ASSUMPTIONS / WIRING (adjust to your Allium workspace):

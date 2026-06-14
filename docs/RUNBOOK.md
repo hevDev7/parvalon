@@ -1,6 +1,6 @@
-# CorporaX — Operator Runbook
+# Parvalon — Operator Runbook
 
-> Operational procedures for deploying, running, and maintaining CorporaX on
+> Operational procedures for deploying, running, and maintaining Parvalon on
 > Robinhood Chain testnet (chainId 46630), Arbitrum Sepolia (421614), or local
 > anvil (31337). Commands here are real and use this repo's tooling. Pair this
 > with [INTEGRATION.md](./INTEGRATION.md) (canonical names/schemas) and

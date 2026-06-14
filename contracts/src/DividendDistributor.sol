@@ -13,7 +13,7 @@ import { MerkleProof } from "@openzeppelin/contracts/utils/cryptography/MerklePr
 import { BitMaps } from "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 
 /// @title DividendDistributor
-/// @author CorporaX
+/// @author Parvalon
 /// @notice Custodies and settles cash dividends for CASH_DIVIDEND actions recorded
 ///         in the {CorporateActionRegistry}. Issuers fund a published action; once
 ///         fully funded it becomes CLAIMABLE and holders (or anyone on their behalf)

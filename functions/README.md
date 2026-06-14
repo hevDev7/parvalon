@@ -1,7 +1,7 @@
-# CorporaX — Chainlink Functions attestation source (P0-4)
+# Parvalon — Chainlink Functions attestation source (P0-4)
 
 The off-chain script the Chainlink Functions DON runs to verify that a corporate
-action is **authentic** against a licensed market-data vendor, before CorporaX will
+action is **authentic** against a licensed market-data vendor, before Parvalon will
 record it on-chain. This is the production realization of the D3 oracle seam
 (`IActionSource` → `FunctionsActionSource`).
 

@@ -1,4 +1,4 @@
-# CorporaX — Production Readiness
+# Parvalon — Production Readiness
 
 > An honest, prioritized roadmap from a hackathon MVP to a production corporate-
 > actions protocol. What ships today is deliberately small and auditable; this
@@ -34,11 +34,11 @@ Functions subscription to fund, a cloud KMS to provision) — not code.
 | P0-3 | Expanded invariants (`InvariantLifecycle`), slither (0 high/med), **8-agent adversarial review → 2 findings + 1 minor fixed + regression-tested** ([AUDIT-PREP.md](./AUDIT-PREP.md) §6) | engage an external audit firm |
 | P0-4 | `FunctionsActionSource` + `MockFunctionsRouter` + `DeployFunctionsSource.s.sol` | fund a Functions subscription; deploy the off-chain source |
 | P0-5 | Snapshot CLI over real `Transfer` logs (chunked/retry/resume) — parity-proven | — (already the production path) |
-| P0-6 | `@corporax/monitor` service (solvency + lifecycle alerts, webhook sink) | point at a prod RPC; wire the alert channel |
+| P0-6 | `@parvalon/monitor` service (solvency + lifecycle alerts, webhook sink) | point at a prod RPC; wire the alert channel |
 | P0-7/P0-8 | `scripts/drills.sh`, `scripts/deploy-and-verify.sh`, [DEPLOY.md](./DEPLOY.md) | run on the target chain |
 | P1-1/P1-2 | `subgraph/` (codegen+build pass) + Allium SQL; CLI `--pin-ipfs` | host a Graph node / pin to a real IPFS provider |
 | P1-3/P1-5 | CLI `--exclude`/`--exclude-file`, `--withholding-bps` + metadata schema | issuer supplies exclusion list + withholding policy |
-| P1-6 | `@corporax/sdk` (typed reads/writes + CAE-1 watchers, 30 tests) | publish to npm |
+| P1-6 | `@parvalon/sdk` (typed reads/writes + CAE-1 watchers, 30 tests) | publish to npm |
 | P1-9 | `scripts/onboard-issuer.sh` + [ONBOARDING.md](./ONBOARDING.md) | run per issuer |
 | P2-1 | `SplitAdjuster` library + `SplitAwareCollateral` example | integrators adopt |
 | P2-2/P2-3 | [eip-cae1.md](./eip/eip-cae1.md) draft; `examples/agent` (x402 narrative) | submit to Ethereum Magicians |
@@ -147,7 +147,7 @@ Strong fits for Certora/SMT or expanded foundry invariants:
 
 ## 7. Tax / compliance metadata (P1-5)
 
-CorporaX provides *mechanism*, not legal compliance (PRD §3.2). Production adds standardized `metadataURI` fields for withholding rate, jurisdiction, ex-/record-/pay-dates, and tax classification; optionally a net-of-withholding payout with a withholding sink address. KYC/AML and legal determinations remain the issuer's responsibility; the protocol exposes the hooks to support them.
+Parvalon provides *mechanism*, not legal compliance (PRD §3.2). Production adds standardized `metadataURI` fields for withholding rate, jurisdiction, ex-/record-/pay-dates, and tax classification; optionally a net-of-withholding payout with a withholding sink address. KYC/AML and legal determinations remain the issuer's responsibility; the protocol exposes the hooks to support them.
 
 ## 8. Definition of "production-ready"
 

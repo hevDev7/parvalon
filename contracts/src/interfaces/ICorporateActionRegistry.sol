@@ -4,7 +4,7 @@ pragma solidity 0.8.26;
 import { ActionStatus, ActionType, ActionView, CorporateAction } from "../libraries/CorporateActionTypes.sol";
 
 /// @title ICorporateActionRegistry
-/// @author CorporaX
+/// @author Parvalon
 /// @notice The on-chain ledger of corporate actions for tokenized stocks. This
 ///         is the authoritative source of an action's identity, key dates, Merkle
 ///         root and lifecycle status. The {IDividendDistributor} reads from it and

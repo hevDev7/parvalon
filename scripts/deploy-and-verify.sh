@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# CorporaX — reproducible deploy + verify + signed manifest (P0-8).
+# Parvalon — reproducible deploy + verify + signed manifest (P0-8).
 #
 # WHAT IT DOES
 #   1. Pins the Foundry toolchain (fails unless the running forge matches

@@ -1,4 +1,4 @@
-# CorporaX — Production Deploy Story
+# Parvalon — Production Deploy Story
 
 > End-to-end: **deploy → verify → governance handover → swap to the production
 > action source → monitor → onboard issuers.** Every command is real and uses

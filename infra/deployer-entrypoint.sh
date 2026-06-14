@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # ============================================================================
-# infra/deployer-entrypoint.sh — one-shot CorporaX bootstrapper.
+# infra/deployer-entrypoint.sh — one-shot Parvalon bootstrapper.
 #
 # Used by the `deployer` service in docker-compose.yml. It:
 #   1. waits until the anvil RPC is accepting requests,

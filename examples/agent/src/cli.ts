@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * CorporaX example agent CLI.
+ * Parvalon example agent CLI.
  *
  * Commands:
  *   watch   Subscribe to the registry's ActionAnnounced (CAE-1) and print a
@@ -121,7 +121,7 @@ async function runDemo(): Promise<void> {
   const tsla = getAddress("0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512");
   const holdings: Holdings = { [tsla.toLowerCase()]: 14n * 10n ** 18n };
 
-  out("CorporaX example agent — DEMO (synthetic events, no chain)");
+  out("Parvalon example agent — DEMO (synthetic events, no chain)");
   out(`book: holding 14 TSLA (${tsla})`);
 
   for (const event of syntheticEvents(tsla)) {

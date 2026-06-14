@@ -187,7 +187,7 @@ Explorer:      ${EXPLORER}`}</Code>
             <p>Run the dApp locally against the live deployment (zero config — the chain defaults to {CHAIN_ID}):</p>
             <Code lang="bash">{`git clone ${GITHUB}.git && cd parvalon
 npm install
-npm -w @corporax/app run dev   # http://localhost:3000`}</Code>
+npm -w @parvalon/app run dev   # http://localhost:3000`}</Code>
           </Section>
 
           {/* ---------------------------------------------------- Architecture */}
@@ -311,12 +311,12 @@ npm -w @corporax/app run dev   # http://localhost:3000`}</Code>
           {/* ---------------------------------------------------- Snapshot */}
           <Section id="snapshot" kicker="08 — Deterministic & verifiable" title="Snapshot & Merkle proofs.">
             <p>
-              The off-chain CLI (<Mono>@corporax/snapshot</Mono>) reconstructs every holder&apos;s balance at the record
+              The off-chain CLI (<Mono>@parvalon/snapshot</Mono>) reconstructs every holder&apos;s balance at the record
               block from <Mono>Transfer</Mono> logs, computes pro-rata payouts, and builds an OpenZeppelin{" "}
               <Mono>StandardMerkleTree</Mono>. Two runs over the same chain state yield an identical root — anyone can
               re-derive and verify it.
             </p>
-            <Code lang="bash">{`npm -w @corporax/snapshot run start -- snapshot \\
+            <Code lang="bash">{`npm -w @parvalon/snapshot run start -- snapshot \\
   --rpc ${RPC} \\
   --token <STOCK_ADDRESS> \\
   --record-block <L2_BLOCK> \\
@@ -420,10 +420,10 @@ event PublishedActionCancelled(uint256 indexed id, address indexed issuer, uint2
           {/* ---------------------------------------------------- SDK */}
           <Section id="sdk" kicker="13 — Typed client" title="TypeScript SDK.">
             <p>
-              <Mono>@corporax/sdk</Mono> ships typed reads/writes, Merkle helpers, and CAE-1 event watchers built on
+              <Mono>@parvalon/sdk</Mono> ships typed reads/writes, Merkle helpers, and CAE-1 event watchers built on
               viem — so integrators don&apos;t hand-roll calldata or ABIs.
             </p>
-            <Code lang="typescript">{`import { createParvalonClient, leaf, buildTree } from "@corporax/sdk";
+            <Code lang="typescript">{`import { createParvalonClient, leaf, buildTree } from "@parvalon/sdk";
 
 const client = createParvalonClient({ chainId: ${CHAIN_ID}, transport: http("${RPC}") });
 

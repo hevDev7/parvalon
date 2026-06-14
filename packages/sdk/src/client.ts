@@ -1,5 +1,5 @@
 /**
- * `CorporaXClient` — the high-level façade that wires reads, writes, event
+ * `ParvalonClient` — the high-level façade that wires reads, writes, event
  * watchers and the claim path together from a single config object.
  *
  * Construct it with `{ chain, addresses, publicClient, walletClient? }`. Reads
@@ -20,7 +20,7 @@ import type {
   Address,
   ClaimedEvent,
   CorporateAction,
-  CorporaXAddresses,
+  ParvalonAddresses,
   EligibleClaim,
   FundedEvent,
   MerkleRootPublishedEvent,
@@ -35,25 +35,25 @@ import type {
 import type { TxOptions } from "./writes.js";
 import type { EventHandler, Unwatch } from "./events.js";
 
-/** Constructor config for {@link CorporaXClient}. */
-export interface CorporaXClientConfig {
+/** Constructor config for {@link ParvalonClient}. */
+export interface ParvalonClientConfig {
   /** The viem chain (e.g. from `./chains`). Informational / convenience. */
   readonly chain: Chain;
   /** Registry + Distributor addresses (e.g. from a deployments/<id>.json). */
-  readonly addresses: CorporaXAddresses;
+  readonly addresses: ParvalonAddresses;
   /** Required — backs all reads and event watchers. */
   readonly publicClient: PublicClient;
   /** Optional — required only for write helpers. */
   readonly walletClient?: WalletClient;
 }
 
-export class CorporaXClient {
+export class ParvalonClient {
   readonly chain: Chain;
-  readonly addresses: CorporaXAddresses;
+  readonly addresses: ParvalonAddresses;
   readonly publicClient: PublicClient;
   readonly walletClient: WalletClient | undefined;
 
-  constructor(config: CorporaXClientConfig) {
+  constructor(config: ParvalonClientConfig) {
     this.chain = config.chain;
     this.addresses = config.addresses;
     this.publicClient = config.publicClient;
@@ -64,7 +64,7 @@ export class CorporaXClient {
   private requireWallet(): WalletClient {
     if (!this.walletClient) {
       throw new Error(
-        "CorporaXClient: this operation needs a walletClient — construct with one",
+        "ParvalonClient: this operation needs a walletClient — construct with one",
       );
     }
     return this.walletClient;

@@ -1,9 +1,9 @@
-# @corporax/sdk
+# @parvalon/sdk
 
-Typed **TypeScript / viem client** for the CorporaX corporate-actions &
+Typed **TypeScript / viem client** for the Parvalon corporate-actions &
 dividend protocol on Robinhood Chain (Arbitrum Orbit L2). Integrators get
 read/write helpers, CAE-1 event watchers, the canonical Merkle claim builder,
-and a high-level `CorporaXClient` — so you **never hand-roll calldata or decode
+and a high-level `ParvalonClient` — so you **never hand-roll calldata or decode
 event logs** yourself.
 
 Conforms exactly to [`docs/INTEGRATION.md`](../../docs/INTEGRATION.md): the enums,
@@ -37,7 +37,7 @@ and after any contract/ABI change you should re-run it to stay in lock-step.
 ```ts
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { CorporaXClient, localAnvil } from "@corporax/sdk";
+import { ParvalonClient, localAnvil } from "@parvalon/sdk";
 import deployment from "../../deployments/31337.json" assert { type: "json" };
 
 const publicClient = createPublicClient({ chain: localAnvil, transport: http() });
@@ -47,7 +47,7 @@ const walletClient = createWalletClient({
   transport: http(),
 });
 
-const cx = new CorporaXClient({
+const cx = new ParvalonClient({
   chain: localAnvil,
   addresses: { registry: deployment.registry, distributor: deployment.distributor },
   publicClient,
@@ -79,7 +79,7 @@ anyone may submit, funds always go to `account`. Given a `corporax-merkle-v1`
 artifact, the SDK resolves the holder's entry and submits the claim:
 
 ```ts
-import { parseProofsFile } from "@corporax/sdk";
+import { parseProofsFile } from "@parvalon/sdk";
 import proofsJson from "../../deployments/proofs-31337-1.json" assert { type: "json" };
 
 const proofs = parseProofsFile(proofsJson);           // validates the format
@@ -88,7 +88,7 @@ const proofs = parseProofsFile(proofsJson);           // validates the format
 const hash = await cx.claimForAccount(proofs, holder);
 
 // …or resolve first, then submit (e.g. to inspect the EligibleClaim):
-import { eligibleClaimFor } from "@corporax/sdk";
+import { eligibleClaimFor } from "@parvalon/sdk";
 const eligible = eligibleClaimFor(proofs, holder);    // EligibleClaim | undefined
 if (eligible) await cx.claimFromEligible(eligible);
 ```
@@ -96,7 +96,7 @@ if (eligible) await cx.claimFromEligible(eligible);
 ### Verifying a proof off-chain
 
 ```ts
-import { verifyProof, canonicalLeaf } from "@corporax/sdk";
+import { verifyProof, canonicalLeaf } from "@parvalon/sdk";
 
 // Same rule as the contract: double-hashed leaf + sorted-pair keccak256 fold.
 const ok = verifyProof(proofs.merkleRoot, 1n, 0n, holder, amount, proof);
@@ -108,7 +108,7 @@ const leaf = canonicalLeaf(1n, 0n, holder, amount); // keccak256(concat(keccak25
 ## Issuer flow — announce, fund, publish, sweep
 
 ```ts
-import { ActionType } from "@corporax/sdk";
+import { ActionType } from "@parvalon/sdk";
 
 // 1. Announce a cash dividend.
 await cx.announceAction({
@@ -159,7 +159,7 @@ cx.watchUnclaimedSwept((e) => { /* UnclaimedSweptEvent */ });
 Decoding a single raw log (e.g. from a receipt) without a watcher:
 
 ```ts
-import { decodeClaimed } from "@corporax/sdk";
+import { decodeClaimed } from "@parvalon/sdk";
 const event = decodeClaimed({ topics: log.topics, data: log.data });
 ```
 
@@ -170,7 +170,7 @@ const event = decodeClaimed({ topics: log.topics, data: log.data });
 The class is sugar over standalone functions — use them directly if you prefer:
 
 ```ts
-import { getAction, claim, watchClaimed, claimCalldata } from "@corporax/sdk";
+import { getAction, claim, watchClaimed, claimCalldata } from "@parvalon/sdk";
 
 await getAction(publicClient, registry, 1n);
 await claim(walletClient, distributor, { id: 1n, index: 0n, account, amount, proof });
@@ -192,7 +192,7 @@ const data = claimCalldata({ id: 1n, index: 0n, account, amount, proof }); // 0x
 import {
   ActionType, ActionStatus,
   actionTypeName, actionStatusName,
-} from "@corporax/sdk";
+} from "@parvalon/sdk";
 
 ActionType.CASH_DIVIDEND;            // 0
 ActionStatus.CLAIMABLE;              // 2
@@ -215,7 +215,7 @@ actionTypeName(0);                   // "CASH_DIVIDEND"
   tampered amount is rejected).
 - `src/events.test.ts` — every CAE-1 decoder round-trips a synthesised log.
 - `src/encode.test.ts` — calldata encoders decode back to the right call;
-  read/write helpers and `CorporaXClient` drive mock viem clients.
+  read/write helpers and `ParvalonClient` drive mock viem clients.
 
 ```bash
 npm test
@@ -236,7 +236,7 @@ npm test
 
 ---
 
-## Releasing (`@corporax/sdk` → npm)
+## Releasing (`@parvalon/sdk` → npm)
 
 Publishing is automated by [`.github/workflows/release-sdk.yml`](../../.github/workflows/release-sdk.yml).
 
@@ -250,7 +250,7 @@ Publishing is automated by [`.github/workflows/release-sdk.yml`](../../.github/w
 **Cut a release**
 
 ```bash
-npm version patch -w @corporax/sdk    # bump (or minor / major)
+npm version patch -w @parvalon/sdk    # bump (or minor / major)
 V=$(node -p "require('./packages/sdk/package.json').version")
 git commit -am "sdk: v$V" && git tag "sdk-v$V" && git push origin "sdk-v$V"
 ```

@@ -2,7 +2,7 @@
 pragma solidity 0.8.26;
 
 /// @title IDividendDistributor
-/// @author CorporaX
+/// @author Parvalon
 /// @notice Holds and pays out cash dividends for actions recorded in the
 ///         {ICorporateActionRegistry}. Funding moves an action to CLAIMABLE;
 ///         holders (or anyone acting on their behalf) then claim pro-rata USDG

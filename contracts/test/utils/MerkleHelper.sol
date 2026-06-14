@@ -4,7 +4,7 @@ pragma solidity 0.8.26;
 /// @title MerkleHelper
 /// @notice Test-only Merkle tree builder that is byte-for-byte compatible with
 ///         OpenZeppelin's {MerkleProof.verify}: pairs are hashed commutatively
-///         (sorted) with keccak256, matching the on-chain verification CorporaX
+///         (sorted) with keccak256, matching the on-chain verification Parvalon
 ///         uses. Odd nodes are promoted unchanged to the next level.
 /// @dev This intentionally mirrors the *verification* rule, not the exact JS
 ///      `StandardMerkleTree` internal layout — any self-consistent construction
@@ -17,7 +17,7 @@ library MerkleHelper {
         return a < b ? keccak256(abi.encodePacked(a, b)) : keccak256(abi.encodePacked(b, a));
     }
 
-    /// @notice CorporaX leaf: double-keccak of abi.encode(id, index, account, amount).
+    /// @notice Parvalon leaf: double-keccak of abi.encode(id, index, account, amount).
     function leaf(uint256 id, uint256 index, address account, uint256 amount) internal pure returns (bytes32) {
         return keccak256(bytes.concat(keccak256(abi.encode(id, index, account, amount))));
     }

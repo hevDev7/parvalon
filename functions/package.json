@@ -1,8 +1,8 @@
 {
-  "name": "@corporax/functions-don",
+  "name": "@parvalon/functions-don",
   "version": "1.0.0",
   "private": true,
-  "description": "Chainlink Functions source that attests CorporaX corporate actions against a market-data vendor (P0-4).",
+  "description": "Chainlink Functions source that attests Parvalon corporate actions against a market-data vendor (P0-4).",
   "license": "MIT",
   "scripts": {
     "test": "node simulate.mjs",

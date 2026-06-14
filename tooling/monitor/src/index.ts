@@ -1,5 +1,5 @@
 /**
- * Public API of `@corporax/monitor`.
+ * Public API of `@parvalon/monitor`.
  *
  * Importers (tests, dashboards, other tooling) should pull from here rather than
  * reaching into modules. The pure checks in `checks.ts` are the reusable core;

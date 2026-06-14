@@ -1,5 +1,5 @@
 # ============================================================================
-# CorporaX — developer task runner.
+# Parvalon — developer task runner.
 #
 # Thin, discoverable wrappers over the real toolchain (forge / npm / docker
 # compose). Run `make help` for the list. Targets assume Foundry + Node 20 +
@@ -20,7 +20,7 @@ RPC_URL   ?= http://127.0.0.1:8545
 
 .PHONY: help
 help: ## Show this help.
-	@echo "CorporaX make targets:"
+	@echo "Parvalon make targets:"
 	@grep -hE '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) \
 	  | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
 
@@ -79,8 +79,8 @@ seed-local: ## Announce + fund a demo CLAIMABLE dividend and write proofs.json.
 	forge script script/Seed.s.sol:Seed --root $(CONTRACTS) --rpc-url $(RPC_URL) --broadcast
 
 .PHONY: snapshot
-snapshot: ## Run the off-chain Merkle snapshot CLI (@corporax/snapshot). Pass args via ARGS=...
-	npm -w @corporax/snapshot run start -- $(ARGS)
+snapshot: ## Run the off-chain Merkle snapshot CLI (@parvalon/snapshot). Pass args via ARGS=...
+	npm -w @parvalon/snapshot run start -- $(ARGS)
 
 # ---- Docker ----------------------------------------------------------------
 

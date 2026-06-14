@@ -1,4 +1,4 @@
-# Dependabot keeps CorporaX dependencies patched.
+# Dependabot keeps Parvalon dependencies patched.
 #
 # Coverage:
 #   - npm          : the root workspace (app + tooling/snapshot share one lockfile).

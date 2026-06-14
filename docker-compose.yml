@@ -1,5 +1,5 @@
 # ============================================================================
-# docker-compose.yml — full local CorporaX stack.
+# docker-compose.yml — full local Parvalon stack.
 #
 #   anvil     → local L2 devnet (chainId 31337, deterministic accounts)
 #   deployer  → one-shot: waits for anvil, runs Deploy.s.sol + Seed.s.sol,

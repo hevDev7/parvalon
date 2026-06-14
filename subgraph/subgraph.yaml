@@ -1,4 +1,4 @@
-# CorporaX subgraph manifest — indexes CAE-1 events (INTEGRATION.md §3).
+# Parvalon subgraph manifest — indexes CAE-1 events (INTEGRATION.md §3).
 #
 # Address / startBlock / network are driven by networks.json, NOT hard-coded:
 #   graph build  --network <robinhood|arbitrum-sepolia|local>
@@ -13,7 +13,7 @@
 # Robinhood Chain (46630) needs a self-hosted Graph Node configured for that
 # chain (Studio does not list it). See README.md "Networks" + "Deploy".
 specVersion: 1.0.0
-description: CorporaX — corporate-actions & dividend index for tokenized stocks on Robinhood Chain (Arbitrum Orbit L2).
+description: Parvalon — corporate-actions & dividend index for tokenized stocks on Robinhood Chain (Arbitrum Orbit L2).
 repository: https://github.com/corporax/arbitrum
 schema:
   file: ./schema.graphql

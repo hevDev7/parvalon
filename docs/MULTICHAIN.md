@@ -1,6 +1,6 @@
-# CorporaX — Multichain Deploy & Deployment Registry
+# Parvalon — Multichain Deploy & Deployment Registry
 
-> Per-chain deployment and the on-disk registry layout. CorporaX targets three
+> Per-chain deployment and the on-disk registry layout. Parvalon targets three
 > chains ([INTEGRATION §8](./INTEGRATION.md#8-chains)); the same bytecode deploys
 > to each, and `deployments/chains.json` is the machine-readable map that tooling
 > resolves a chain by. Pair with [DEPLOY.md](./DEPLOY.md).

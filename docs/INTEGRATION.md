@@ -1,4 +1,4 @@
-# CorporaX — Integration Contract (FROZEN)
+# Parvalon — Integration Contract (FROZEN)
 
 > Single source of truth for cross-package integration. Every package (contracts,
 > snapshot CLI, frontend, indexer, infra) MUST conform to the names, shapes and

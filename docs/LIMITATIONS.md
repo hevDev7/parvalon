@@ -1,6 +1,6 @@
-# CorporaX — Limitations (v1)
+# Parvalon — Limitations (v1)
 
-> An honest accounting of what CorporaX v1 does **not** do, and why each
+> An honest accounting of what Parvalon v1 does **not** do, and why each
 > simplification is the right call for this stage. Engineering honesty is a
 > feature: every limitation below is deliberate, scoped, and has a written
 > production path in [PRODUCTION-READINESS.md](./PRODUCTION-READINESS.md).
@@ -11,9 +11,9 @@
 
 ## 1. Splits are informational, not rebasing
 
-`STOCK_SPLIT` and `STOCK_DIVIDEND` are recorded as **informational** actions — a standardized CAE-1 event plus a ratio in metadata — and flow **no value**. CorporaX does not rebase or reissue the underlying token.
+`STOCK_SPLIT` and `STOCK_DIVIDEND` are recorded as **informational** actions — a standardized CAE-1 event plus a ratio in metadata — and flow **no value**. Parvalon does not rebase or reissue the underlying token.
 
-**Why acceptable.** We deliberately do not control the Robinhood TSLA/AMZN token contracts (design decision D2), so we *cannot* rebase them — and a true rebase isn't what integrators actually need. A lending market or AMM needs a **trustworthy signal and ratio** to adjust collateral factors and oracle scaling at the record block; CorporaX provides exactly that. Pretending to rebase a token we don't own would be dishonest engineering. In-kind execution via an optional wrapper vault + `SplitAdjuster` library is roadmap (P2-1).
+**Why acceptable.** We deliberately do not control the Robinhood TSLA/AMZN token contracts (design decision D2), so we *cannot* rebase them — and a true rebase isn't what integrators actually need. A lending market or AMM needs a **trustworthy signal and ratio** to adjust collateral factors and oracle scaling at the record block; Parvalon provides exactly that. Pretending to rebase a token we don't own would be dishonest engineering. In-kind execution via an optional wrapper vault + `SplitAdjuster` library is roadmap (P2-1).
 
 ## 2. The action oracle is issuer-fed (D3)
 
@@ -47,7 +47,7 @@ The payout math assumes the **asset has `1e18` units** (`amount = balance * rate
 
 ## 7. No L1 finality assumptions
 
-CorporaX makes no assumptions about Arbitrum → L1 finality or withdrawal timing. Record-date semantics are enforced on the **L2 block number**: `publishRoot` compares `recordBlock` against `ArbSys.arbBlockNumber()` on Arbitrum/Orbit — the same L2 height the snapshot tooling (`eth_getLogs` / `eth_blockNumber`) reads — and falls back to `block.number` on non-Arbitrum chains (local anvil). This matters because the raw EVM `block.number` on Orbit is the **L1** block number; reading ArbSys is what keeps the on-chain guard and the off-chain snapshot on the same clock (otherwise `publishRoot` would be unsatisfiable).
+Parvalon makes no assumptions about Arbitrum → L1 finality or withdrawal timing. Record-date semantics are enforced on the **L2 block number**: `publishRoot` compares `recordBlock` against `ArbSys.arbBlockNumber()` on Arbitrum/Orbit — the same L2 height the snapshot tooling (`eth_getLogs` / `eth_blockNumber`) reads — and falls back to `block.number` on non-Arbitrum chains (local anvil). This matters because the raw EVM `block.number` on Orbit is the **L1** block number; reading ArbSys is what keeps the on-chain guard and the off-chain snapshot on the same clock (otherwise `publishRoot` would be unsatisfiable).
 
 **Why acceptable.** The protocol settles entirely on L2 in L2-native USDG; there is no cross-domain message, no bridging of dividend funds, and therefore no dependence on the L1 dispute/finality window. Reorg-safe snapshotting at depth is an operational practice (PRODUCTION-READINESS §5), not a protocol assumption. Keeping the protocol L1-finality-agnostic is what lets it deploy unchanged across anvil, Sepolia, and Robinhood Chain.
 

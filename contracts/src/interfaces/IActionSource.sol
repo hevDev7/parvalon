@@ -2,7 +2,7 @@
 pragma solidity 0.8.26;
 
 /// @title IActionSource
-/// @author CorporaX
+/// @author Parvalon
 /// @notice The pluggable "source of truth" seam for corporate-action data.
 /// @dev This is design decision D3 from the PRD made concrete. In a real
 ///      transfer-agent stack the *authenticity* of a corporate action originates

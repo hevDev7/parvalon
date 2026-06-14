@@ -4,7 +4,7 @@
 
 > Built on **Robinhood Chain** (Arbitrum Orbit L2) for the Arbitrum Open House London Buildathon.
 
-> **Naming.** This project was renamed **CorporaX → Parvalon**, and the brand migration is in progress. The npm workspace scope (`@corporax/*`), the in-source identifiers, the remaining `docs/` files, and the `PRD-CorporaX.md` filename still read `corporax` — so the package names, file paths, and commands below are shown exactly as they resolve in the repo today. The UI and this README use the new name; the rest is renamed in a follow-up pass.
+> **Naming.** This project was renamed **Parvalon → Parvalon**, and the brand migration is in progress. The npm workspace scope (`@parvalon/*`), the in-source identifiers, the remaining `docs/` files, and the `PRD-Parvalon.md` filename still read `corporax` — so the package names, file paths, and commands below are shown exactly as they resolve in the repo today. The UI and this README use the new name; the rest is renamed in a follow-up pass.
 
 ---
 
@@ -142,14 +142,14 @@ The Merkle root is **deterministic and independently verifiable**: two runs of t
 
 ## Monorepo map
 
-> Package names are shown as they currently resolve in the repo (`@corporax/*`); the scope rename to Parvalon is part of the pending brand migration noted above.
+> Package names are shown as they currently resolve in the repo (`@parvalon/*`); the scope rename to Parvalon is part of the pending brand migration noted above.
 
 | Path | What |
 |---|---|
 | `contracts/` | Foundry protocol — `CorporateActionRegistry`, `DividendDistributor`, `AdminActionSource` + `FunctionsActionSource` (D3 seam), `SplitAdjuster` lib, `TimelockController` governance, mocks, **81 tests**, deploy/seed/governance scripts |
 | `tooling/snapshot/` | TypeScript (viem) deterministic Merkle snapshot CLI — exclusion lists, withholding, IPFS pinning |
-| `tooling/monitor/` | `@corporax/monitor` — solvency-invariant + lifecycle alerting service |
-| `packages/sdk/` | `@corporax/sdk` — typed client (reads/writes + CAE-1 watchers) for integrators |
+| `tooling/monitor/` | `@parvalon/monitor` — solvency-invariant + lifecycle alerting service |
+| `packages/sdk/` | `@parvalon/sdk` — typed client (reads/writes + CAE-1 watchers) for integrators |
 | `app/` | Next.js 14 dApp — `/claim`, `/issuer`, `/feed`, `/api/actions`, plus a live **TradingView coverage ticker** of the underlying equity prices |
 | `subgraph/` | The Graph subgraph indexing CAE-1 events (+ Allium SQL) |
 | `examples/agent/` | Example dividend-aware AI agent consuming CAE-1 (x402 narrative) |
@@ -202,7 +202,7 @@ The Merkle root is **deterministic and independently verifiable**: two runs of t
 | [eip/eip-cae1.md](docs/eip/eip-cae1.md) | Draft EIP for the **CAE-1** Corporate Action Events standard. |
 | [LIMITATIONS.md](docs/LIMITATIONS.md) | Honest current limitations and why each is acceptable for v1. |
 | [DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) | The <3-minute demo video script, mapped to the working flow. |
-| [PRD-CorporaX.md](PRD-CorporaX.md) | Product requirements — scope, priorities, decision log. *(Filename retains the former name pending the code rename.)* |
+| [PRD-Parvalon.md](PRD-Parvalon.md) | Product requirements — scope, priorities, decision log. *(Filename retains the former name pending the code rename.)* |
 
 ## Design principles
 

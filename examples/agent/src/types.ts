@@ -1,5 +1,5 @@
 /**
- * Shared types & enumerations for the CorporaX example agent.
+ * Shared types & enumerations for the Parvalon example agent.
  *
  * The enum values are FROZEN by INTEGRATION.md §2 and docs/eip/eip-cae1.md.
  * Keep them numeric (the wire encoding is uint8) and expose name lookups for

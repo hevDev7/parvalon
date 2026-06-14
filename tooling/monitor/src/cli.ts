@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * `corporax-monitor` — the CorporaX monitoring & alerting service (P0-6).
+ * `corporax-monitor` — the Parvalon monitoring & alerting service (P0-6).
  *
  * Commands:
  *
@@ -71,7 +71,7 @@ function overridesFrom(opts: Record<string, unknown>): CliOverrides {
 const program = new Command();
 program
   .name("corporax-monitor")
-  .description("Monitoring & alerting for the CorporaX corporate-actions protocol.")
+  .description("Monitoring & alerting for the Parvalon corporate-actions protocol.")
   .version("1.0.0");
 
 const shared = (c: Command): Command =>

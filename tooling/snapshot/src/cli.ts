@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * `corporax-snapshot` — the CorporaX Merkle snapshot CLI.
+ * `corporax-snapshot` — the Parvalon Merkle snapshot CLI.
  *
  * Two commands:
  *
@@ -130,7 +130,7 @@ const program = new Command();
 program
   .name("corporax-snapshot")
   .description(
-    "Deterministic Merkle snapshot generator for CorporaX corporate actions.",
+    "Deterministic Merkle snapshot generator for Parvalon corporate actions.",
   )
   .version("1.0.0");
 

@@ -1,6 +1,6 @@
-# CorporaX — Threat Model
+# Parvalon — Threat Model
 
-> A STRIDE-style analysis of the CorporaX protocol as built. Every mitigation is
+> A STRIDE-style analysis of the Parvalon protocol as built. Every mitigation is
 > mapped to a concrete contract control or test. Scope is the on-chain protocol
 > (`CorporateActionRegistry`, `DividendDistributor`, `AdminActionSource`) plus the
 > snapshot/frontend trust boundaries. See [ARCHITECTURE.md](./ARCHITECTURE.md) for

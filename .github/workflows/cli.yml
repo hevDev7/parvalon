@@ -1,5 +1,5 @@
 # TypeScript workspaces CI — typechecks and tests every npm workspace:
-#   @corporax/sdk, @corporax/snapshot, @corporax/monitor, @corporax/example-agent
+#   @parvalon/sdk, @parvalon/snapshot, @parvalon/monitor, @parvalon/example-agent
 # (and the Next.js app's typecheck). The snapshot CLI produces the canonical
 # corporax-merkle-v1 proofs.json whose leaf encoding is frozen in
 # docs/INTEGRATION.md §4-5; its parity test asserts JS↔Solidity equivalence.

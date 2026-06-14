@@ -15,7 +15,7 @@ export const wagmiConfig = createConfig({
   chains: [robinhoodTestnet, arbitrumSepolia, anvil],
   connectors: [
     injected({ shimDisconnect: true }),
-    coinbaseWallet({ appName: "CorporaX", preference: "all" }),
+    coinbaseWallet({ appName: "Parvalon", preference: "all" }),
     ...(wcProjectId ? [walletConnect({ projectId: wcProjectId, showQrModal: true })] : []),
   ],
   transports: {

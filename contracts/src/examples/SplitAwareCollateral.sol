@@ -6,9 +6,9 @@ import { ActionType, CorporateAction } from "../libraries/CorporateActionTypes.s
 import { SplitAdjuster } from "../libraries/SplitAdjuster.sol";
 
 /// @title SplitAwareCollateral
-/// @author CorporaX
+/// @author Parvalon
 /// @notice Reference integration showing how a lending market / collateral oracle
-///         consumes a CorporaX `STOCK_SPLIT` signal to keep its valuation correct.
+///         consumes a Parvalon `STOCK_SPLIT` signal to keep its valuation correct.
 ///         Without this, a 4-for-1 split would silently 4× the share count while
 ///         the protocol still priced each share at the pre-split level — a real,
 ///         systemic mispricing of tokenized-stock collateral.

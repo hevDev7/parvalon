@@ -8,7 +8,7 @@ import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol"
 import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 
 /// @title CorporateActionRegistry
-/// @author CorporaX
+/// @author Parvalon
 /// @notice Immutable on-chain ledger for corporate actions on tokenized stocks.
 ///         It records announcements, enforces record-date semantics, stores the
 ///         snapshot Merkle root, and is the single authority over an action's

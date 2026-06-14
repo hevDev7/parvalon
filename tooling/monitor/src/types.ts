@@ -1,5 +1,5 @@
 /**
- * Shared types for `@corporax/monitor`.
+ * Shared types for `@parvalon/monitor`.
  *
  * These describe the protocol's on-chain shapes (as read via the FROZEN ABIs in
  * `abis/index.ts`) plus the monitor's own alert/severity model. Anything that

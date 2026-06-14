@@ -1,7 +1,7 @@
 // =============================================================================
-// CorporaX — Chainlink Functions source (the script the DON runs off-chain)
+// Parvalon — Chainlink Functions source (the script the DON runs off-chain)
 //
-// Purpose: independently verify that a corporate action a CorporaX issuer is about
+// Purpose: independently verify that a corporate action a Parvalon issuer is about
 // to announce on-chain is AUTHENTIC according to a licensed market-data vendor,
 // and return a single boolean verdict.
 //
@@ -41,12 +41,12 @@ const RATE_TOLERANCE = 0.005; // half a cent per share
 const ONE = 1000000000000000000n; // 1e18
 
 function notAuthentic(reason) {
-  console.log(`CorporaX attestation: NOT authentic — ${reason}`);
+  console.log(`Parvalon attestation: NOT authentic — ${reason}`);
   return Functions.encodeUint256(0);
 }
 
 function authentic() {
-  console.log("CorporaX attestation: authentic");
+  console.log("Parvalon attestation: authentic");
   return Functions.encodeUint256(1);
 }
 

@@ -1,4 +1,4 @@
-# CorporaX — Disaster Recovery
+# Parvalon — Disaster Recovery
 
 > How to restore the **operational picture** purely from on-chain state plus
 > committed artifacts — re-derive proofs, re-pin to IPFS, rebuild the indexer —
@@ -105,7 +105,7 @@ Loss or compromise of a privileged key. Severity depends on the key class
 Compromise = gas griefing only (claim-on-behalf always pays `account`). Steps:
 1. **Disable** the KMS key (`aws kms disable-key`) — stops new signatures now.
 2. Drain/cap the relayer balance; rotate to a new KMS key id; redeploy relayer config.
-3. No on-chain change to CorporaX needed. Resume gasless claims.
+3. No on-chain change to Parvalon needed. Resume gasless claims.
 
 ### 4b. Issuer key
 Can fund/sweep/announce for its asset; cannot touch user claims. Steps:

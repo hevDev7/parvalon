@@ -1,5 +1,5 @@
 /**
- * Shared types for the CorporaX snapshot CLI.
+ * Shared types for the Parvalon snapshot CLI.
  *
  * The on-the-wire JSON shapes here are FROZEN by docs/INTEGRATION.md §4–§5
  * ("corporax-merkle-v1"). Field names, ordering of the leaf encoding, and the
@@ -94,7 +94,7 @@ export interface ClaimEntry {
  * to — e.g. `ipfs://<cid>`). This is the MECHANISM-level contract only: it
  * documents the fields tooling reads/writes so issuer feeds, the snapshot tool,
  * and the frontend agree on shape. Anything legal/KYC/jurisdictional in here is
- * asserted BY THE ISSUER — CorporaX neither validates nor enforces it.
+ * asserted BY THE ISSUER — Parvalon neither validates nor enforces it.
  *
  * All fields are optional so partial issuer metadata is still well-formed.
  */

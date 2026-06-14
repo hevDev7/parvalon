@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# CorporaX — emergency DRILLS (P0-7). cast-based incident playbook.
+# Parvalon — emergency DRILLS (P0-7). cast-based incident playbook.
 #
 # Exercises the live emergency controls against a deployment and VERIFIES each
 # step, so a drill that silently fails to take effect exits non-zero:

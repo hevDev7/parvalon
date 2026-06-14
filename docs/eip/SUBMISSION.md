@@ -24,7 +24,7 @@ in-repo draft ─▶ Ethereum Magicians thread ─▶ PR to ethereum/EIPs ─▶
 - [x] **`title`** ≤ 44 chars, no EIP number, no the words "standard"/"interface"/"ERC".
       → "Corporate Action Events" (23).
 - [x] **`description`** ≤ 140 chars, no title duplication. → 131 chars.
-- [x] **`author`** in `Name (@github)` or `Name <email>` form. → `CorporaX (@corporax)`.
+- [x] **`author`** in `Name (@github)` or `Name <email>` form. → `Parvalon (@corporax)`.
 - [x] **Required sections** in order: Abstract, Motivation, Specification, Rationale,
       Backwards Compatibility, Reference Implementation (optional for Final but present),
       Security Considerations, Copyright.

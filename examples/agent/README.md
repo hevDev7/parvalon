@@ -1,6 +1,6 @@
-# @corporax/example-agent
+# @parvalon/example-agent
 
-A runnable example of a **dividend-aware autonomous agent** for CorporaX. It
+A runnable example of a **dividend-aware autonomous agent** for Parvalon. It
 subscribes to the registry's `ActionAnnounced` event (the CAE-1 announcement,
 see [`docs/eip/eip-cae1.md`](../../docs/eip/eip-cae1.md)) and prints
 **strategy decisions** — e.g.
@@ -55,7 +55,7 @@ runs the illustrative x402 flow.
 ## Live subscription
 
 ```bash
-# Against a local anvil with the CorporaX contracts deployed (deployments/31337.json):
+# Against a local anvil with the Parvalon contracts deployed (deployments/31337.json):
 AGENT_HOLDINGS='{"0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512":"14000000000000000000"}' \
   npx tsx src/cli.ts watch
 ```
@@ -121,7 +121,7 @@ The flow it models:
 4. The agent **retries** with an `X-PAYMENT` header proving settlement → server
    verifies and returns `200` + the premium payload.
 
-The natural CorporaX fit: the public `/api/actions` feed is free and
+The natural Parvalon fit: the public `/api/actions` feed is free and
 event-derived, but a value-added provider could gate a low-latency or enriched
 feed (tax lots, ex-date forecasts, cross-venue holdings) behind x402 so the agent
 pays per call, with no API keys or subscriptions.

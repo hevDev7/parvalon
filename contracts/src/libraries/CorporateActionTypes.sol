@@ -2,7 +2,7 @@
 pragma solidity 0.8.26;
 
 /// @title CorporateActionTypes
-/// @author CorporaX
+/// @author Parvalon
 /// @notice Canonical data types shared by the registry, distributor and every
 ///         off-chain consumer (snapshot CLI, indexer, frontend). These types are
 ///         the on-chain half of the **CAE-1** (Corporate Action Events) schema.
@@ -12,7 +12,7 @@ pragma solidity 0.8.26;
 /// @notice The class of corporate action being represented.
 /// @dev `CASH_DIVIDEND` is the only type that flows value through the
 ///      DividendDistributor. `STOCK_SPLIT` / `STOCK_DIVIDEND` are *informational*
-///      actions in v1 (signal + ratio metadata) because CorporaX deliberately
+///      actions in v1 (signal + ratio metadata) because Parvalon deliberately
 ///      does not control the underlying token and therefore cannot rebase it.
 enum ActionType {
     CASH_DIVIDEND, // 0 — pro-rata cash (USDG) distribution, claimable by holders

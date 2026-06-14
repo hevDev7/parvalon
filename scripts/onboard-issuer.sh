@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# CorporaX — issuer onboarding (P1-9). registry.setAssetIssuer(asset, issuer).
+# Parvalon — issuer onboarding (P1-9). registry.setAssetIssuer(asset, issuer).
 #
 # Authorizes `issuer` as the transfer-agent ops account for `asset` (the address
 # allowed to fund/sweep that asset's dividends). Two paths, auto-selected by who

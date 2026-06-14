@@ -5,7 +5,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// @title MockPool
-/// @author CorporaX
+/// @author Parvalon
 /// @notice DEMO-ONLY fixed-rate swap (USDG -> stock) backing the optional
 ///         "claim & reinvest" stretch flow (FR-14). It is NOT an AMM and has no
 ///         price discovery, slippage, or liquidity guarantees. Clearly labeled as

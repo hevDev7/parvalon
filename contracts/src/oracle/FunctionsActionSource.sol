@@ -7,7 +7,7 @@ import { ActionType } from "../libraries/CorporateActionTypes.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title FunctionsActionSource
-/// @author CorporaX
+/// @author Parvalon
 /// @notice Production implementation of the {IActionSource} seam (PRD D3, P0-4):
 ///         corporate-action authenticity is verified off-chain by a **Chainlink
 ///         Functions** DON against a licensed data vendor, and the verdict is

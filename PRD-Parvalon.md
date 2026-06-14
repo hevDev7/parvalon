@@ -1,4 +1,4 @@
-# PRD — CorporaX
+# PRD — Parvalon
 ## Corporate-Actions & Dividend Engine untuk Tokenized Stocks di Robinhood Chain
 
 | | |
@@ -18,7 +18,7 @@
 
 Ada **1.997 tokenized stocks/ETF** di ekosistem Arbitrum (data Robinhood, Des 2025). Tidak satu pun memiliki mekanisme **dividend distribution** atau **corporate actions** yang berjalan on-chain dan machine-readable. Juri Arbitrum Open House NYC secara eksplisit menyebut pemenang mereka mengisi *"the operational services layer that institutional tokenization still lacks"* — dan dividend/corporate actions adalah lapisan operasional paling fundamental yang masih kosong.
 
-**CorporaX** adalah protokol infrastruktur yang memberi tokenized stocks tiga kemampuan yang selama ini hanya ada di sistem transfer agent tradisional: (1) **pengumuman corporate action on-chain** dengan record-date semantics yang benar, (2) **distribusi dividen pro-rata dalam USDG** ke seluruh holder via Merkle-snapshot claim yang gas-efficient, dan (3) **event feed terstandar (draft "CAE-1")** sehingga protokol DeFi dan AI agents bisa bereaksi terhadap corporate actions secara otomatis.
+**Parvalon** adalah protokol infrastruktur yang memberi tokenized stocks tiga kemampuan yang selama ini hanya ada di sistem transfer agent tradisional: (1) **pengumuman corporate action on-chain** dengan record-date semantics yang benar, (2) **distribusi dividen pro-rata dalam USDG** ke seluruh holder via Merkle-snapshot claim yang gas-efficient, dan (3) **event feed terstandar (draft "CAE-1")** sehingga protokol DeFi dan AI agents bisa bereaksi terhadap corporate actions secara otomatis.
 
 MVP hackathon: satu siklus penuh `announce → record snapshot → publish root → fund → claim` untuk cash dividend token TSLA/AMZN di Robinhood Chain testnet, dengan claim flow **gasless berbasis passkey** (ERC-4337 via Alchemy) sebagai lapisan UX pembeda.
 
@@ -49,7 +49,7 @@ Teridentifikasi satu submission di ruang yang sama: **CorpAction Engine** (`gith
 
 Celah yang teramati dari README mereka (verifikasi langsung di H0 sebelum dipakai sebagai claim publik):
 
-| Dimensi | CorpAction Engine | CorporaX |
+| Dimensi | CorpAction Engine | Parvalon |
 |---|---|---|
 | Aset yang dipakai | Demo pada ticker AAPL/NVDA/GOOGL/MSFT/TWTR — bukan stock tokens yang benar-benar ada di testnet (TSLA/AMZN/PLTR/NFLX/AMD) → indikasi mock tokens / closed loop; SplitExecutor mensyaratkan token ber-ERC-8056 (butuh kontrol token) | Berjalan pada **TSLA/AMZN riil milik Robinhood** tanpa modifikasi token (permissionless snapshot) |
 | Bukti E2E | Tx terpublikasi = intent *proposals* + ops admin (pause/resume, configure quorum, attestation); tidak terlihat publish root, execute dividend, atau **claim oleh holder** | DoD = holder claim USDG nyata, ≥2 wallet, verifiable di explorer |
@@ -76,7 +76,7 @@ Celah yang teramati dari README mereka (verifikasi langsung di H0 sebelum dipaka
 
 ### 3.2 Non-Goals (eksplisit di luar scope hackathon)
 
-- **Bukan** custody, brokerage, atau penerbitan token saham — CorporaX adalah lapisan operasional di atas token yang sudah ada.
+- **Bukan** custody, brokerage, atau penerbitan token saham — Parvalon adalah lapisan operasional di atas token yang sudah ada.
 - **Bukan** kepatuhan legal/regulasi riil (tax withholding, KYC issuer) — disimulasikan; field metadata disiapkan untuk masa depan.
 - **Bukan** rebasing/modifikasi kontrak token underlying — kita tidak mengontrol kontrak TSLA/AMZN milik Robinhood (lihat keputusan desain D2).
 - **Bukan** mainnet deployment, multi-chain, atau stock dividend in-kind penuh.
@@ -98,7 +98,7 @@ Celah yang teramati dari README mereka (verifikasi langsung di H0 sebelum dipaka
 | **P2 — Issuer / Transfer Agent Ops ("Robinhood Ops")** | Tim operasional penerbit tokenized stock | Mengumumkan action, mengambil snapshot record date, mendanai pool payout, audit trail lengkap | Menjalankan issuer console |
 | **P3 — Integrator / Protocol Dev ("Leo")** | Developer lending/AMM/agent yang memakai tokenized stock | Event terstandar + endpoint untuk bereaksi terhadap dividen/split | Mengkonsumsi action feed JSON & events |
 
-Pembeli sesungguhnya (PMF): **P2 dan P3** — CorporaX adalah B2B2C infrastructure. P1 adalah wajah demo karena paling visual untuk juri.
+Pembeli sesungguhnya (PMF): **P2 dan P3** — Parvalon adalah B2B2C infrastructure. P1 adalah wajah demo karena paling visual untuk juri.
 
 ---
 
@@ -131,7 +131,7 @@ Pembeli sesungguhnya (PMF): **P2 dan P3** — CorporaX adalah B2B2C infrastructu
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        CorporaX dApp (Next.js)                   │
+│                        Parvalon dApp (Next.js)                   │
 │  /claim (Holder) · /issuer (Console) · /feed (+ /api/actions)   │
 │           Alchemy Account Kit (passkey, ERC-4337, gasless)       │
 └───────────────┬─────────────────────────────────┬───────────────┘
@@ -354,7 +354,7 @@ Next.js 14 (App Router) + Tailwind + viem/wagmi + **Alchemy Account Kit** (passk
 
 | Waktu | Segmen | Naskah inti |
 |---|---|---|
-| 0:00–0:20 | **Hook** | "There are almost two thousand tokenized stocks on Arbitrum — and if you actually hold one, there is still no way to claim a dividend on-chain. Tokenization solved issuance. CorporaX is the operations layer that works on the tokens that already exist — no token changes, no issuer integration required." |
+| 0:00–0:20 | **Hook** | "There are almost two thousand tokenized stocks on Arbitrum — and if you actually hold one, there is still no way to claim a dividend on-chain. Tokenization solved issuance. Parvalon is the operations layer that works on the tokens that already exist — no token changes, no issuer integration required." |
 | 0:20–0:45 | Masalah | 3 korban: holder (tak ada rail klaim), protokol DeFi (buta split/ex-date → risiko collateral), agents (tak ada data machine-readable). |
 | 0:45–1:30 | Demo issuer | Announce TSLA dividend → record block → snapshot CLI (tunjukkan determinisme & auditability: "anyone can re-run and verify this root") → publish → fund USDG. |
 | 1:30–2:10 | Demo holder ⭐ | Passkey login, "Your dividend is ready", satu tap Claim, gasless, USDG masuk, bukti di Blockscout. Momen paling visual — perlambat di sini. |
@@ -367,7 +367,7 @@ Next.js 14 (App Router) + Tailwind + viem/wagmi + **Alchemy Account Kit** (passk
 
 ## 14. Mapping ke Kriteria Juri
 
-| Kriteria | Bagaimana CorporaX menang di sini |
+| Kriteria | Bagaimana Parvalon menang di sini |
 |---|---|
 | **Smart contract quality** | OZ v5 + StandardMerkleTree, bitmap claims, custom errors, NatSpec, ≥12 unit tests + invariants, verified source, immutable-by-design dengan justifikasi |
 | **Product-Market Fit** | Pembeli jelas (issuer/transfer agent; integrator protokol), wedge → platform, pasar terukur (1.997 tokenized stocks; RWA = vertikal prioritas resmi ekosistem), jalur grants/Founder House masuk akal |
@@ -415,7 +415,7 @@ Next.js 14 (App Router) + Tailwind + viem/wagmi + **Alchemy Account Kit** (passk
 | M3 | Publikasi draft **CAE-1** sebagai ERC; claim relayer + dukungan x402 untuk agent subscriptions | Diskusi di Ethereum Magicians |
 | M4 | Multi-issuer onboarding (Backed, Dinari, dsb.) + mainnet Robinhood Chain saat live | LOI issuer |
 
-Posisi jangka panjang: **CorporaX = transfer agent layer untuk on-chain capital markets.** Dividen hanyalah wedge.
+Posisi jangka panjang: **Parvalon = transfer agent layer untuk on-chain capital markets.** Dividen hanyalah wedge.
 
 ---
 
@@ -444,4 +444,4 @@ Posisi jangka panjang: **CorporaX = transfer agent layer untuk on-chain capital 
 
 ---
 
-*Dokumen ini adalah single source of truth untuk build CorporaX hingga 14 Juni 2026. Perubahan scope hanya melalui Decision Gates §12.*
+*Dokumen ini adalah single source of truth untuk build Parvalon hingga 14 Juni 2026. Perubahan scope hanya melalui Decision Gates §12.*

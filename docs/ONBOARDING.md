@@ -1,4 +1,4 @@
-# CorporaX — Issuer Onboarding (P1-9)
+# Parvalon — Issuer Onboarding (P1-9)
 
 > How to authorize an asset's **issuer** (transfer-agent ops account) and the
 > mechanics of `scripts/onboard-issuer.sh`. Pair with [DEPLOY.md](./DEPLOY.md),

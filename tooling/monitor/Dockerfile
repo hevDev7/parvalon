@@ -1,4 +1,4 @@
-# @corporax/monitor — container image.
+# @parvalon/monitor — container image.
 #
 # BUILD CONTEXT = repo root (arbitrum/), NOT this directory, because the ABI sync
 # (scripts/sync-abi.mjs) reads ../../abis/index.ts and address resolution reads

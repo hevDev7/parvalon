@@ -1,5 +1,5 @@
 # ============================================================================
-# infra/anvil.Dockerfile — local CorporaX devnet (anvil) + Foundry toolchain.
+# infra/anvil.Dockerfile — local Parvalon devnet (anvil) + Foundry toolchain.
 #
 # Produces an image that:
 #   - runs an anvil node on 0.0.0.0:8545 with a deterministic mnemonic

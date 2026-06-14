@@ -8,7 +8,7 @@ import { AdminActionSource } from "../src/oracle/AdminActionSource.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
 /// @title Deploy
-/// @notice Deploys the CorporaX protocol and writes an address registry to
+/// @notice Deploys the Parvalon protocol and writes an address registry to
 ///         `/deployments/<chainId>.json`. Works in two modes, chosen per token by
 ///         environment:
 ///           - REAL mode:  pass an existing token address (Robinhood Chain TSLA/AMZN/USDG).
@@ -79,7 +79,7 @@ contract Deploy is Script {
 
         _writeDeployment(address(registry), address(distributor), address(source), usdg, tsla, amzn, admin, issuer);
 
-        console2.log("=== CorporaX deployed on chain", block.chainid, "===");
+        console2.log("=== Parvalon deployed on chain", block.chainid, "===");
         console2.log("registry    ", address(registry));
         console2.log("distributor ", address(distributor));
         console2.log("actionSource", address(source));

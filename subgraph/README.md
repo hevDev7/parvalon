@@ -1,6 +1,6 @@
-# CorporaX Subgraph
+# Parvalon Subgraph
 
-A [Graph Protocol](https://thegraph.com) subgraph that indexes the CorporaX
+A [Graph Protocol](https://thegraph.com) subgraph that indexes the Parvalon
 **CAE-1 event stream** (`docs/INTEGRATION.md §3`) into a queryable GraphQL API.
 It replaces ad-hoc `eth_getLogs` pagination for integrators and the public feed
 at scale: announce/publish/status events from `CorporateActionRegistry` and

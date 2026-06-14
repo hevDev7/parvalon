@@ -1,4 +1,4 @@
-# Frontend CI for the CorporaX Next.js app (@corporax/app): lint, typecheck, build.
+# Frontend CI for the Parvalon Next.js app (@parvalon/app): lint, typecheck, build.
 name: frontend
 
 on:
@@ -44,10 +44,10 @@ jobs:
         run: npm ci
 
       - name: Lint
-        run: npm -w @corporax/app run lint
+        run: npm -w @parvalon/app run lint
 
       - name: Typecheck
-        run: npm -w @corporax/app run typecheck
+        run: npm -w @parvalon/app run typecheck
 
       - name: Build
         # NEXT_PUBLIC_* are inlined at build time; supply inert, non-secret
@@ -56,4 +56,4 @@ jobs:
           NEXT_PUBLIC_CHAIN_ID: "31337"
           NEXT_PUBLIC_RPC_URL: "http://127.0.0.1:8545"
           NEXT_PUBLIC_BLOCKSCOUT_URL: "https://explorer.testnet.chain.robinhood.com"
-        run: npm -w @corporax/app run build
+        run: npm -w @parvalon/app run build

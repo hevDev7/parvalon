@@ -1,8 +1,8 @@
 {
-  "name": "@corporax/subgraph",
+  "name": "@parvalon/subgraph",
   "version": "1.0.0",
   "private": true,
-  "description": "The Graph subgraph indexing CorporaX CAE-1 events (CorporateActionRegistry + DividendDistributor) for fast, scalable corporate-action & dividend queries.",
+  "description": "The Graph subgraph indexing Parvalon CAE-1 events (CorporateActionRegistry + DividendDistributor) for fast, scalable corporate-action & dividend queries.",
   "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",

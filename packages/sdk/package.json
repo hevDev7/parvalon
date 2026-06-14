@@ -1,9 +1,9 @@
 {
-  "name": "@corporax/sdk",
+  "name": "@parvalon/sdk",
   "version": "1.0.0",
-  "description": "Typed TypeScript/viem client for the CorporaX corporate-actions & dividend protocol — read/write helpers, CAE-1 event watchers, Merkle claim builders, and a CorporaXClient that wires it together. Integrators never hand-roll calldata or event decoding.",
+  "description": "Typed TypeScript/viem client for the Parvalon corporate-actions & dividend protocol — read/write helpers, CAE-1 event watchers, Merkle claim builders, and a ParvalonClient that wires it together. Integrators never hand-roll calldata or event decoding.",
   "license": "MIT",
-  "author": "CorporaX",
+  "author": "Parvalon",
   "keywords": [
     "corporax",
     "cae-1",

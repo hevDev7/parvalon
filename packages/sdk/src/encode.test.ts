@@ -3,7 +3,7 @@
  *
  * No live chain: we decode the SDK's calldata back with viem `decodeFunctionData`
  * to prove the function selector + args are correct, and we drive the read/write
- * helpers and `CorporaXClient` with hand-rolled mock viem clients that capture
+ * helpers and `ParvalonClient` with hand-rolled mock viem clients that capture
  * the request the SDK would send.
  */
 import { describe, it, expect, vi } from "vitest";
@@ -20,7 +20,7 @@ import {
 } from "./encode.js";
 import * as reads from "./reads.js";
 import * as writes from "./writes.js";
-import { CorporaXClient } from "./client.js";
+import { ParvalonClient } from "./client.js";
 import { localAnvil } from "./chains.js";
 import {
   ActionType,
@@ -242,10 +242,10 @@ describe("write helpers send the right request", () => {
   });
 });
 
-describe("CorporaXClient wiring", () => {
+describe("ParvalonClient wiring", () => {
   it("routes reads to the public client", async () => {
     const { client: publicClient, readContract } = mockPublicClient(42n);
-    const cx = new CorporaXClient({
+    const cx = new ParvalonClient({
       chain: localAnvil,
       addresses: { registry: REGISTRY, distributor: DISTRIBUTOR },
       publicClient,
@@ -259,7 +259,7 @@ describe("CorporaXClient wiring", () => {
 
   it("throws when a write is attempted without a wallet", async () => {
     const { client: publicClient } = mockPublicClient(0n);
-    const cx = new CorporaXClient({
+    const cx = new ParvalonClient({
       chain: localAnvil,
       addresses: { registry: REGISTRY, distributor: DISTRIBUTOR },
       publicClient,
@@ -272,7 +272,7 @@ describe("CorporaXClient wiring", () => {
   it("claimForAccount resolves proofs + submits via the wallet", async () => {
     const { client: publicClient } = mockPublicClient(0n);
     const { client: walletClient, writeContract } = mockWalletClient();
-    const cx = new CorporaXClient({
+    const cx = new ParvalonClient({
       chain: localAnvil,
       addresses: { registry: REGISTRY, distributor: DISTRIBUTOR },
       publicClient,
@@ -307,7 +307,7 @@ describe("CorporaXClient wiring", () => {
   it("claimForAccount throws for a non-eligible account", async () => {
     const { client: publicClient } = mockPublicClient(0n);
     const { client: walletClient } = mockWalletClient();
-    const cx = new CorporaXClient({
+    const cx = new ParvalonClient({
       chain: localAnvil,
       addresses: { registry: REGISTRY, distributor: DISTRIBUTOR },
       publicClient,

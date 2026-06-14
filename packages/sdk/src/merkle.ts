@@ -1,5 +1,5 @@
 /**
- * Canonical CorporaX Merkle leaf encoding & proof verification (client-side).
+ * Canonical Parvalon Merkle leaf encoding & proof verification (client-side).
  *
  * FROZEN by INTEGRATION.md §4:
  *

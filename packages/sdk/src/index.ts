@@ -1,9 +1,9 @@
 /**
- * @corporax/sdk — typed TypeScript/viem client for the CorporaX
+ * @parvalon/sdk — typed TypeScript/viem client for the Parvalon
  * corporate-actions & dividend protocol.
  *
  * Public surface:
- *  - {@link CorporaXClient} — the high-level façade.
+ *  - {@link ParvalonClient} — the high-level façade.
  *  - read / write / event helpers as standalone functions.
  *  - calldata encoders, the canonical Merkle leaf + claim builders.
  *  - the domain types mirroring docs/INTEGRATION.md.
@@ -102,8 +102,8 @@ export {
 
 // High-level client.
 export {
-  CorporaXClient,
-  type CorporaXClientConfig,
+  ParvalonClient,
+  type ParvalonClientConfig,
 } from "./client.js";
 
 // The imported ABIs, re-exported for callers who want them directly.

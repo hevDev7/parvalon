@@ -1,14 +1,14 @@
 // AUTO-VENDORED from ../../abis/index.ts (`registryAbi`) — do NOT hand-edit.
 //
-// CorporaX ships auto-generated, typed (`as const`) ABIs in the monorepo
+// Parvalon ships auto-generated, typed (`as const`) ABIs in the monorepo
 // abis/ package (INTEGRATION.md §7). This example is a self-contained, npm-
 // publishable package, so it vendors the single ABI it needs as a verbatim,
 // mechanically-extracted copy of that canonical export — preserving full viem
 // type inference without reaching across the monorepo at build time.
 //
-// PRODUCTION PATH: inside the CorporaX monorepo, import directly instead:
+// PRODUCTION PATH: inside the Parvalon monorepo, import directly instead:
 //
-//     import { registryAbi } from "@corporax/abis";   // or the abis/ workspace
+//     import { registryAbi } from "@parvalon/abis";   // or the abis/ workspace
 //
 // To refresh this file after a contract change, re-run the repo's ABI export
 // (`npm run abi`) and re-vendor with:

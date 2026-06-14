@@ -1,4 +1,4 @@
-# Foundry CI for the CorporaX protocol (contracts/).
+# Foundry CI for the Parvalon protocol (contracts/).
 #
 # Gates every push/PR on: formatting, a clean build (with deployed-size report),
 # the full test suite, and a coverage summary. Uses the `ci` Foundry profile

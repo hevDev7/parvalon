@@ -1,8 +1,8 @@
 {
-  "name": "@corporax/example-agent",
+  "name": "@parvalon/example-agent",
   "version": "1.0.0",
   "private": true,
-  "description": "Runnable example: a dividend-aware autonomous agent that subscribes to CorporaX ActionAnnounced (CAE-1) events and prints strategy decisions. Includes an illustrative x402 (HTTP 402) pay-per-call narrative for premium feeds.",
+  "description": "Runnable example: a dividend-aware autonomous agent that subscribes to Parvalon ActionAnnounced (CAE-1) events and prints strategy decisions. Includes an illustrative x402 (HTTP 402) pay-per-call narrative for premium feeds.",
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",

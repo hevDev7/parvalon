@@ -1,4 +1,4 @@
-# CorporaX — Audit Preparation (P0-3)
+# Parvalon — Audit Preparation (P0-3)
 
 > Self-assessment to maximize the value of an external audit (P0-3 in
 > [PRODUCTION-READINESS.md](./PRODUCTION-READINESS.md)). It records the automated
