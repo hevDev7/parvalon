@@ -69,8 +69,8 @@ export function SiteFooter() {
             title="Developers"
             links={[
               ["GET /api/actions", "/api/actions"],
-              ["Documentation", "#"],
-              ["GitHub", "#"],
+              ["Documentation", "/docs"],
+              ["GitHub", "https://github.com/hevDev7/parvalon"],
             ]}
           />
           <FooterCol
