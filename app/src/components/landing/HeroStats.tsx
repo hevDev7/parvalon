@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { SectionLabel } from "@/components/Shared";
-import { Globe } from "@/components/Globe";
+import { GlobeLazy as Globe } from "@/components/GlobeLazy";
 import { CountUp } from "@/components/CountUp";
 
 export function Hero() {
@@ -15,7 +15,7 @@ export function Hero() {
         loop
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         aria-label="Financial district skyline"
       >
         <source src="/hero-skyline.mp4" type="video/mp4" />

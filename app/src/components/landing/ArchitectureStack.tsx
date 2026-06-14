@@ -1,5 +1,5 @@
 import { SectionLabel } from "@/components/Shared";
-import { TradingViewTape } from "@/components/Ticker";
+import { TradingViewTapeLazy as TradingViewTape } from "@/components/TradingViewTapeLazy";
 import { Database, Code2, Layers, Activity, LayoutTemplate } from "lucide-react";
 
 export function Coverage() {
