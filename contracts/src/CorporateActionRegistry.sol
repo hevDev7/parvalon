@@ -2,6 +2,7 @@
 pragma solidity 0.8.26;
 
 import { IActionSource } from "./interfaces/IActionSource.sol";
+import { IArbSys } from "./interfaces/IArbSys.sol";
 import { ICorporateActionRegistry } from "./interfaces/ICorporateActionRegistry.sol";
 import { ActionStatus, ActionType, ActionView, CorporateAction } from "./libraries/CorporateActionTypes.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
@@ -28,6 +29,9 @@ contract CorporateActionRegistry is ICorporateActionRegistry, AccessControl, Pau
     bytes32 public constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
     /// @notice May pause/unpause issuer operations in an emergency.
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+
+    /// @dev The Arbitrum ArbSys precompile address (present on Arbitrum/Orbit).
+    address private constant ARB_SYS = 0x0000000000000000000000000000000000000064;
 
     /*//////////////////////////////////////////////////////////////
                                  STORAGE
@@ -141,8 +145,12 @@ contract CorporateActionRegistry is ICorporateActionRegistry, AccessControl, Pau
             revert InvalidStatus(id, a.status, ActionStatus.ANNOUNCED);
         }
         // Record-date semantics: the snapshot block must be in the past so the
-        // balance set is final and the root is reproducible (FR-3).
-        if (block.number <= a.recordBlock) revert RecordNotTaken(id, a.recordBlock, block.number);
+        // balance set is final and the root is reproducible (FR-3). On Arbitrum/Orbit
+        // the EVM `block.number` is the L1 block, which disagrees with the L2 block
+        // the snapshot tooling keys on; `_recordChainBlock()` returns the L2 number so
+        // the on-chain guard and the off-chain snapshot stay on the same clock.
+        uint256 nowBlock = _recordChainBlock();
+        if (nowBlock <= a.recordBlock) revert RecordNotTaken(id, a.recordBlock, nowBlock);
         if (root == bytes32(0)) revert InvalidParams("root=0");
         if (totalPayout == 0) revert InvalidParams("totalPayout=0");
 
@@ -276,6 +284,17 @@ contract CorporateActionRegistry is ICorporateActionRegistry, AccessControl, Pau
     /*//////////////////////////////////////////////////////////////
                                 INTERNAL
     //////////////////////////////////////////////////////////////*/
+
+    /// @dev The block number record-date enforcement compares against. Uses the
+    ///      Arbitrum L2 block number (ArbSys) when the precompile is present, so it
+    ///      matches the L2 height the snapshot tooling reads; falls back to
+    ///      `block.number` on chains without ArbSys (local anvil / non-Arbitrum).
+    function _recordChainBlock() private view returns (uint256) {
+        if (ARB_SYS.code.length != 0) {
+            return IArbSys(ARB_SYS).arbBlockNumber();
+        }
+        return block.number;
+    }
 
     /// @dev Loads an action by id, reverting {ActionNotFound} when absent.
     function _requireAction(uint256 id) private view returns (CorporateAction storage a) {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Coins, Megaphone, Activity, Droplets, ArrowLeft } from "lucide-react";
 import { WalletButton } from "@/components/WalletButton";
+import { WrongNetworkBanner } from "@/components/WrongNetworkBanner";
 
 const NAV = [
   { href: "/claim", label: "Claim Dividends", icon: Coins },
@@ -61,6 +62,7 @@ export function DappShell({ title, children }: { title: string; children: ReactN
 
       {/* Main */}
       <main className="flex-1 flex flex-col min-h-screen bg-surface">
+        <WrongNetworkBanner />
         <header className="h-20 border-b border-border-subtle bg-[#faf9f6]/80 backdrop-blur-md flex items-center justify-between px-6 sm:px-10 shrink-0 sticky top-0 z-10">
           <h1 className="text-[20px] font-bold tracking-tight text-primary flex items-center space-x-3">
             <span className="w-1.5 h-6 bg-gradient-pulse rounded-full" />

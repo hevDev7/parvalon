@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAccount, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { addresses, distributorAbi } from "@/lib/contracts";
 import { explorerTxUrl } from "@/lib/chain";
@@ -189,10 +189,20 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
   const [error, setError] = useState<string>();
   const { writeContractAsync } = useWriteContract();
 
-  useWaitForTransactionReceipt({
-    hash,
-    query: { enabled: Boolean(hash) },
-  });
+  // Only show success once the claim tx is actually mined and did NOT revert.
+  const receipt = useWaitForTransactionReceipt({ hash, query: { enabled: Boolean(hash) } });
+  useEffect(() => {
+    if (!hash) return;
+    if (receipt.isSuccess && receipt.data?.status === "success") {
+      setPhase("done");
+      const t = setTimeout(onClaimed, 1200);
+      return () => clearTimeout(t);
+    }
+    if (receipt.isError || receipt.data?.status === "reverted") {
+      setError("Transaction reverted on-chain");
+      setPhase("error");
+    }
+  }, [hash, receipt.isSuccess, receipt.isError, receipt.data?.status, onClaimed]);
 
   async function onClaim() {
     setError(undefined);
@@ -211,8 +221,7 @@ function ClaimCard({ claim, onClaimed }: { claim: EligibleClaim; onClaimed: () =
         });
       }
       setHash(tx);
-      setPhase("done");
-      setTimeout(onClaimed, 1200);
+      setPhase("confirming"); // wait for the receipt before declaring success
     } catch (e) {
       setError(e instanceof Error ? e.message.split("\n")[0] : "Claim failed");
       setPhase("error");

@@ -47,7 +47,7 @@ The payout math assumes the **asset has `1e18` units** (`amount = balance * rate
 
 ## 7. No L1 finality assumptions
 
-CorporaX makes no assumptions about Arbitrum → L1 finality or withdrawal timing. Record-date semantics are enforced purely on **L2 block number** (`publishRoot` requires `block.number > recordBlock`).
+CorporaX makes no assumptions about Arbitrum → L1 finality or withdrawal timing. Record-date semantics are enforced on the **L2 block number**: `publishRoot` compares `recordBlock` against `ArbSys.arbBlockNumber()` on Arbitrum/Orbit — the same L2 height the snapshot tooling (`eth_getLogs` / `eth_blockNumber`) reads — and falls back to `block.number` on non-Arbitrum chains (local anvil). This matters because the raw EVM `block.number` on Orbit is the **L1** block number; reading ArbSys is what keeps the on-chain guard and the off-chain snapshot on the same clock (otherwise `publishRoot` would be unsatisfiable).
 
 **Why acceptable.** The protocol settles entirely on L2 in L2-native USDG; there is no cross-domain message, no bridging of dividend funds, and therefore no dependence on the L1 dispute/finality window. Reorg-safe snapshotting at depth is an operational practice (PRODUCTION-READINESS §5), not a protocol assumption. Keeping the protocol L1-finality-agnostic is what lets it deploy unchanged across anvil, Sepolia, and Robinhood Chain.
 
