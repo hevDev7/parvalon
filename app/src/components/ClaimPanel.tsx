@@ -172,18 +172,7 @@ export function ClaimPanel() {
           <h2 className="display mt-2 mb-4 text-2xl text-ink">Claimed</h2>
           <TableShell head={["Asset", "Held at record block", "Claimed", ""]}>
             {history.map((c) => (
-              <tr key={`${c.actionId}-${c.index}`} className="text-sm">
-                <Td>
-                  <AssetCell symbol={c.assetSymbol} sub={`Action #${c.actionId}`} />
-                </Td>
-                <Td className="tabular text-ink-soft">{held(c)}</Td>
-                <Td className="tabular text-right font-medium text-ink">{dividend(c)}</Td>
-                <Td className="text-right">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-money-wash px-2.5 py-1 text-xs font-medium text-money">
-                    ✓ Paid
-                  </span>
-                </Td>
-              </tr>
+              <HistoryRow key={`${c.actionId}-${c.index}`} claim={c} />
             ))}
           </TableShell>
         </section>
@@ -228,6 +217,46 @@ function AssetCell({ symbol, sub }: { symbol: string; sub?: string }) {
         {sub && <p className="text-[0.7rem] text-ink-faint">{sub}</p>}
       </div>
     </div>
+  );
+}
+
+/* -------------------------------------------------------------- HistoryRow */
+function HistoryRow({ claim }: { claim: EligibleClaim }) {
+  // Recover the on-chain Claimed tx so "Paid" links to its explorer receipt.
+  const tx = useQuery({
+    queryKey: ["claim-tx", claim.actionId, claim.account],
+    queryFn: async (): Promise<`0x${string}` | null> => {
+      const res = await fetch(`/api/claim-tx?actionId=${claim.actionId}&account=${claim.account}`, { cache: "no-store" });
+      if (!res.ok) return null;
+      const d = (await res.json()) as { found?: boolean; txHash?: `0x${string}` };
+      return d.found && d.txHash ? d.txHash : null;
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  const badge = (
+    <span className="inline-flex items-center gap-1 rounded-full bg-money-wash px-2.5 py-1 text-xs font-medium text-money">
+      ✓ Paid{tx.data ? " ↗" : ""}
+    </span>
+  );
+
+  return (
+    <tr className="text-sm">
+      <Td>
+        <AssetCell symbol={claim.assetSymbol} sub={`Action #${claim.actionId}`} />
+      </Td>
+      <Td className="tabular text-ink-soft">{held(claim)}</Td>
+      <Td className="tabular text-right font-medium text-ink">{dividend(claim)}</Td>
+      <Td className="text-right">
+        {tx.data ? (
+          <a href={explorerTxUrl(tx.data)} target="_blank" rel="noreferrer" title="View claim receipt" className="transition hover:opacity-80">
+            {badge}
+          </a>
+        ) : (
+          badge
+        )}
+      </Td>
+    </tr>
   );
 }
 
