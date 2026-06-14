@@ -1,4 +1,8 @@
-# Parvalon
+<p align="center">
+  <img src="logo-parvalon.png" alt="Parvalon" width="120" />
+</p>
+
+<h1 align="center">Parvalon</h1>
 
 **The missing corporate-actions layer for tokenized stocks** — on-chain dividends, splits, and record-date semantics for the tokens that already exist. A permissionless **overlay** that works on tokenized stocks you don't control: no token changes, no issuer integration.
 
