@@ -4,7 +4,7 @@
 
 > Built on **Robinhood Chain** (Arbitrum Orbit L2, chainId 46630) for the Arbitrum Open House London Buildathon.
 
-> **Live on Robinhood Chain testnet.** The protocol is deployed against the **real** Robinhood tokenized stocks, settling in USDG — addresses in [Contract addresses](#contract-addresses), explorer [`explorer.testnet.chain.robinhood.com`](https://explorer.testnet.chain.robinhood.com). (On testnet the USDG *payout* token defaults to a faucet-mintable mock, since the real USDG faucet is rate-limited — see [Contract addresses](#contract-addresses).)
+> **Live on Robinhood Chain testnet.** Deployed against the **real** Robinhood tokenized stocks, settling in USDG. **All five stocks (TSLA, AMZN, PLTR, NFLX, AMD) have a funded, CLAIMABLE dividend on-chain right now** — ~917,571 holders snapshotted, ≈13.61M USDG funded, claims settled on-chain. Click-verify every step in **[Live corporate actions](#live-corporate-actions-on-chain-proof)**. (On testnet the USDG *payout* token defaults to a faucet-mintable mock, since the real USDG faucet is rate-limited — see [Contract addresses](#contract-addresses).)
 
 > **Naming.** Formerly **Corporax** → now **Parvalon**. The rename is complete across the UI, this README, the npm workspace scope (`@parvalon/*`), the root package, the PRD (`PRD-Parvalon.md`), and the docs. A few frozen wire/format identifiers intentionally keep the legacy string for backward compatibility — most notably the Merkle artifact format `corporax-merkle-v1` (baked into every committed `proofs.json` and the leaf domain) and the `corporax-snapshot`/`corporax-monitor` CLI bin names. Those are format constants, not branding.
 
@@ -203,7 +203,29 @@ Against the **real** Robinhood tokenized stocks (`tokenMode: real`). Authoritati
 
 > **Payout USDG.** The real USDG faucet is rate-limited (~100/24h) — too little to fund a meaningful multi-holder dividend. So the dApp defaults the payout/settlement token to the **faucet-mintable mock USDG** above (6-dec, open `mint`, self-serve from `/faucet`); the **stock** tokens stay real. Set `NEXT_PUBLIC_USDG_ADDRESS` to the real USDG to switch back. Either way the protocol is indifferent — the payout token is chosen per-action and there is no payout-token allowlist (LIMITATIONS §5).
 >
-> Live control is currently a **single EOA** (admin == issuer). The `TimelockController` + Gnosis Safe governance handover (`script/DeployGovernance.s.sol`) is implemented but **not yet deployed** on 46630 — see [LIMITATIONS.md](docs/LIMITATIONS.md) §8 and [PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md). PLTR/NFLX/AMD are wired in the dApp and onboardable, but the seeded demo dividend uses TSLA/AMZN.
+> Live control is currently a **single EOA** (admin == issuer). The `TimelockController` + Gnosis Safe governance handover (`script/DeployGovernance.s.sol`) is implemented but **not yet deployed** on 46630 — see [LIMITATIONS.md](docs/LIMITATIONS.md) §8 and [PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md). **All five stocks now have funded, CLAIMABLE dividends on-chain** — see [Live corporate actions](#live-corporate-actions-on-chain-proof).
+
+### Live corporate actions (on-chain proof)
+
+**All five real Robinhood tokenized stocks each have a funded, CLAIMABLE cash dividend on Robinhood Chain testnet** — holders snapshotted from public `Transfer` logs at record block `75361177` (TSLA at `75293412`), Merkle root published on-chain, then funded in USDG. **~917,571 holder positions across the five, ≈13.61M USDG funded**, with real claims settled on-chain (claim-on-behalf pays the holder, anyone can submit). Every step is click-verifiable on Blockscout:
+
+| Stock | Action | Holders @ record block | Funded (USDG) | Verify on-chain |
+|---|---|---|---|---|
+| TSLA | #2 | 184,143 | 2,721,462 | [publish](https://explorer.testnet.chain.robinhood.com/tx/0x732a573797902ed7e49c7c4c6320da8d8df4d208004d5af3fa2e88ec1a6e1e89) · [fund](https://explorer.testnet.chain.robinhood.com/tx/0x1088c97881d58fc7b31549b84c00060b64ae28fbc8210821244510a6a6bee3ea) · [claim](https://explorer.testnet.chain.robinhood.com/tx/0x8bf17424b996329b891e4e2a3c4de19982cb69203cab5ed2bca92d876cb31329) |
+| AMZN | #4 | 183,324 | 2,722,317 | [announce](https://explorer.testnet.chain.robinhood.com/tx/0x39198dfb58b2bec02640ce8bb65ab7025bf05865476667c0205c539794323a7c) · [publish](https://explorer.testnet.chain.robinhood.com/tx/0x0e4f8ce770d68f4e8b423e0890433683892b2807fcf8038cf7dcf658af090eda) · [fund](https://explorer.testnet.chain.robinhood.com/tx/0x16f58d3ec91218743c53f0c81170d933132f3635d4f91c2f6e820a95f7236bf7) · [claim](https://explorer.testnet.chain.robinhood.com/tx/0xd4c64d992f518a8fd56eab085d54e2a87d435ca2f111020695b43e0a0ab7bf72) |
+| PLTR | #5 | 183,918 | 2,722,317 | [announce](https://explorer.testnet.chain.robinhood.com/tx/0xf3ef329ac4f5570ed87ae4d12ffe00b35640139d8b04811196cbc44dc5a773a0) · [publish](https://explorer.testnet.chain.robinhood.com/tx/0xde185695ca3f3962517423e75f40e3a991d02a8d6bc4f276918a63b5749775fb) · [fund](https://explorer.testnet.chain.robinhood.com/tx/0x8df5dc85725726b9dc917db53f8817d8bbf96b78850004c05da01e490ee5b5f3) |
+| NFLX | #6 | 182,602 | 2,722,317 | [announce](https://explorer.testnet.chain.robinhood.com/tx/0xb7dc1ee3c8759f4744b9dab3d6f32ef02d501e7329a7aec17e7f705527b8fbad) · [publish](https://explorer.testnet.chain.robinhood.com/tx/0x69c324a3338af085e68bbb772258d8892fabeb2442e2ac26a60005659b1401ba) · [fund](https://explorer.testnet.chain.robinhood.com/tx/0xb45556546f53fe2e88962aa55cbec040be3bfd96f767395510b7acbc29e6cf80) |
+| AMD | #7 | 183,584 | 2,722,317 | [announce](https://explorer.testnet.chain.robinhood.com/tx/0xa455a79a922c0353b1c0cacb0d4d47972ae5ac678d0d16dca99427007ec8924c) · [publish](https://explorer.testnet.chain.robinhood.com/tx/0x24c9f3d20313c7f83d96ed28e71d9111e6a51fe6254d9ff933c4f635e53320b0) · [fund](https://explorer.testnet.chain.robinhood.com/tx/0x1dfda3447cf9d150d747c0d5ae5ada43206e7cc1005fd7601541cec370bf2b2f) |
+
+**Merkle roots** — anyone can re-derive these from public `Transfer` logs (`npm run snapshot`) and get a byte-identical root; that reproducibility is auditability a traditional transfer agent can't offer:
+
+- TSLA #2 — `0x8690a30781156045c5088dc89ab743a79f73cee51764072ac6e29164c53b55f0`
+- AMZN #4 — `0x547c7199f6d2f4fbbc01ad1c29b112b92d363569aa0ae1142a3bf2966336aa4b`
+- PLTR #5 — `0xcc7c9c6c946bf0d6ddd756c61679101aba2c00442ebe1c7fd78d879714674e24`
+- NFLX #6 — `0xd9cd7c4cecb105e41a4577829458dca025f48c3735d5d4a947fb5749d11a53aa`
+- AMD #7 — `0x9b6077458d8697a7744a1facf09a2a5ecd476454e2ce8a4a66735250734125c0`
+
+> Holder counts include **every** address with a non-zero balance at the record block (LP/escrow/contract/burn addresses included — testnet runs no exclusion list, [LIMITATIONS.md](docs/LIMITATIONS.md) §3). These specific tickers don't pay real-world dividends — the amounts are **illustrative**; the protocol is asset- and amount-agnostic. Payout settles in faucet-mintable mock USDG (real USDG faucet is rate-limited), and the per-holder proofs are served by `GET /api/proof` so a 184k-holder set never ships to the browser.
 
 ### Local (anvil, chainId 31337) — committed dev deployment
 
