@@ -42,7 +42,7 @@ jobs:
       FOUNDRY_PROFILE: ci
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -53,7 +53,7 @@ jobs:
       # forge keys its own cache off solc inputs; persisting out/ + cache/
       # across runs makes incremental builds and coverage materially faster.
       - name: Cache Foundry artifacts
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.svm

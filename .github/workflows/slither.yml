@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # slither-action needs Foundry on PATH to compile this foundry project.
       - name: Install Foundry
@@ -43,7 +43,7 @@ jobs:
           version: stable
 
       - name: Run Slither
-        uses: crytic/slither-action@v0.4.0
+        uses: crytic/slither-action@v0.4.2
         id: slither
         # Keep going to the SARIF upload even when the gate fails, so findings are
         # always visible; the explicit gate step below is what blocks the merge.
@@ -56,7 +56,7 @@ jobs:
           fail-on: medium
 
       - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         # Only attempt the upload if Slither produced a SARIF file.
         if: always() && steps.slither.outputs.sarif != ''
         continue-on-error: true
